@@ -272,7 +272,13 @@ npm run build        # Build the package
 npm run dev          # Watch mode
 npm run typecheck    # Type check
 npm run clean        # Clean dist/
+npm run storybook    # Launch Storybook (http://localhost:6006)
+npm run build-storybook  # Build static Storybook site
 ```
+
+### Storybook
+
+This project uses [Storybook](https://storybook.js.org/) for component development and preview. Run `npm run storybook` to browse all components interactively in the browser at `http://localhost:6006`.
 
 ## License
 
