@@ -1,11 +1,21 @@
-import type { Config } from 'tailwindcss'
-import animate from 'tailwindcss-animate'
-
-// Arkite UI shared Tailwind preset
-// Usage: import arkitePreset from '@arkite/ui/tailwind'
-const arkiteConfig: Config = {
-  darkMode: 'class',
-  content: [],
+/**
+ * Arkite UI Tailwind CSS v4 preset (JS compat layer).
+ *
+ * Tailwind v4 uses CSS-first configuration. The recommended way to
+ * consume Arkite UI is to import the CSS file:
+ *
+ *   @import "@arkite/ui/styles.css";
+ *
+ * If you need a JS config (e.g. for tooling or legacy compat),
+ * you can reference this preset via the @config directive:
+ *
+ *   @config "@arkite/ui/tailwind";
+ *
+ * @deprecated Prefer importing the CSS file directly in Tailwind v4.
+ */
+const arkiteConfig = {
+  darkMode: 'class' as const,
+  content: [] as string[],
   theme: {
     extend: {
       colors: {
@@ -63,32 +73,9 @@ const arkiteConfig: Config = {
         ],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
       },
-      keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
-        },
-        shimmer: {
-          '100%': { transform: 'translateX(100%)' },
-        },
-        spin: {
-          from: { transform: 'rotate(0deg)' },
-          to: { transform: 'rotate(360deg)' },
-        },
-      },
-      animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-        shimmer: 'shimmer 2s infinite',
-        spin: 'spin 1s linear infinite',
-      },
     },
   },
-  plugins: [animate],
+  plugins: [],
 }
 
 export default arkiteConfig
