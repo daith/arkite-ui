@@ -57,6 +57,13 @@ export * from './components/steps'
 export * from './components/timeline'
 export * from './components/calendar'
 
+// Actions
+export * from './components/action-buttons'
+export * from './components/confirm-dialog'
+export * from './components/pagination'
+export * from './components/page-header'
+export * from './components/error-boundary'
+
 // Layout
 export * from './components/card'
 export * from './components/container'

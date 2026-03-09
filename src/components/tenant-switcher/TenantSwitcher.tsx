@@ -149,7 +149,7 @@ function GlobeIcon({ className }: { className?: string }) {
 // --- Component ---
 
 export function TenantSwitcher({
-  tenants,
+  tenants = [],
   currentTenant = null,
   onSelect,
   onSearch,
