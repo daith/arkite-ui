@@ -52,6 +52,11 @@ export * from './components/alert'
 export * from './components/progress'
 export * from './components/skeleton'
 
+// Process
+export * from './components/steps'
+export * from './components/timeline'
+export * from './components/calendar'
+
 // Layout
 export * from './components/card'
 export * from './components/container'
