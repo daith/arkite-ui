@@ -122,7 +122,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
 Breadcrumb.displayName = 'Breadcrumb'
 
 // Compound component approach
-export interface BreadcrumbRootProps extends HTMLAttributes<HTMLElement> {}
+export type BreadcrumbRootProps = HTMLAttributes<HTMLElement>
 
 export const BreadcrumbRoot = forwardRef<HTMLElement, BreadcrumbRootProps>(
   ({ className, ...props }, ref) => (
@@ -132,7 +132,7 @@ export const BreadcrumbRoot = forwardRef<HTMLElement, BreadcrumbRootProps>(
 
 BreadcrumbRoot.displayName = 'BreadcrumbRoot'
 
-export interface BreadcrumbListProps extends HTMLAttributes<HTMLOListElement> {}
+export type BreadcrumbListProps = HTMLAttributes<HTMLOListElement>
 
 export const BreadcrumbList = forwardRef<HTMLOListElement, BreadcrumbListProps>(
   ({ className, ...props }, ref) => (
@@ -146,7 +146,7 @@ export const BreadcrumbList = forwardRef<HTMLOListElement, BreadcrumbListProps>(
 
 BreadcrumbList.displayName = 'BreadcrumbList'
 
-export interface BreadcrumbItemProps extends HTMLAttributes<HTMLLIElement> {}
+export type BreadcrumbItemProps = HTMLAttributes<HTMLLIElement>
 
 export const BreadcrumbItemComponent = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   ({ className, ...props }, ref) => (
@@ -166,7 +166,7 @@ export interface BreadcrumbLinkProps extends HTMLAttributes<HTMLAnchorElement> {
 }
 
 export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
-  ({ className, href, ...props }, ref) => (
+  ({ className, href, children, ...props }, ref) => (
     <a
       ref={ref}
       href={href}
@@ -175,13 +175,15 @@ export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>
         className
       )}
       {...props}
-    />
+    >
+      {children}
+    </a>
   )
 )
 
 BreadcrumbLink.displayName = 'BreadcrumbLink'
 
-export interface BreadcrumbPageProps extends HTMLAttributes<HTMLSpanElement> {}
+export type BreadcrumbPageProps = HTMLAttributes<HTMLSpanElement>
 
 export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
   ({ className, ...props }, ref) => (
@@ -198,7 +200,7 @@ export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
 
 BreadcrumbPage.displayName = 'BreadcrumbPage'
 
-export interface BreadcrumbSeparatorProps extends HTMLAttributes<HTMLSpanElement> {}
+export type BreadcrumbSeparatorProps = HTMLAttributes<HTMLSpanElement>
 
 export const BreadcrumbSeparator = forwardRef<HTMLSpanElement, BreadcrumbSeparatorProps>(
   ({ className, children, ...props }, ref) => (
@@ -216,7 +218,7 @@ export const BreadcrumbSeparator = forwardRef<HTMLSpanElement, BreadcrumbSeparat
 
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator'
 
-export interface BreadcrumbEllipsisProps extends HTMLAttributes<HTMLSpanElement> {}
+export type BreadcrumbEllipsisProps = HTMLAttributes<HTMLSpanElement>
 
 export const BreadcrumbEllipsis = forwardRef<HTMLSpanElement, BreadcrumbEllipsisProps>(
   ({ className, ...props }, ref) => (

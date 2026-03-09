@@ -180,7 +180,15 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         {/* Dropzone */}
         <div
+          role="button"
+          tabIndex={0}
           onClick={handleClick}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleClick()
+            }
+          }}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}

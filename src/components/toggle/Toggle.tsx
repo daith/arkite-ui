@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import { forwardRef, useId, type InputHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 
 export type ToggleSize = 'sm' | 'md' | 'lg'
@@ -45,7 +45,8 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     ref
   ) => {
     const styles = sizeStyles[size]
-    const toggleId = id || `toggle-${Math.random().toString(36).slice(2)}`
+    const stableId = useId()
+    const toggleId = id || stableId
 
     const toggle = (
       <div className="relative flex items-center">

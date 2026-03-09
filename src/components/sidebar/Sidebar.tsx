@@ -91,7 +91,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
 Sidebar.displayName = 'Sidebar'
 
 // Sidebar Header
-export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarHeaderProps = HTMLAttributes<HTMLDivElement>
 
 export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
   ({ className, ...props }, ref) => {
@@ -114,7 +114,7 @@ export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
 SidebarHeader.displayName = 'SidebarHeader'
 
 // Sidebar Content
-export interface SidebarContentProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarContentProps = HTMLAttributes<HTMLDivElement>
 
 export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
   ({ className, ...props }, ref) => (
@@ -129,7 +129,7 @@ export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
 SidebarContent.displayName = 'SidebarContent'
 
 // Sidebar Footer
-export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type SidebarFooterProps = HTMLAttributes<HTMLDivElement>
 
 export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
   ({ className, ...props }, ref) => {
@@ -251,7 +251,7 @@ export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
 SidebarItem.displayName = 'SidebarItem'
 
 // Sidebar Toggle
-export interface SidebarToggleProps extends HTMLAttributes<HTMLButtonElement> {}
+export type SidebarToggleProps = HTMLAttributes<HTMLButtonElement>
 
 export const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(
   ({ className, ...props }, ref) => {

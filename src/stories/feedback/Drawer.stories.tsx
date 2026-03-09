@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Meta, StoryObj } from '@storybook/react-vite'
+import type { Meta, StoryFn } from '@storybook/react-vite'
 import { Drawer } from '../../components/drawer'
 import { Button } from '../../components/button'
 
@@ -19,61 +19,60 @@ const meta = {
 } satisfies Meta<typeof Drawer>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
-export const Right: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false)
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>Open Drawer</Button>
-        <Drawer
-          open={open}
-          onClose={() => setOpen(false)}
-          title="Drawer Title"
-          description="This is a side panel"
-        >
-          <p className="text-sm text-muted-foreground p-4">Drawer content goes here.</p>
-        </Drawer>
-      </>
-    )
-  },
+const RightDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Drawer</Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Drawer Title"
+        description="This is a side panel"
+      >
+        <p className="text-sm text-muted-foreground p-4">Drawer content goes here.</p>
+      </Drawer>
+    </>
+  )
 }
 
-export const Left: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false)
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>Open Left Drawer</Button>
-        <Drawer
-          open={open}
-          onClose={() => setOpen(false)}
-          title="Navigation"
-          position="left"
-        >
-          <p className="text-sm text-muted-foreground p-4">Left side content.</p>
-        </Drawer>
-      </>
-    )
-  },
+export const Right: StoryFn = () => <RightDemo />
+
+const LeftDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Left Drawer</Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Navigation"
+        position="left"
+      >
+        <p className="text-sm text-muted-foreground p-4">Left side content.</p>
+      </Drawer>
+    </>
+  )
 }
 
-export const Bottom: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false)
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>Open Bottom Drawer</Button>
-        <Drawer
-          open={open}
-          onClose={() => setOpen(false)}
-          title="Details"
-          position="bottom"
-        >
-          <p className="text-sm text-muted-foreground p-4">Bottom panel content.</p>
-        </Drawer>
-      </>
-    )
-  },
+export const Left: StoryFn = () => <LeftDemo />
+
+const BottomDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open Bottom Drawer</Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Details"
+        position="bottom"
+      >
+        <p className="text-sm text-muted-foreground p-4">Bottom panel content.</p>
+      </Drawer>
+    </>
+  )
 }
+
+export const Bottom: StoryFn = () => <BottomDemo />

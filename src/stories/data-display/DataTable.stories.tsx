@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react-vite'
-import { DataTable } from '../../components/data-table'
+import type { Meta, StoryFn } from '@storybook/react-vite'
+import { DataTable, type Column } from '../../components/data-table'
 import { Badge } from '../../components/badge'
 
 interface User {
@@ -21,14 +21,14 @@ const sampleData: User[] = [
   { id: 8, name: 'Henry Wang', email: 'henry@example.com', role: 'Viewer', status: 'active' },
 ]
 
-const columns = [
+const columns: Column<User>[] = [
   { key: 'name', header: 'Name', sortable: true },
   { key: 'email', header: 'Email', sortable: true },
   { key: 'role', header: 'Role' },
   {
     key: 'status',
     header: 'Status',
-    cell: (row: User) => (
+    cell: (row) => (
       <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>
         {row.status}
       </Badge>
@@ -36,7 +36,7 @@ const columns = [
   },
 ]
 
-const meta = {
+const meta: Meta = {
   title: 'Data Display/DataTable',
   component: DataTable,
   argTypes: {
@@ -44,29 +44,35 @@ const meta = {
     loading: { control: 'boolean' },
     selectable: { control: 'boolean' },
   },
-  args: {
-    data: sampleData,
-    columns,
-    getRowKey: (row: User) => row.id,
-    pagination: true,
-    defaultPageSize: 5,
-  },
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof DataTable>
+}
 
 export default meta
-type Story = StoryObj<typeof meta>
 
-export const Default: Story = {}
+const Template: StoryFn = (args) => (
+  <DataTable<User>
+    data={sampleData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    pagination
+    defaultPageSize={5}
+    {...args}
+  />
+)
 
-export const Loading: Story = {
-  args: { loading: true },
-}
+export const Default = Template.bind({})
 
-export const Empty: Story = {
-  args: { data: [], emptyContent: 'No users found' },
-}
+export const Loading = Template.bind({})
+Loading.args = { loading: true }
 
-export const NoPagination: Story = {
-  args: { pagination: false },
-}
+export const Empty: StoryFn = () => (
+  <DataTable<User>
+    data={[]}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    emptyContent="No users found"
+  />
+)
+
+export const NoPagination = Template.bind({})
+NoPagination.args = { pagination: false }

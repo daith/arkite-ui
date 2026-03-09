@@ -77,7 +77,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
 
 Tabs.displayName = 'Tabs'
 
-export interface TabsListProps extends HTMLAttributes<HTMLDivElement> {}
+export type TabsListProps = HTMLAttributes<HTMLDivElement>
 
 const listVariantStyles: Record<TabsVariant, string> = {
   default: 'bg-muted rounded-lg p-1',

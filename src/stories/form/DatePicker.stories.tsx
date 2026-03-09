@@ -18,34 +18,40 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+const DefaultDemo = () => {
+  const [date, setDate] = useState<Date | null>(null)
+  return <DatePicker value={date} onChange={setDate} />
+}
+
 export const Default: Story = {
-  render: () => {
-    const [date, setDate] = useState<Date | null>(null)
-    return <DatePicker value={date} onChange={setDate} />
-  },
+  render: () => <DefaultDemo />,
+}
+
+const WithMinMaxDemo = () => {
+  const [date, setDate] = useState<Date | null>(null)
+  const min = new Date()
+  const max = new Date()
+  max.setMonth(max.getMonth() + 3)
+  return (
+    <DatePicker
+      value={date}
+      onChange={setDate}
+      minDate={min}
+      maxDate={max}
+      placeholder="Select within 3 months..."
+    />
+  )
 }
 
 export const WithMinMax: Story = {
-  render: () => {
-    const [date, setDate] = useState<Date | null>(null)
-    const min = new Date()
-    const max = new Date()
-    max.setMonth(max.getMonth() + 3)
-    return (
-      <DatePicker
-        value={date}
-        onChange={setDate}
-        minDate={min}
-        maxDate={max}
-        placeholder="Select within 3 months..."
-      />
-    )
-  },
+  render: () => <WithMinMaxDemo />,
+}
+
+const WithErrorDemo = () => {
+  const [date, setDate] = useState<Date | null>(null)
+  return <DatePicker value={date} onChange={setDate} error />
 }
 
 export const WithError: Story = {
-  render: () => {
-    const [date, setDate] = useState<Date | null>(null)
-    return <DatePicker value={date} onChange={setDate} error />
-  },
+  render: () => <WithErrorDemo />,
 }

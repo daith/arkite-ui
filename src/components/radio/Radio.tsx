@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import { forwardRef, useId, type InputHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 
 export type RadioSize = 'sm' | 'md' | 'lg'
@@ -48,7 +48,8 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
     ref
   ) => {
     const styles = sizeStyles[size]
-    const radioId = id || `radio-${Math.random().toString(36).slice(2)}`
+    const stableId = useId()
+    const radioId = id || stableId
 
     return (
       <div className={cn('flex items-start gap-3', className)}>

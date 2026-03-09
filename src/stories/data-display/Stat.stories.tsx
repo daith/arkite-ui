@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Stat, StatCard, StatGroup } from '../../components/stat'
+import { StatCard, StatGroup } from '../../components/stat'
 
 const meta = {
   title: 'Data Display/StatCard',

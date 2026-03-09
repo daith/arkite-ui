@@ -21,9 +21,9 @@ export interface CardHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>, 't
   action?: ReactNode
 }
 
-export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+export type CardContentProps = HTMLAttributes<HTMLDivElement>
 
-export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type CardFooterProps = HTMLAttributes<HTMLDivElement>
 
 const paddingStyles = {
   none: '',

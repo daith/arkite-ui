@@ -208,7 +208,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 Modal.displayName = 'Modal'
 
 // Convenience components
-export interface ModalHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type ModalHeaderProps = HTMLAttributes<HTMLDivElement>
 
 export const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, ...props }, ref) => (
@@ -222,7 +222,7 @@ export const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
 
 ModalHeader.displayName = 'ModalHeader'
 
-export interface ModalBodyProps extends HTMLAttributes<HTMLDivElement> {}
+export type ModalBodyProps = HTMLAttributes<HTMLDivElement>
 
 export const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(
   ({ className, ...props }, ref) => (
@@ -232,7 +232,7 @@ export const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(
 
 ModalBody.displayName = 'ModalBody'
 
-export interface ModalFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type ModalFooterProps = HTMLAttributes<HTMLDivElement>
 
 export const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
   ({ className, ...props }, ref) => (

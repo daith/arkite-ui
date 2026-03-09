@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Stack, HStack, VStack } from '../../components/stack'
+import { Stack, HStack } from '../../components/stack'
 
 const Box = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-primary/10 border border-primary/20 rounded px-4 py-2 text-sm">

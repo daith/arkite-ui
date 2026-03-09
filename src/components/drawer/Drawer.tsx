@@ -128,7 +128,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
     useEffect(() => {
       if (open) {
         // Mount first, then animate in
-        setIsVisible(true)
+        setIsVisible(true) // eslint-disable-line react-hooks/set-state-in-effect -- coordinating mount/animation with DOM
         // Use requestAnimationFrame to ensure DOM is ready before animating
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
@@ -247,7 +247,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
 Drawer.displayName = 'Drawer'
 
 // Convenience components for custom layouts
-export interface DrawerHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerHeaderProps = HTMLAttributes<HTMLDivElement>
 
 export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
   ({ className, ...props }, ref) => (
@@ -261,7 +261,7 @@ export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
 
 DrawerHeader.displayName = 'DrawerHeader'
 
-export interface DrawerBodyProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerBodyProps = HTMLAttributes<HTMLDivElement>
 
 export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(
   ({ className, ...props }, ref) => (
@@ -275,7 +275,7 @@ export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(
 
 DrawerBody.displayName = 'DrawerBody'
 
-export interface DrawerFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export type DrawerFooterProps = HTMLAttributes<HTMLDivElement>
 
 export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(
   ({ className, ...props }, ref) => (

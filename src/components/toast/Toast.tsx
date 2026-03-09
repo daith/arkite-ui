@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react'
 import { create } from 'zustand'
@@ -185,22 +185,24 @@ export function ToastContainer({
 export function useToast() {
   const { addToast, removeToast, clearToasts } = useToastStore()
 
-  const toast = (options: Omit<ToastData, 'id'>) => addToast(options)
-
-  toast.success = (title: ReactNode, description?: ReactNode) =>
-    addToast({ title, description, variant: 'success' })
-
-  toast.error = (title: ReactNode, description?: ReactNode) =>
-    addToast({ title, description, variant: 'error' })
-
-  toast.warning = (title: ReactNode, description?: ReactNode) =>
-    addToast({ title, description, variant: 'warning' })
-
-  toast.info = (title: ReactNode, description?: ReactNode) =>
-    addToast({ title, description, variant: 'info' })
-
-  toast.dismiss = removeToast
-  toast.clear = clearToasts
+  const toast = useMemo(() => {
+    const t = Object.assign(
+      (options: Omit<ToastData, 'id'>) => addToast(options),
+      {
+        success: (title: ReactNode, description?: ReactNode) =>
+          addToast({ title, description, variant: 'success' as const }),
+        error: (title: ReactNode, description?: ReactNode) =>
+          addToast({ title, description, variant: 'error' as const }),
+        warning: (title: ReactNode, description?: ReactNode) =>
+          addToast({ title, description, variant: 'warning' as const }),
+        info: (title: ReactNode, description?: ReactNode) =>
+          addToast({ title, description, variant: 'info' as const }),
+        dismiss: removeToast,
+        clear: clearToasts,
+      }
+    )
+    return t
+  }, [addToast, removeToast, clearToasts])
 
   return toast
 }

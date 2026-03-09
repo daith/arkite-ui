@@ -114,7 +114,7 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
 FormLabel.displayName = 'FormLabel'
 
 // FormControl component - wrapper for form inputs
-export interface FormControlProps extends HTMLAttributes<HTMLDivElement> {}
+export type FormControlProps = HTMLAttributes<HTMLDivElement>
 
 export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
   ({ className, children, ...props }, ref) => {
@@ -129,7 +129,7 @@ export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
 FormControl.displayName = 'FormControl'
 
 // FormDescription component
-export interface FormDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+export type FormDescriptionProps = HTMLAttributes<HTMLParagraphElement>
 
 export const FormDescription = forwardRef<HTMLParagraphElement, FormDescriptionProps>(
   ({ className, ...props }, ref) => (

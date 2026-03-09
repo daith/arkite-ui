@@ -159,7 +159,7 @@ export const NavbarLink = forwardRef<HTMLAnchorElement, NavbarLinkProps>(
 NavbarLink.displayName = 'NavbarLink'
 
 // Navbar Divider
-export interface NavbarDividerProps extends HTMLAttributes<HTMLDivElement> {}
+export type NavbarDividerProps = HTMLAttributes<HTMLDivElement>
 
 export const NavbarDivider = forwardRef<HTMLDivElement, NavbarDividerProps>(
   ({ className, ...props }, ref) => (
@@ -174,7 +174,7 @@ export const NavbarDivider = forwardRef<HTMLDivElement, NavbarDividerProps>(
 NavbarDivider.displayName = 'NavbarDivider'
 
 // Navbar Spacer
-export interface NavbarSpacerProps extends HTMLAttributes<HTMLDivElement> {}
+export type NavbarSpacerProps = HTMLAttributes<HTMLDivElement>
 
 export const NavbarSpacer = forwardRef<HTMLDivElement, NavbarSpacerProps>(
   ({ className, ...props }, ref) => (

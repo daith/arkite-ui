@@ -112,7 +112,8 @@ export function useDataFetch<T>(
     return () => {
       mountedRef.current = false
     }
-  }, []) // Empty dependency array - only run on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally only run on mount
+  }, [])
 
   return {
     data,

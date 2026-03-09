@@ -79,7 +79,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       minDate,
       maxDate,
       disabledDates = [],
-      clearable = true,
+      clearable: _clearable = true,
       error,
       disabled,
       placeholder = 'Select date',
@@ -88,14 +88,14 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     ref
   ) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [inputValue, setInputValue] = useState('')
+    const [inputValue, setInputValue] = useState(value ? formatDate(value, format) : '')
     const [viewDate, setViewDate] = useState(value || new Date())
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Sync input value with prop value
     useEffect(() => {
       if (value) {
-        setInputValue(formatDate(value, format))
+        setInputValue(formatDate(value, format)) // eslint-disable-line react-hooks/set-state-in-effect -- syncing derived state from props
         setViewDate(value)
       } else {
         setInputValue('')
