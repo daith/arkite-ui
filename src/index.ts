@@ -20,6 +20,10 @@ export * from './components/popover'
 export * from './components/tooltip'
 export * from './components/dropdown-menu'
 
+// Composite Components (Radix + cmdk)
+export * from './components/combobox'
+export * from './components/command-palette'
+
 // Navigation
 export * from './components/sidebar'
 export * from './components/tenant-switcher'
