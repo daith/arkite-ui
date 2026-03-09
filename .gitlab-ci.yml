@@ -48,6 +48,19 @@ test:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
 
+size:
+  stage: check
+  image: node:20-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  script:
+    - npm ci --ignore-scripts
+    - npm run build
+    - npm run size
+  dependencies: []
+
 build:
   stage: build
   image: node:20-alpine
