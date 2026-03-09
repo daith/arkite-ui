@@ -71,3 +71,43 @@ export const Simple: StoryFn = () => (
     </SimpleTooltip>
   </div>
 )
+
+export const CustomOffset: StoryFn = () => (
+  <div className="flex gap-8">
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline" size="sm">Default (4px)</Button>
+      </TooltipTrigger>
+      <TooltipContent sideOffset={4}>sideOffset: 4</TooltipContent>
+    </Tooltip>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline" size="sm">Relaxed (10px)</Button>
+      </TooltipTrigger>
+      <TooltipContent sideOffset={10}>sideOffset: 10</TooltipContent>
+    </Tooltip>
+  </div>
+)
+
+/** Radix auto-flips when hitting viewport edges */
+export const BoundaryAware: StoryFn = () => (
+  <div className="flex justify-between w-full px-0">
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline" size="sm">Left edge</Button>
+      </TooltipTrigger>
+      <TooltipContent side="left" collisionPadding={8}>
+        Auto-flips when clipped
+      </TooltipContent>
+    </Tooltip>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline" size="sm">Right edge</Button>
+      </TooltipTrigger>
+      <TooltipContent side="right" collisionPadding={8}>
+        Auto-flips when clipped
+      </TooltipContent>
+    </Tooltip>
+  </div>
+)
+BoundaryAware.parameters = { layout: 'padded' }
