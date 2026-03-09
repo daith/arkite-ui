@@ -35,6 +35,7 @@ export * from './components/breadcrumb'
 export * from './components/tabs'
 
 // Data
+export * from './components/filter-bar'
 export * from './components/data-table'
 export * from './components/virtual-list'
 export * from './components/stat'
