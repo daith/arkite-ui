@@ -1,0 +1,286 @@
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
+import { cn } from '../../utils/cn'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+// Sidebar Context
+interface SidebarContextValue {
+  collapsed: boolean
+  setCollapsed: (collapsed: boolean) => void
+  collapsible: boolean
+}
+
+const SidebarContext = createContext<SidebarContextValue | null>(null)
+
+export function useSidebar() {
+  const context = useContext(SidebarContext)
+  if (!context) {
+    throw new Error('useSidebar must be used within a Sidebar')
+  }
+  return context
+}
+
+// Sidebar Root
+export interface SidebarProps extends HTMLAttributes<HTMLElement> {
+  /** Collapsible sidebar */
+  collapsible?: boolean
+  /** Default collapsed state */
+  defaultCollapsed?: boolean
+  /** Controlled collapsed state */
+  collapsed?: boolean
+  /** On collapsed change */
+  onCollapsedChange?: (collapsed: boolean) => void
+  /** Sidebar width */
+  width?: string
+  /** Collapsed width */
+  collapsedWidth?: string
+}
+
+export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
+  (
+    {
+      className,
+      collapsible = true,
+      defaultCollapsed = false,
+      collapsed: controlledCollapsed,
+      onCollapsedChange,
+      width = '240px',
+      collapsedWidth = '64px',
+      children,
+      style,
+      ...props
+    },
+    ref
+  ) => {
+    const [uncontrolledCollapsed, setUncontrolledCollapsed] = useState(defaultCollapsed)
+
+    const collapsed = controlledCollapsed ?? uncontrolledCollapsed
+    const setCollapsed = (value: boolean) => {
+      setUncontrolledCollapsed(value)
+      onCollapsedChange?.(value)
+    }
+
+    return (
+      <SidebarContext.Provider value={{ collapsed, setCollapsed, collapsible }}>
+        <aside
+          ref={ref}
+          className={cn(
+            'flex flex-col border-r bg-card transition-all duration-300',
+            className
+          )}
+          style={{
+            width: collapsed ? collapsedWidth : width,
+            minWidth: collapsed ? collapsedWidth : width,
+            ...style,
+          }}
+          {...props}
+        >
+          {children}
+        </aside>
+      </SidebarContext.Provider>
+    )
+  }
+)
+
+Sidebar.displayName = 'Sidebar'
+
+// Sidebar Header
+export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+
+export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
+  ({ className, ...props }, ref) => {
+    const { collapsed } = useSidebar()
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'flex h-14 items-center border-b px-4',
+          collapsed && 'justify-center px-2',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+
+SidebarHeader.displayName = 'SidebarHeader'
+
+// Sidebar Content
+export interface SidebarContentProps extends HTMLAttributes<HTMLDivElement> {}
+
+export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('flex-1 overflow-auto py-2', className)}
+      {...props}
+    />
+  )
+)
+
+SidebarContent.displayName = 'SidebarContent'
+
+// Sidebar Footer
+export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {}
+
+export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
+  ({ className, ...props }, ref) => {
+    const { collapsed } = useSidebar()
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'border-t p-4',
+          collapsed && 'px-2',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
+
+SidebarFooter.displayName = 'SidebarFooter'
+
+// Sidebar Group
+export interface SidebarGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /** Group label */
+  label?: ReactNode
+}
+
+export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
+  ({ className, label, children, ...props }, ref) => {
+    const { collapsed } = useSidebar()
+
+    return (
+      <div ref={ref} className={cn('px-2 py-2', className)} {...props}>
+        {label && !collapsed && (
+          <div className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            {label}
+          </div>
+        )}
+        <div className="space-y-1">{children}</div>
+      </div>
+    )
+  }
+)
+
+SidebarGroup.displayName = 'SidebarGroup'
+
+// Sidebar Item
+export interface SidebarItemProps extends HTMLAttributes<HTMLButtonElement> {
+  /** Item icon */
+  icon?: ReactNode
+  /** Active state */
+  active?: boolean
+  /** Disabled state */
+  disabled?: boolean
+  /** As link */
+  href?: string
+}
+
+export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
+  (
+    {
+      className,
+      icon,
+      active,
+      disabled,
+      href,
+      children,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
+    const { collapsed } = useSidebar()
+
+    const content = (
+      <>
+        {icon && (
+          <span className={cn('shrink-0', collapsed ? '' : 'mr-3')}>
+            {icon}
+          </span>
+        )}
+        {!collapsed && <span className="truncate">{children}</span>}
+      </>
+    )
+
+    const itemClassName = cn(
+      'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+      'hover:bg-muted hover:text-foreground',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+      active && 'bg-primary/10 text-primary',
+      disabled && 'pointer-events-none opacity-50',
+      collapsed && 'justify-center px-2',
+      className
+    )
+
+    if (href) {
+      return (
+        <a href={href} className={itemClassName}>
+          {content}
+        </a>
+      )
+    }
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        disabled={disabled}
+        onClick={onClick}
+        className={itemClassName}
+        {...props}
+      >
+        {content}
+      </button>
+    )
+  }
+)
+
+SidebarItem.displayName = 'SidebarItem'
+
+// Sidebar Toggle
+export interface SidebarToggleProps extends HTMLAttributes<HTMLButtonElement> {}
+
+export const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(
+  ({ className, ...props }, ref) => {
+    const { collapsed, setCollapsed, collapsible } = useSidebar()
+
+    if (!collapsible) return null
+
+    return (
+      <button
+        ref={ref}
+        type="button"
+        onClick={() => setCollapsed(!collapsed)}
+        className={cn(
+          'flex h-8 w-8 items-center justify-center rounded-md border bg-background text-muted-foreground',
+          'hover:text-foreground hover:bg-muted',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          className
+        )}
+        {...props}
+      >
+        {collapsed ? (
+          <ChevronRight className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+        <span className="sr-only">Toggle sidebar</span>
+      </button>
+    )
+  }
+)
+
+SidebarToggle.displayName = 'SidebarToggle'

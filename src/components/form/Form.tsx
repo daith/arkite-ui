@@ -1,0 +1,232 @@
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  useId,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
+import { cn } from '../../utils/cn'
+import { Label } from '../label/Label'
+
+// Form Context
+interface FormContextValue {
+  disabled?: boolean
+}
+
+const FormContext = createContext<FormContextValue>({})
+
+export function useFormContext() {
+  return useContext(FormContext)
+}
+
+// Form component
+export interface FormProps extends HTMLAttributes<HTMLFormElement> {
+  /** Disable all form fields */
+  disabled?: boolean
+}
+
+export const Form = forwardRef<HTMLFormElement, FormProps>(
+  ({ className, disabled, children, ...props }, ref) => (
+    <FormContext.Provider value={{ disabled }}>
+      <form ref={ref} className={cn('space-y-6', className)} {...props}>
+        {children}
+      </form>
+    </FormContext.Provider>
+  )
+)
+
+Form.displayName = 'Form'
+
+// FormField Context
+interface FormFieldContextValue {
+  id: string
+  name?: string
+  error?: string
+  disabled?: boolean
+}
+
+const FormFieldContext = createContext<FormFieldContextValue | null>(null)
+
+export function useFormFieldContext() {
+  const context = useContext(FormFieldContext)
+  if (!context) {
+    throw new Error('FormField components must be used within a FormField')
+  }
+  return context
+}
+
+// FormField component
+export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
+  /** Field name */
+  name?: string
+  /** Error message */
+  error?: string
+  /** Disable field */
+  disabled?: boolean
+}
+
+export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
+  ({ className, name, error, disabled, children, ...props }, ref) => {
+    const id = useId()
+    const formContext = useFormContext()
+    const isDisabled = disabled || formContext.disabled
+
+    return (
+      <FormFieldContext.Provider value={{ id, name, error, disabled: isDisabled }}>
+        <div ref={ref} className={cn('space-y-2', className)} {...props}>
+          {children}
+        </div>
+      </FormFieldContext.Provider>
+    )
+  }
+)
+
+FormField.displayName = 'FormField'
+
+// FormLabel component
+export interface FormLabelProps extends HTMLAttributes<HTMLLabelElement> {
+  /** Required indicator */
+  required?: boolean
+  /** Optional indicator */
+  optional?: boolean
+}
+
+export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
+  ({ className, required, optional, children, ...props }, ref) => {
+    const { id, disabled } = useFormFieldContext()
+
+    return (
+      <Label
+        ref={ref}
+        htmlFor={id}
+        required={required}
+        optional={optional}
+        className={cn(disabled && 'opacity-50', className)}
+        {...props}
+      >
+        {children}
+      </Label>
+    )
+  }
+)
+
+FormLabel.displayName = 'FormLabel'
+
+// FormControl component - wrapper for form inputs
+export interface FormControlProps extends HTMLAttributes<HTMLDivElement> {}
+
+export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
+  ({ className, children, ...props }, ref) => {
+    return (
+      <div ref={ref} className={className} {...props}>
+        {children}
+      </div>
+    )
+  }
+)
+
+FormControl.displayName = 'FormControl'
+
+// FormDescription component
+export interface FormDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+
+export const FormDescription = forwardRef<HTMLParagraphElement, FormDescriptionProps>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
+  )
+)
+
+FormDescription.displayName = 'FormDescription'
+
+// FormMessage component - for error messages
+export interface FormMessageProps extends HTMLAttributes<HTMLParagraphElement> {
+  /** Error message (overrides context) */
+  error?: string
+}
+
+export const FormMessage = forwardRef<HTMLParagraphElement, FormMessageProps>(
+  ({ className, error: errorProp, children, ...props }, ref) => {
+    const context = useContext(FormFieldContext)
+    const error = errorProp || context?.error
+
+    if (!error && !children) return null
+
+    return (
+      <p
+        ref={ref}
+        className={cn('text-sm text-destructive', className)}
+        {...props}
+      >
+        {error || children}
+      </p>
+    )
+  }
+)
+
+FormMessage.displayName = 'FormMessage'
+
+// FormSection component - for grouping fields
+export interface FormSectionProps extends Omit<HTMLAttributes<HTMLFieldSetElement>, 'title'> {
+  /** Section title */
+  title?: ReactNode
+  /** Section description */
+  description?: ReactNode
+}
+
+export const FormSection = forwardRef<HTMLFieldSetElement, FormSectionProps>(
+  ({ className, title, description, children, ...props }, ref) => (
+    <fieldset
+      ref={ref}
+      className={cn('space-y-4', className)}
+      {...props}
+    >
+      {(title || description) && (
+        <div className="space-y-1">
+          {title && (
+            <legend className="text-base font-medium">{title}</legend>
+          )}
+          {description && (
+            <p className="text-sm text-muted-foreground">{description}</p>
+          )}
+        </div>
+      )}
+      {children}
+    </fieldset>
+  )
+)
+
+FormSection.displayName = 'FormSection'
+
+// FormActions component - for form buttons
+export interface FormActionsProps extends HTMLAttributes<HTMLDivElement> {
+  /** Alignment */
+  align?: 'left' | 'center' | 'right' | 'between'
+}
+
+export const FormActions = forwardRef<HTMLDivElement, FormActionsProps>(
+  ({ className, align = 'right', children, ...props }, ref) => {
+    const alignStyles = {
+      left: 'justify-start',
+      center: 'justify-center',
+      right: 'justify-end',
+      between: 'justify-between',
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn('flex items-center gap-2 pt-4', alignStyles[align], className)}
+        {...props}
+      >
+        {children}
+      </div>
+    )
+  }
+)
+
+FormActions.displayName = 'FormActions'

@@ -1,0 +1,109 @@
+import { forwardRef, type InputHTMLAttributes } from 'react'
+import { cn } from '../../utils/cn'
+import { Check } from 'lucide-react'
+
+export type CheckboxSize = 'sm' | 'md' | 'lg'
+
+export interface CheckboxProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
+  /** Checkbox size */
+  size?: CheckboxSize
+  /** Label text */
+  label?: string
+  /** Description text */
+  description?: string
+  /** Error state */
+  error?: boolean
+}
+
+const sizeStyles: Record<CheckboxSize, { box: string; icon: string; text: string }> = {
+  sm: {
+    box: 'h-4 w-4',
+    icon: 'h-3 w-3',
+    text: 'text-sm',
+  },
+  md: {
+    box: 'h-5 w-5',
+    icon: 'h-3.5 w-3.5',
+    text: 'text-sm',
+  },
+  lg: {
+    box: 'h-6 w-6',
+    icon: 'h-4 w-4',
+    text: 'text-base',
+  },
+}
+
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+  (
+    {
+      className,
+      size = 'md',
+      label,
+      description,
+      error = false,
+      disabled,
+      id,
+      ...props
+    },
+    ref
+  ) => {
+    const styles = sizeStyles[size]
+    const checkboxId = id || `checkbox-${Math.random().toString(36).slice(2)}`
+
+    return (
+      <div className={cn('flex items-start gap-3', className)}>
+        <div className="relative flex items-center">
+          <input
+            type="checkbox"
+            ref={ref}
+            id={checkboxId}
+            disabled={disabled}
+            className="peer sr-only"
+            {...props}
+          />
+          <div
+            className={cn(
+              'flex shrink-0 items-center justify-center rounded border',
+              'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2',
+              'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+              'transition-colors duration-200',
+              styles.box,
+              error
+                ? 'border-destructive'
+                : 'border-input peer-checked:border-primary peer-checked:bg-primary'
+            )}
+          >
+            <Check
+              className={cn(
+                'text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100',
+                styles.icon
+              )}
+            />
+          </div>
+        </div>
+        {(label || description) && (
+          <div className="space-y-1">
+            {label && (
+              <label
+                htmlFor={checkboxId}
+                className={cn(
+                  'font-medium leading-none cursor-pointer',
+                  styles.text,
+                  disabled && 'cursor-not-allowed opacity-50'
+                )}
+              >
+                {label}
+              </label>
+            )}
+            {description && (
+              <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+)
+
+Checkbox.displayName = 'Checkbox'

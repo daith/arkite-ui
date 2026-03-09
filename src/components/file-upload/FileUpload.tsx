@@ -1,0 +1,323 @@
+import {
+  forwardRef,
+  useRef,
+  useState,
+  type DragEvent,
+  type HTMLAttributes,
+  type InputHTMLAttributes,
+} from 'react'
+import { cn } from '../../utils/cn'
+import { Upload, X, File, Image, FileText, FileArchive } from 'lucide-react'
+
+export interface FileUploadProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange' | 'onError'> {
+  /** Accepted file types */
+  accept?: string
+  /** Allow multiple files */
+  multiple?: boolean
+  /** Max file size in bytes */
+  maxSize?: number
+  /** Max number of files */
+  maxFiles?: number
+  /** Uploaded files */
+  value?: File[]
+  /** On files change */
+  onChange?: (files: File[]) => void
+  /** On error */
+  onError?: (error: string) => void
+  /** Disabled state */
+  disabled?: boolean
+  /** Show file list */
+  showFileList?: boolean
+  /** Custom dropzone content */
+  children?: React.ReactNode
+  /** Dropzone class name */
+  dropzoneClassName?: string
+}
+
+const fileTypeIcons: Record<string, typeof File> = {
+  image: Image,
+  text: FileText,
+  application: FileArchive,
+}
+
+function getFileIcon(file: File) {
+  const type = file.type.split('/')[0]
+  return fileTypeIcons[type] || File
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
+  (
+    {
+      className,
+      accept,
+      multiple = false,
+      maxSize,
+      maxFiles,
+      value = [],
+      onChange,
+      onError,
+      disabled = false,
+      showFileList = true,
+      children,
+      dropzoneClassName,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null)
+    const [isDragging, setIsDragging] = useState(false)
+
+    const handleFiles = (fileList: FileList | null) => {
+      if (!fileList || disabled) return
+
+      const files = Array.from(fileList)
+      let validFiles: File[] = []
+      let error: string | null = null
+
+      for (const file of files) {
+        // Check file size
+        if (maxSize && file.size > maxSize) {
+          error = `File "${file.name}" exceeds maximum size of ${formatFileSize(maxSize)}`
+          continue
+        }
+
+        // Check file type
+        if (accept) {
+          const acceptedTypes = accept.split(',').map((t) => t.trim())
+          const isAccepted = acceptedTypes.some((type) => {
+            if (type.startsWith('.')) {
+              return file.name.toLowerCase().endsWith(type.toLowerCase())
+            }
+            if (type.endsWith('/*')) {
+              return file.type.startsWith(type.replace('/*', '/'))
+            }
+            return file.type === type
+          })
+
+          if (!isAccepted) {
+            error = `File "${file.name}" is not an accepted file type`
+            continue
+          }
+        }
+
+        validFiles.push(file)
+      }
+
+      // Check max files
+      if (maxFiles) {
+        const totalFiles = value.length + validFiles.length
+        if (totalFiles > maxFiles) {
+          error = `Maximum ${maxFiles} files allowed`
+          validFiles = validFiles.slice(0, maxFiles - value.length)
+        }
+      }
+
+      if (error) {
+        onError?.(error)
+      }
+
+      if (validFiles.length > 0) {
+        const newFiles = multiple ? [...value, ...validFiles] : validFiles
+        onChange?.(newFiles)
+      }
+    }
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault()
+      if (!disabled) {
+        setIsDragging(true)
+      }
+    }
+
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault()
+      setIsDragging(false)
+    }
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault()
+      setIsDragging(false)
+      handleFiles(e.dataTransfer.files)
+    }
+
+    const handleClick = () => {
+      if (!disabled) {
+        inputRef.current?.click()
+      }
+    }
+
+    const handleRemove = (index: number) => {
+      const newFiles = value.filter((_, i) => i !== index)
+      onChange?.(newFiles)
+    }
+
+    return (
+      <div className={cn('space-y-4', className)}>
+        {/* Hidden input */}
+        <input
+          ref={(node) => {
+            (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = node
+            if (typeof ref === 'function') ref(node)
+            else if (ref) ref.current = node
+          }}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          disabled={disabled}
+          className="sr-only"
+          onChange={(e) => handleFiles(e.target.files)}
+          {...props}
+        />
+
+        {/* Dropzone */}
+        <div
+          onClick={handleClick}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          className={cn(
+            'relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors cursor-pointer',
+            isDragging
+              ? 'border-primary bg-primary/5'
+              : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+            disabled && 'pointer-events-none opacity-50',
+            dropzoneClassName
+          )}
+        >
+          {children || (
+            <>
+              <Upload className="mb-4 h-10 w-10 text-muted-foreground" />
+              <p className="mb-1 text-sm font-medium">
+                Drop files here or click to upload
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {accept
+                  ? `Accepted: ${accept}`
+                  : 'Any file type accepted'}
+                {maxSize && ` \u2022 Max size: ${formatFileSize(maxSize)}`}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* File list */}
+        {showFileList && value.length > 0 && (
+          <ul className="space-y-2">
+            {value.map((file, index) => {
+              const Icon = getFileIcon(file)
+              return (
+                <li
+                  key={`${file.name}-${index}`}
+                  className="flex items-center gap-3 rounded-lg border bg-card p-3"
+                >
+                  <Icon className="h-8 w-8 shrink-0 text-muted-foreground" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{file.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatFileSize(file.size)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleRemove(index)
+                    }}
+                    className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                    <span className="sr-only">Remove</span>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
+    )
+  }
+)
+
+FileUpload.displayName = 'FileUpload'
+
+// Compact variant
+export interface FileUploadButtonProps
+  extends Omit<HTMLAttributes<HTMLButtonElement>, 'onChange'> {
+  /** Accepted file types */
+  accept?: string
+  /** Allow multiple files */
+  multiple?: boolean
+  /** On files change */
+  onChange?: (files: File[]) => void
+  /** Disabled state */
+  disabled?: boolean
+}
+
+export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonProps>(
+  (
+    {
+      className,
+      accept,
+      multiple = false,
+      onChange,
+      disabled = false,
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const inputRef = useRef<HTMLInputElement>(null)
+
+    const handleClick = () => {
+      inputRef.current?.click()
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files
+      if (files) {
+        onChange?.(Array.from(files))
+      }
+    }
+
+    return (
+      <>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          multiple={multiple}
+          disabled={disabled}
+          className="sr-only"
+          onChange={handleChange}
+        />
+        <button
+          ref={ref}
+          type="button"
+          onClick={handleClick}
+          disabled={disabled}
+          className={cn(
+            'inline-flex items-center gap-2 rounded-md border bg-background px-4 py-2 text-sm font-medium transition-colors',
+            'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'disabled:pointer-events-none disabled:opacity-50',
+            className
+          )}
+          {...props}
+        >
+          <Upload className="h-4 w-4" />
+          {children || 'Upload'}
+        </button>
+      </>
+    )
+  }
+)
+
+FileUploadButton.displayName = 'FileUploadButton'
