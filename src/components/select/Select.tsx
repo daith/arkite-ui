@@ -63,7 +63,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     return (
-      <div className={cn('relative', fullWidth && 'w-full')}>
+      <div className={cn('relative', fullWidth ? 'w-full' : 'w-fit')}>
         <div className="relative">
           {leftIcon && (
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">

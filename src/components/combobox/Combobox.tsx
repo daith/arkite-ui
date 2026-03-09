@@ -39,6 +39,8 @@ export interface ComboboxProps {
   renderOption?: (option: ComboboxOption, selected: boolean) => ReactNode
   /** Size variant */
   size?: ComboboxSize
+  /** Full width */
+  fullWidth?: boolean
   className?: string
 }
 
@@ -71,6 +73,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       loading = false,
       renderOption,
       size = 'md',
+      fullWidth = false,
       className,
     },
     ref
@@ -135,7 +138,8 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
             ref={ref}
             disabled={disabled}
             className={cn(
-              'flex w-full items-center justify-between rounded-md border bg-background py-2',
+              'flex items-center justify-between rounded-md border bg-background py-2',
+              fullWidth ? 'w-full' : 'w-fit',
               triggerSizeStyles[size],
               'ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
