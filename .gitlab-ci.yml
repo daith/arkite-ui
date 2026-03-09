@@ -90,6 +90,24 @@ build:
       - dist/
     expire_in: 1 hour
 
+chromatic:
+  stage: check
+  image: node:20-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  script:
+    - apk add --no-cache git
+    - npm ci --ignore-scripts
+    - npm run chromatic
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == "main"
+  variables:
+    CHROMATIC_PROJECT_TOKEN: $CHROMATIC_PROJECT_TOKEN
+  allow_failure: true
+
 # -------------------------------------------------------------------
 # Deploy & Publish: only on tags on main branch
 # -------------------------------------------------------------------
