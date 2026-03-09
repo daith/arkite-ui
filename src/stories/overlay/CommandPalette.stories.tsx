@@ -12,6 +12,7 @@ import {
   useCommandPalette,
 } from '../../components/command-palette'
 import { Button } from '../../components/button'
+import { Kbd } from '../../components/kbd'
 
 const meta: Meta = {
   title: 'Overlay/CommandPalette',
@@ -55,7 +56,7 @@ const DialogDemo = () => {
       <div className="space-y-2 text-center">
         <Button onClick={() => setOpen(true)}>Open Command Palette</Button>
         <p className="text-xs text-muted-foreground">
-          or press <kbd className="rounded border bg-muted px-1.5 py-0.5 text-xs font-mono">Cmd+K</kbd>
+          or press <Kbd>⌘</Kbd> <Kbd>K</Kbd>
         </p>
       </div>
       <CommandDialog open={open} onOpenChange={setOpen}>

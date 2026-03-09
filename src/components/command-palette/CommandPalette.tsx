@@ -141,13 +141,22 @@ CommandItem.displayName = 'CommandItem'
 
 export function CommandShortcut({
   className,
+  children,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
-    <span
-      className={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)}
-      {...props}
-    />
+    <span className={cn('ml-auto flex items-center gap-1', className)} {...props}>
+      {typeof children === 'string'
+        ? children.split('+').map((key, i) => (
+            <kbd
+              key={i}
+              className="inline-flex min-w-5 items-center justify-center rounded border border-border bg-muted px-1 py-0.5 font-sans text-[10px] font-medium leading-none text-muted-foreground shadow-xs select-none"
+            >
+              {key.trim()}
+            </kbd>
+          ))
+        : children}
+    </span>
   )
 }
 
