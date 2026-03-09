@@ -61,6 +61,20 @@ size:
     - npm run size
   dependencies: []
 
+changeset:check:
+  stage: check
+  image: node:20-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  script:
+    - npm ci --ignore-scripts
+    - npx changeset status
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  allow_failure: true
+
 build:
   stage: build
   image: node:20-alpine
