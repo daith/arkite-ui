@@ -61,6 +61,10 @@ const arkiteConfig = {
         'chart-3': 'hsl(var(--chart-3))',
         'chart-4': 'hsl(var(--chart-4))',
         'chart-5': 'hsl(var(--chart-5))',
+        'status-online': 'hsl(var(--status-online))',
+        'status-offline': 'hsl(var(--status-offline))',
+        'status-busy': 'hsl(var(--status-busy))',
+        'status-away': 'hsl(var(--status-away))',
       },
       borderRadius: {
         lg: 'var(--radius)',

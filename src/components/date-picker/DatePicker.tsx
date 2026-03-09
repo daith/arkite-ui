@@ -49,8 +49,10 @@ function parseDate(dateStr: string, format: string): Date | null {
   return new Date(year, month, day)
 }
 
+export type DatePickerSize = 'sm' | 'md' | 'lg'
+
 export interface DatePickerProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'size'> {
   /** Selected date */
   value?: Date | null
   /** On date change */
@@ -67,6 +69,20 @@ export interface DatePickerProps
   clearable?: boolean
   /** Error state */
   error?: boolean
+  /** Size variant */
+  size?: DatePickerSize
+}
+
+const inputSizeStyles: Record<DatePickerSize, string> = {
+  sm: 'h-8 px-3 pr-8 text-xs',
+  md: 'h-10 px-3 pr-10 text-sm',
+  lg: 'h-12 px-4 pr-12 text-base',
+}
+
+const iconSizeStyles: Record<DatePickerSize, string> = {
+  sm: 'h-3.5 w-3.5',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
 }
 
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
@@ -82,6 +98,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       clearable: _clearable = true,
       error,
       disabled,
+      size = 'md',
       placeholder = 'Select date',
       ...props
     },
@@ -267,7 +284,8 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm',
+              'flex w-full rounded-md border border-input bg-background',
+              inputSizeStyles[size],
               'ring-offset-background placeholder:text-muted-foreground',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
@@ -283,7 +301,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               disabled && 'cursor-not-allowed'
             )}
           >
-            <CalendarIcon className="h-4 w-4" />
+            <CalendarIcon className={iconSizeStyles[size]} />
           </button>
         </div>
 

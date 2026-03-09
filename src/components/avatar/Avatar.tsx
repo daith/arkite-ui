@@ -1,5 +1,6 @@
 import { forwardRef, useState, type ImgHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { StatusDot, type StatusType, type StatusDotSize } from '../status-dot/StatusDot'
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 export type AvatarVariant = 'circle' | 'rounded' | 'square'
@@ -14,29 +15,22 @@ export interface AvatarProps extends ImgHTMLAttributes<HTMLImageElement> {
   /** Alt text for the image */
   alt?: string
   /** Status indicator */
-  status?: 'online' | 'offline' | 'busy' | 'away'
+  status?: StatusType
 }
 
-const sizeStyles: Record<AvatarSize, { container: string; text: string; status: string }> = {
-  xs: { container: 'h-6 w-6', text: 'text-xs', status: 'h-1.5 w-1.5' },
-  sm: { container: 'h-8 w-8', text: 'text-xs', status: 'h-2 w-2' },
-  md: { container: 'h-10 w-10', text: 'text-sm', status: 'h-2.5 w-2.5' },
-  lg: { container: 'h-12 w-12', text: 'text-base', status: 'h-3 w-3' },
-  xl: { container: 'h-16 w-16', text: 'text-lg', status: 'h-3.5 w-3.5' },
-  '2xl': { container: 'h-20 w-20', text: 'text-xl', status: 'h-4 w-4' },
+const sizeStyles: Record<AvatarSize, { container: string; text: string; statusDot: StatusDotSize }> = {
+  xs: { container: 'h-6 w-6', text: 'text-xs', statusDot: 'xs' },
+  sm: { container: 'h-8 w-8', text: 'text-xs', statusDot: 'sm' },
+  md: { container: 'h-10 w-10', text: 'text-sm', statusDot: 'md' },
+  lg: { container: 'h-12 w-12', text: 'text-base', statusDot: 'md' },
+  xl: { container: 'h-16 w-16', text: 'text-lg', statusDot: 'lg' },
+  '2xl': { container: 'h-20 w-20', text: 'text-xl', statusDot: 'lg' },
 }
 
 const variantStyles: Record<AvatarVariant, string> = {
   circle: 'rounded-full',
   rounded: 'rounded-lg',
   square: 'rounded-none',
-}
-
-const statusColors: Record<NonNullable<AvatarProps['status']>, string> = {
-  online: 'bg-success',
-  offline: 'bg-muted-foreground',
-  busy: 'bg-destructive',
-  away: 'bg-warning',
 }
 
 function getInitials(name: string): string {
@@ -94,12 +88,10 @@ export const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
           />
         )}
         {status && (
-          <span
-            className={cn(
-              'absolute bottom-0 right-0 block rounded-full ring-2 ring-background',
-              styles.status,
-              statusColors[status]
-            )}
+          <StatusDot
+            status={status}
+            size={styles.statusDot}
+            className="absolute bottom-0 right-0 ring-2 ring-background"
           />
         )}
       </div>

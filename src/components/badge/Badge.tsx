@@ -10,9 +10,13 @@ export type BadgeVariant =
   | 'outline'
   | 'info'
 
+export type BadgeSize = 'sm' | 'md'
+
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /** Badge style variant */
   variant?: BadgeVariant
+  /** Badge size */
+  size?: BadgeSize
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
@@ -32,15 +36,19 @@ const variantStyles: Record<BadgeVariant, string> = {
     'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
 }
 
+const sizeStyles: Record<BadgeSize, string> = {
+  sm: 'px-2 py-0.5 text-[10px] leading-none',
+  md: 'px-2.5 py-0.5 text-xs',
+}
+
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant = 'default', ...props }, ref) => {
+  ({ className, variant = 'default', size = 'md', ...props }, ref) => {
     return (
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center rounded-full px-2.5 py-0.5',
-          'text-xs font-medium',
-          'transition-colors',
+          'inline-flex items-center rounded-full font-medium transition-colors',
+          sizeStyles[size],
           variantStyles[variant],
           className
         )}

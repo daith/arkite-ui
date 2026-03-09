@@ -10,6 +10,8 @@ export interface ComboboxOption {
   icon?: ReactNode
 }
 
+export type ComboboxSize = 'sm' | 'md' | 'lg'
+
 export interface ComboboxProps {
   /** Available options */
   options: ComboboxOption[]
@@ -35,7 +37,21 @@ export interface ComboboxProps {
   loading?: boolean
   /** Custom option renderer */
   renderOption?: (option: ComboboxOption, selected: boolean) => ReactNode
+  /** Size variant */
+  size?: ComboboxSize
   className?: string
+}
+
+const triggerSizeStyles: Record<ComboboxSize, string> = {
+  sm: 'h-8 px-3 text-xs',
+  md: 'h-10 px-3 text-sm',
+  lg: 'h-12 px-4 text-base',
+}
+
+const searchSizeStyles: Record<ComboboxSize, string> = {
+  sm: 'h-8 text-xs',
+  md: 'h-10 text-sm',
+  lg: 'h-12 text-base',
 }
 
 export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
@@ -53,6 +69,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       onSearch,
       loading = false,
       renderOption,
+      size = 'md',
       className,
     },
     ref
@@ -117,7 +134,8 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
             ref={ref}
             disabled={disabled}
             className={cn(
-              'flex h-10 w-full items-center justify-between rounded-md border bg-background px-3 py-2 text-sm',
+              'flex w-full items-center justify-between rounded-md border bg-background py-2',
+              triggerSizeStyles[size],
               'ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
               'disabled:cursor-not-allowed disabled:opacity-50',
               error && 'border-destructive focus:ring-destructive',
@@ -189,7 +207,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="flex h-10 w-full bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                className={cn('flex w-full bg-transparent py-3 outline-none placeholder:text-muted-foreground', searchSizeStyles[size])}
               />
             </div>
 

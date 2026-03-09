@@ -13,6 +13,7 @@ export * from './components/radio'
 export * from './components/toggle'
 export * from './components/spinner'
 export * from './components/kbd'
+export * from './components/status-dot'
 export * from './components/avatar'
 export * from './components/label'
 

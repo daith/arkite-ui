@@ -45,6 +45,12 @@
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
 
+  /* Status palette — for Avatar dots, Badge, Table status columns */
+  --color-status-online: hsl(var(--status-online));
+  --color-status-offline: hsl(var(--status-offline));
+  --color-status-busy: hsl(var(--status-busy));
+  --color-status-away: hsl(var(--status-away));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -140,6 +146,12 @@
   --chart-4: 280 65% 60%;
   --chart-5: 200 80% 50%;
 
+  /* Status */
+  --status-online: 145 65% 42%;
+  --status-offline: 220 9% 46%;
+  --status-busy: 0 72% 51%;
+  --status-away: 38 92% 50%;
+
   /* Radius */
   --radius: 0.5rem;
 }
@@ -181,6 +193,12 @@
   --chart-3: 38 92% 55%;
   --chart-4: 280 65% 68%;
   --chart-5: 200 80% 58%;
+
+  /* Status */
+  --status-online: 145 65% 50%;
+  --status-offline: 220 9% 60%;
+  --status-busy: 0 72% 55%;
+  --status-away: 38 92% 55%;
 }
 
 /* Base styles */
