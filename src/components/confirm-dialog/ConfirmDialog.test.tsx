@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
-import { ConfirmDialog } from './ConfirmDialog'
+import { ConfirmDialog, DeleteConfirmDialog } from './ConfirmDialog'
 
 describe('ConfirmDialog', () => {
   it('renders title and description when open', () => {
@@ -95,5 +95,58 @@ describe('ConfirmDialog', () => {
       />
     )
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+  })
+
+  it('shows warning variant with icon', () => {
+    render(
+      <ConfirmDialog
+        open
+        onClose={vi.fn()}
+        variant="warning"
+        title="Warning!"
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Warning!')).toBeInTheDocument()
+  })
+})
+
+describe('DeleteConfirmDialog', () => {
+  it('renders with default delete text', () => {
+    render(
+      <DeleteConfirmDialog
+        open
+        onClose={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Delete this item?')).toBeInTheDocument()
+    expect(screen.getByText('This action cannot be undone. All associated data will be permanently removed.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument()
+  })
+
+  it('renders with custom itemName', () => {
+    render(
+      <DeleteConfirmDialog
+        open
+        onClose={vi.fn()}
+        onConfirm={vi.fn()}
+        itemName="this user"
+      />
+    )
+    expect(screen.getByText('Delete this user?')).toBeInTheDocument()
+  })
+
+  it('calls onConfirm when delete button is clicked', async () => {
+    const onConfirm = vi.fn()
+    render(
+      <DeleteConfirmDialog
+        open
+        onClose={vi.fn()}
+        onConfirm={onConfirm}
+      />
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }))
+    expect(onConfirm).toHaveBeenCalledOnce()
   })
 })

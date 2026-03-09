@@ -9,7 +9,7 @@ export interface ConfirmDialogProps {
   /** Callback when dialog should close */
   onClose: () => void
   /** Dialog variant */
-  variant?: 'default' | 'destructive'
+  variant?: 'default' | 'destructive' | 'warning'
   /** Dialog title */
   title: ReactNode
   /** Dialog description */
@@ -56,6 +56,8 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
     ref
   ) => {
     const isDestructive = variant === 'destructive'
+    const isWarning = variant === 'warning'
+    const hasIcon = variant !== 'default'
     const resolvedConfirmLabel = confirmLabel ?? (isDestructive ? 'Delete' : 'Confirm')
 
     return (
@@ -69,13 +71,13 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
         closeOnEscape={!loading}
       >
         <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-4">
-          {(icon || isDestructive) && (
+          {(icon || hasIcon) && (
             <div
               className={cn(
                 'flex shrink-0 items-center justify-center h-10 w-10 rounded-full',
-                isDestructive
-                  ? 'bg-destructive/10 text-destructive'
-                  : 'bg-primary/10 text-primary'
+                isDestructive && 'bg-destructive/10 text-destructive',
+                isWarning && 'bg-warning/10 text-warning',
+                !isDestructive && !isWarning && 'bg-primary/10 text-primary'
               )}
             >
               {icon ?? <WarningIcon className="h-5 w-5" />}
@@ -110,3 +112,53 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
 )
 
 ConfirmDialog.displayName = 'ConfirmDialog'
+
+/* ─── Presets ─── */
+
+export interface DeleteConfirmDialogProps extends Omit<ConfirmDialogProps, 'variant' | 'title' | 'description' | 'confirmLabel'> {
+  /** Item name to display in the dialog (e.g. "this user") */
+  itemName?: string
+  /** Custom title (overrides preset) */
+  title?: ReactNode
+  /** Custom description (overrides preset) */
+  description?: ReactNode
+  /** Custom confirm label (overrides preset) */
+  confirmLabel?: string
+}
+
+/**
+ * Pre-configured destructive ConfirmDialog for delete operations.
+ *
+ * @example
+ * ```tsx
+ * <DeleteConfirmDialog
+ *   open={open}
+ *   onClose={() => setOpen(false)}
+ *   itemName="this user"
+ *   onConfirm={handleDelete}
+ * />
+ * ```
+ */
+export const DeleteConfirmDialog = forwardRef<HTMLDivElement, DeleteConfirmDialogProps>(
+  (
+    {
+      itemName,
+      title = `Delete ${itemName ?? 'this item'}?`,
+      description = 'This action cannot be undone. All associated data will be permanently removed.',
+      confirmLabel = 'Delete',
+      ...props
+    },
+    ref
+  ) => (
+    <ConfirmDialog
+      ref={ref}
+      variant="destructive"
+      title={title}
+      description={description}
+      confirmLabel={confirmLabel}
+      {...props}
+    />
+  )
+)
+
+DeleteConfirmDialog.displayName = 'DeleteConfirmDialog'

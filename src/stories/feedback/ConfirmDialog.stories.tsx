@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Meta, StoryFn } from '@storybook/react-vite'
-import { ConfirmDialog } from '../../components/confirm-dialog'
+import { ConfirmDialog, DeleteConfirmDialog } from '../../components/confirm-dialog'
 import { Button } from '../../components/button'
 
 const meta = {
@@ -76,3 +76,68 @@ const AsyncDemo = () => {
 }
 
 export const AsyncConfirm: StoryFn = () => <AsyncDemo />
+
+const WarningDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Archive Project</Button>
+      <ConfirmDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        variant="warning"
+        title="Archive this project?"
+        description="The project will be hidden from the dashboard. You can restore it later from Settings."
+        confirmLabel="Archive"
+        onConfirm={() => setOpen(false)}
+      />
+    </>
+  )
+}
+
+export const Warning: StoryFn = () => <WarningDemo />
+
+const DeletePresetDemo = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button variant="destructive" onClick={() => setOpen(true)}>Delete User</Button>
+      <DeleteConfirmDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        itemName="this user"
+        onConfirm={() => setOpen(false)}
+      />
+    </>
+  )
+}
+
+export const DeletePreset: StoryFn = () => <DeletePresetDemo />
+
+const DeleteAsyncDemo = () => {
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const handleDelete = () => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      setOpen(false)
+    }, 2000)
+  }
+
+  return (
+    <>
+      <Button variant="destructive" onClick={() => setOpen(true)}>Delete Order</Button>
+      <DeleteConfirmDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        itemName="order #12345"
+        onConfirm={handleDelete}
+        loading={loading}
+      />
+    </>
+  )
+}
+
+export const DeleteAsync: StoryFn = () => <DeleteAsyncDemo />
