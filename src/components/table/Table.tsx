@@ -10,10 +10,12 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   bordered?: boolean
   /** Hoverable rows */
   hoverable?: boolean
+  /** Sticky header — stays fixed while scrolling vertically */
+  stickyHeader?: boolean
 }
 
 export const Table = forwardRef<HTMLTableElement, TableProps>(
-  ({ className, variant = 'default', compact, bordered, hoverable, ...props }, ref) => (
+  ({ className, variant = 'default', compact, bordered, hoverable, stickyHeader, ...props }, ref) => (
     <div className="relative w-full overflow-auto">
       <table
         ref={ref}
@@ -25,6 +27,7 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
         data-variant={variant}
         data-compact={compact}
         data-hoverable={hoverable}
+        data-sticky-header={stickyHeader || undefined}
         {...props}
       />
     </div>
@@ -37,7 +40,16 @@ export type TableHeaderProps = HTMLAttributes<HTMLTableSectionElement>
 
 export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className, ...props }, ref) => (
-    <thead ref={ref} className={cn('[&_tr]:border-b', className)} {...props} />
+    <thead
+      ref={ref}
+      className={cn(
+        '[&_tr]:border-b',
+        /* Sticky header: activated by parent table[data-sticky-header] */
+        '[table[data-sticky-header]_&]:sticky [table[data-sticky-header]_&]:top-0 [table[data-sticky-header]_&]:z-10 [table[data-sticky-header]_&]:bg-background [table[data-sticky-header]_&]:shadow-[0_1px_0_0_hsl(var(--border))]',
+        className
+      )}
+      {...props}
+    />
   )
 )
 
@@ -100,18 +112,22 @@ export interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
   sortable?: boolean
   /** Sort direction */
   sortDirection?: 'asc' | 'desc' | null
+  /** Sticky action column — pins to the right edge during horizontal scroll */
+  stickyAction?: boolean
 }
 
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, sortable, sortDirection, children, ...props }, ref) => (
+  ({ className, sortable, sortDirection, stickyAction, children, ...props }, ref) => (
     <th
       ref={ref}
       className={cn(
         'h-10 px-4 text-left align-middle font-medium text-muted-foreground',
         '[&:has([role=checkbox])]:pr-0',
         sortable && 'cursor-pointer select-none hover:text-foreground',
+        stickyAction && 'sticky right-0 bg-background shadow-[-2px_0_4px_-2px_rgb(0_0_0/0.1)]',
         className
       )}
+      data-sticky-action={stickyAction || undefined}
       {...props}
     >
       {sortable ? (
@@ -132,16 +148,21 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
 
 TableHead.displayName = 'TableHead'
 
-export type TableCellProps = TdHTMLAttributes<HTMLTableCellElement>
+export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
+  /** Sticky action column — pins to the right edge during horizontal scroll */
+  stickyAction?: boolean
+}
 
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, stickyAction, ...props }, ref) => (
     <td
       ref={ref}
       className={cn(
         'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+        stickyAction && 'sticky right-0 bg-background shadow-[-2px_0_4px_-2px_rgb(0_0_0/0.1)]',
         className
       )}
+      data-sticky-action={stickyAction || undefined}
       {...props}
     />
   )

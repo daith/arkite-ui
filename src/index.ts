@@ -64,6 +64,7 @@ export * from './components/confirm-dialog'
 export * from './components/pagination'
 export * from './components/page-header'
 export * from './components/error-boundary'
+export * from './components/bulk-action-bar'
 
 // Layout
 export * from './components/card'

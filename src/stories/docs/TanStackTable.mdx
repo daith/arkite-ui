@@ -1,0 +1,292 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Foundation/TanStack Table Integration" />
+
+# Integrating with TanStack Table
+
+Arkite UI provides **Table primitives** (`Table`, `TableHeader`, `TableRow`, `TableHead`, `TableCell`, etc.) —
+not a full data-grid. This keeps the library lightweight while letting each project own its data layer.
+
+[TanStack Table](https://tanstack.com/table) is the recommended headless table library. Below are
+copy-paste recipes for common patterns.
+
+## Basic Setup
+
+```bash
+npm install @tanstack/react-table
+```
+
+```tsx
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  type ColumnDef,
+} from '@tanstack/react-table'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@arkite/ui'
+
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
+const columns: ColumnDef<User>[] = [
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'email', header: 'Email' },
+  { accessorKey: 'role', header: 'Role' },
+]
+
+function UsersTable({ data }: { data: User[] }) {
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  return (
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead key={header.id}>
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+## Sorting
+
+```tsx
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  flexRender,
+  type SortingState,
+} from '@tanstack/react-table'
+
+function SortableTable({ data, columns }) {
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  })
+
+  return (
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead
+                key={header.id}
+                sortable={header.column.getCanSort()}
+                sortDirection={header.column.getIsSorted() || null}
+                onClick={header.column.getToggleSortingHandler()}
+              >
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
+```
+
+## Row Selection + BulkActionBar
+
+```tsx
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  type RowSelectionState,
+} from '@tanstack/react-table'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@arkite/ui'
+import { BulkActionBar } from '@arkite/ui'
+import { Checkbox } from '@arkite/ui'
+import { Button } from '@arkite/ui'
+
+function SelectableTable({ data, columns }) {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const table = useReactTable({
+    data,
+    columns: [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllRowsSelected()}
+            onChange={table.getToggleAllRowsSelectedHandler()}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+          />
+        ),
+        size: 40,
+      },
+      ...columns,
+    ],
+    state: { rowSelection },
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+  })
+
+  const selectedCount = Object.keys(rowSelection).length
+
+  return (
+    <>
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id} selected={row.getIsSelected()}>
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <BulkActionBar
+        selectedCount={selectedCount}
+        onClose={() => setRowSelection({})}
+      >
+        <Button size="sm" variant="secondary">Export</Button>
+        <Button size="sm" variant="destructive">Delete</Button>
+      </BulkActionBar>
+    </>
+  )
+}
+```
+
+## Sticky Header + Action Column
+
+```tsx
+<Table stickyHeader>
+  <TableHeader>
+    <TableRow>
+      <TableHead>Name</TableHead>
+      <TableHead>Email</TableHead>
+      <TableHead stickyAction>Actions</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {table.getRowModel().rows.map((row) => (
+      <TableRow key={row.id}>
+        <TableCell>{row.getValue('name')}</TableCell>
+        <TableCell>{row.getValue('email')}</TableCell>
+        <TableCell stickyAction>
+          <Button size="sm" variant="ghost">Edit</Button>
+        </TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>
+```
+
+## Pagination (Server-Side)
+
+```tsx
+import { getPaginationRowModel } from '@tanstack/react-table'
+import { Pagination } from '@arkite/ui'
+
+function PaginatedTable({ data, columns, pageCount, onPageChange }) {
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 })
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: { pagination },
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount,
+  })
+
+  return (
+    <div className="space-y-4">
+      <Table>{/* ...render header/body as above */}</Table>
+
+      <Pagination
+        currentPage={pagination.pageIndex + 1}
+        totalPages={pageCount}
+        onPageChange={(page) => table.setPageIndex(page - 1)}
+      />
+    </div>
+  )
+}
+```
+
+## Why Headless?
+
+| Concern | Owned by | Rationale |
+|---------|----------|-----------|
+| Visual markup (`<table>`, `<tr>`, `<td>`) | **Arkite UI** | Consistent styling across projects |
+| Data fetching, sorting, filtering, pagination logic | **TanStack Table** | Headless, framework-agnostic, well-tested |
+| Business rules (permissions, row actions, API calls) | **Your app** | Domain-specific, varies per project |
+
+This separation keeps Arkite UI lightweight (~0 KB runtime for tables) while giving
+each project full control over data and behavior.
