@@ -12,3 +12,5 @@ export {
 export { createTheme, type CreateThemeOptions } from './create-theme'
 
 export { applyTheme, applyDarkTheme, themeToCSS } from './apply-theme'
+
+export { chartColors, chartColorList, type ChartColorKey } from './chart-colors'

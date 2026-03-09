@@ -38,6 +38,13 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* Chart palette — for Recharts / Nivo / any charting library */
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -126,6 +133,13 @@
   --input: 220 13% 91%;
   --ring: 250 100% 65%;
 
+  /* Chart */
+  --chart-1: 250 100% 65%;
+  --chart-2: 168 80% 45%;
+  --chart-3: 38 92% 50%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 200 80% 50%;
+
   /* Radius */
   --radius: 0.5rem;
 }
@@ -161,6 +175,12 @@
   --border: 220 15% 22%;
   --input: 220 15% 22%;
   --ring: 250 100% 70%;
+
+  --chart-1: 250 100% 70%;
+  --chart-2: 168 80% 55%;
+  --chart-3: 38 92% 55%;
+  --chart-4: 280 65% 68%;
+  --chart-5: 200 80% 58%;
 }
 
 /* Base styles */

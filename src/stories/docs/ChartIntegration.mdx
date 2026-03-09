@@ -1,0 +1,109 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Foundation/Chart Integration" />
+
+# Chart Integration
+
+Arkite UI provides **chart color tokens** — not chart components. This keeps the library lightweight
+while ensuring all projects share a unified data visualization palette.
+
+## Chart Colors
+
+5 semantic colors that adapt to light/dark mode:
+
+| Token | CSS Variable | Light | Dark | Use Case |
+|-------|-------------|-------|------|----------|
+| `chart-1` | `--chart-1` | Primary purple | Lighter purple | Primary metric |
+| `chart-2` | `--chart-2` | Teal | Lighter teal | Secondary metric |
+| `chart-3` | `--chart-3` | Amber | Lighter amber | Tertiary metric |
+| `chart-4` | `--chart-4` | Violet | Lighter violet | Fourth metric |
+| `chart-5` | `--chart-5` | Blue | Lighter blue | Fifth metric |
+
+## Usage with Recharts
+
+```tsx
+import { chartColors } from '@arkite/ui'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+function RevenueChart({ data }) {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={data}>
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="revenue" fill={chartColors[1]} />
+        <Bar dataKey="cost" fill={chartColors[2]} />
+      </BarChart>
+    </ResponsiveContainer>
+  )
+}
+```
+
+## Usage with Multiple Datasets
+
+```tsx
+import { chartColorList } from '@arkite/ui'
+
+// Map datasets to colors automatically
+const datasets = ['revenue', 'cost', 'profit', 'tax', 'net']
+
+<BarChart data={data}>
+  {datasets.map((key, i) => (
+    <Bar key={key} dataKey={key} fill={chartColorList[i]} />
+  ))}
+</BarChart>
+```
+
+## Usage in Tailwind Classes
+
+Chart colors are also available as Tailwind utilities:
+
+```tsx
+// Legend items
+<span className="h-3 w-3 rounded-full bg-chart-1" />
+<span className="h-3 w-3 rounded-full bg-chart-2" />
+```
+
+## Custom Chart Tooltip
+
+Style Recharts tooltips to match Arkite UI:
+
+```tsx
+function CustomTooltip({ active, payload, label }) {
+  if (!active || !payload) return null
+  return (
+    <div className="rounded-lg border bg-card p-3 shadow-md">
+      <p className="text-sm font-medium">{label}</p>
+      {payload.map((entry) => (
+        <p key={entry.name} className="text-sm text-muted-foreground">
+          <span style={{ color: entry.color }}>●</span> {entry.name}: {entry.value}
+        </p>
+      ))}
+    </div>
+  )
+}
+
+<BarChart>
+  <Tooltip content={<CustomTooltip />} />
+</BarChart>
+```
+
+## Overriding Chart Colors
+
+Override per-project in your CSS:
+
+```css
+:root {
+  --chart-1: 210 100% 50%;  /* custom blue */
+  --chart-2: 340 80% 55%;   /* custom pink */
+}
+```
+
+## Why Not Wrap Recharts?
+
+- **Bundle size** — Recharts is ~200KB, not every project needs charts
+- **API surface** — Chart requirements vary wildly (line, bar, pie, area, funnel, treemap)
+- **Customization** — Wrapping Recharts limits its flexibility, defeating its purpose
+
+Arkite UI provides the **visual standard** (colors, tooltip style). Each project brings its own charting library.
