@@ -245,7 +245,7 @@ export function DataTable<T>({
       </Table>
 
       {pagination && sortedData.length > 0 && (
-        <div className="flex items-center justify-between border-t px-4 py-3">
+        <div className="flex items-center justify-between border-t px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Rows per page:</span>
             <select
