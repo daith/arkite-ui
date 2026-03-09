@@ -1,0 +1,90 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guide/Component Guidelines" />
+
+# Component Guidelines
+
+Rules for using and contributing to Arkite UI.
+
+## What belongs in Arkite UI
+
+| Belongs | Does NOT belong |
+|---------|-----------------|
+| Pure UI components (Button, Input, Modal) | Business logic (OrderStatusBadge) |
+| Framework-agnostic patterns | Router-dependent components |
+| Reusable across 2+ projects | Single-project components |
+| Accepts callbacks/slots for flexibility | Calls API directly |
+| Design tokens and theme utilities | Domain-specific data models |
+
+## Component API Conventions
+
+### Props Pattern
+
+```tsx
+// Good — accepts callback, no business logic
+<PageHeader title="Users" onBack={() => navigate(-1)} />
+
+// Bad — binds to router internally
+<PageHeader title="Users" backTo="/users" />
+```
+
+### Slot Pattern
+
+```tsx
+// Good — flexible via slots
+<DataTable
+  columns={columns}
+  emptyContent={<MyCustomEmpty />}  // escape hatch
+/>
+
+// Bad — limited configuration
+<DataTable
+  columns={columns}
+  emptyText="No data"  // can't customize structure
+/>
+```
+
+### Styling
+
+- All components accept `className` for overrides
+- Use `cn()` utility internally to merge classes
+- Never use inline styles — always Tailwind classes
+- Consumers can override any visual via `className` prop
+
+## Composition over Configuration
+
+When a component doesn't do what you need, compose from primitives:
+
+```tsx
+// Instead of requesting a "DataTableWithTabs" component,
+// compose it yourself:
+import { Tabs, TabsContent, DataTable } from '@arkite/ui'
+
+<Tabs defaultValue="active">
+  <TabsContent value="active">
+    <DataTable data={activeUsers} columns={columns} />
+  </TabsContent>
+  <TabsContent value="inactive">
+    <DataTable data={inactiveUsers} columns={columns} />
+  </TabsContent>
+</Tabs>
+```
+
+## Adding a New Component
+
+1. Create `src/components/my-component/MyComponent.tsx`
+2. Create `src/components/my-component/index.ts` (barrel export)
+3. Add export to `src/index.ts`
+4. Create Storybook story with **all states** (default, loading, empty, error, disabled)
+5. Create unit tests (`MyComponent.test.tsx`)
+6. Run `npm run typecheck && npm run test && npm run build`
+
+## Commit Convention
+
+```
+feat: add new component
+fix: correct button hover state
+docs: add form patterns guide
+test: add DataTable edge case tests
+chore: upgrade dependencies
+```

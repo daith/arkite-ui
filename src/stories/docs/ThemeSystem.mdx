@@ -1,0 +1,103 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guide/Theme System" />
+
+# Theme System
+
+Arkite UI uses **HSL CSS variables** for theming. All colors are defined as CSS custom properties,
+making it easy to switch themes at runtime.
+
+## Dark Mode
+
+Toggle dark mode by adding/removing the `dark` class on `<html>`:
+
+```ts
+// Toggle
+document.documentElement.classList.toggle('dark')
+
+// Set explicitly
+document.documentElement.classList.add('dark')    // dark
+document.documentElement.classList.remove('dark')  // light
+```
+
+## Preset Themes
+
+4 built-in presets: `default`, `neutral`, `ocean`, `forest`.
+
+```tsx
+import { themePresets, applyTheme, applyDarkTheme } from '@arkite/ui'
+
+// Apply a preset
+applyTheme(themePresets.ocean)
+
+// Apply dark variant
+applyDarkTheme(themePresets.ocean)
+```
+
+## Custom Themes
+
+Create a theme from 1-2 hex colors:
+
+```tsx
+import { createTheme, applyTheme } from '@arkite/ui'
+
+const myTheme = createTheme({
+  name: 'brand',
+  primary: '#FF6B00',
+  accent: '#00B4D8',
+  radius: '0.75rem',
+})
+
+applyTheme(myTheme)
+```
+
+## SSR / Style Tag
+
+Generate a CSS string for server-side rendering:
+
+```tsx
+import { themeToCSS, themePresets } from '@arkite/ui'
+
+const css = themeToCSS(themePresets.default)
+// Returns: :root { --primary: 250 100% 65%; ... } .dark { ... }
+```
+
+## Available Tokens
+
+| Token | Light Default | Usage |
+|-------|--------------|-------|
+| `--primary` | `250 100% 65%` | Brand color, CTA buttons |
+| `--secondary` | `220 14% 96%` | Secondary buttons, backgrounds |
+| `--accent` | `168 80% 45%` | Accent highlights |
+| `--destructive` | `0 72% 51%` | Delete, error states |
+| `--success` | `145 65% 42%` | Success states |
+| `--warning` | `38 92% 50%` | Warning states |
+| `--muted` | `220 14% 96%` | Muted text, subtle backgrounds |
+| `--background` | `0 0% 100%` | Page background |
+| `--foreground` | `220 15% 20%` | Main text color |
+| `--border` | `220 13% 91%` | Border color |
+| `--radius` | `0.5rem` | Border radius base |
+
+## Elevation Shadows
+
+Consistent depth system for layered UI:
+
+| Token | Use Case |
+|-------|----------|
+| `shadow-xs` | Input, Badge |
+| `shadow-sm` | Card, Dropdown |
+| `shadow-md` | Popover, Toast |
+| `shadow-lg` | Modal, Drawer |
+| `shadow-xl` | Command Palette |
+| `shadow-2xl` | Full-screen overlay |
+
+## Overriding Tokens
+
+Override any token in your project's CSS:
+
+```css
+:root {
+  --primary: 210 100% 50%;
+  --radius: 0.75rem;
+}
+```

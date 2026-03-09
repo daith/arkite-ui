@@ -1,0 +1,103 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guide/Form Patterns" />
+
+# Form Patterns
+
+Arkite UI provides **layout-only** form components. They handle structure, labels, error display,
+and accessibility — but **do not own form state or validation**.
+
+This design lets you use any form library: `react-hook-form`, `formik`, native `useState`, or none at all.
+
+## Components
+
+| Component | Purpose |
+|-----------|---------|
+| `Form` | `<form>` wrapper with `disabled` context |
+| `FormField` | Single field container with `name`, `error`, context |
+| `FormLabel` | Connected `<label>` with `required`/`optional` indicator |
+| `FormControl` | Wrapper for the actual input element |
+| `FormDescription` | Help text below the input |
+| `FormMessage` | Error message (reads from `FormField` context) |
+| `FormSection` | `<fieldset>` with title and description |
+| `FormActions` | Button row with alignment options |
+
+## Basic Usage
+
+```tsx
+import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite/ui'
+import { Input, Button } from '@arkite/ui'
+
+<Form onSubmit={handleSubmit}>
+  <FormField name="email" error={errors.email}>
+    <FormLabel required>Email</FormLabel>
+    <FormControl>
+      <Input type="email" error={!!errors.email} />
+    </FormControl>
+    <FormMessage />
+  </FormField>
+
+  <FormActions>
+    <Button type="submit">Save</Button>
+  </FormActions>
+</Form>
+```
+
+## With react-hook-form + zod
+
+```tsx
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite/ui'
+import { Input, Button } from '@arkite/ui'
+
+const schema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+})
+
+type FormValues = z.infer<typeof schema>
+
+function MyForm() {
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+  })
+
+  const onSubmit = async (data: FormValues) => {
+    await api.save(data)
+  }
+
+  return (
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <FormField name="name" error={errors.name?.message}>
+        <FormLabel required>Name</FormLabel>
+        <FormControl>
+          <Input {...register('name')} error={!!errors.name} />
+        </FormControl>
+        <FormMessage />
+      </FormField>
+
+      <FormField name="email" error={errors.email?.message}>
+        <FormLabel required>Email</FormLabel>
+        <FormControl>
+          <Input {...register('email')} error={!!errors.email} />
+        </FormControl>
+        <FormMessage />
+      </FormField>
+
+      <FormActions>
+        <Button type="submit" loading={isSubmitting}>Save</Button>
+      </FormActions>
+    </Form>
+  )
+}
+```
+
+## Key Principles
+
+1. **Arkite UI owns layout, you own state.** The library never calls `useState` or manages form values.
+2. **Pass `error` to `FormField`**, not to the input. `FormMessage` reads it from context automatically.
+3. **Pass `error` (boolean) to `Input`** for red border styling. This is separate from the message.
+4. **Use `FormSection`** for multi-step or grouped forms — it renders a semantic `<fieldset>`.
+5. **Use `FormActions align="between"`** for split layouts (e.g. Reset on left, Save on right).
