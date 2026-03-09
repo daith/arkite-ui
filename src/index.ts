@@ -15,6 +15,11 @@ export * from './components/spinner'
 export * from './components/avatar'
 export * from './components/label'
 
+// Overlay Primitives (Radix-based)
+export * from './components/popover'
+export * from './components/tooltip'
+export * from './components/dropdown-menu'
+
 // Navigation
 export * from './components/sidebar'
 export * from './components/tenant-switcher'

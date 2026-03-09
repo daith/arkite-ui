@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import animate from 'tailwindcss-animate'
 
 // Arkite UI shared Tailwind preset
 // Usage: import arkitePreset from '@arkite/ui/tailwind'
@@ -87,7 +88,7 @@ const arkiteConfig: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [animate],
 }
 
 export default arkiteConfig
