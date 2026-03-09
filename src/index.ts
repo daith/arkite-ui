@@ -65,6 +65,9 @@ export * from './hooks/usePermission'
 // Motion (requires framer-motion peer dependency)
 export * from './components/motion'
 
+// Theme
+export * from './theme'
+
 // Stores
 export * from './stores/authStore'
 export * from './stores/tenantStore'
