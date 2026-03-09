@@ -63,79 +63,81 @@ const sampleData = [
   { id: '5', name: 'Eve Davis', email: 'eve@example.com', role: 'Admin' },
 ]
 
-export const WithTable: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<Set<string>>(new Set())
+function WithTableDemo() {
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
-    const toggleRow = (id: string) => {
-      setSelected((prev) => {
-        const next = new Set(prev)
-        if (next.has(id)) next.delete(id)
-        else next.add(id)
-        return next
-      })
+  const toggleRow = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleAll = () => {
+    if (selected.size === sampleData.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(sampleData.map((d) => d.id)))
     }
+  }
 
-    const toggleAll = () => {
-      if (selected.size === sampleData.length) {
-        setSelected(new Set())
-      } else {
-        setSelected(new Set(sampleData.map((d) => d.id)))
-      }
-    }
-
-    return (
-      <div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-10">
+  return (
+    <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-10">
+              <input
+                type="checkbox"
+                checked={selected.size === sampleData.length}
+                onChange={toggleAll}
+              />
+            </TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sampleData.map((row) => (
+            <TableRow key={row.id} selected={selected.has(row.id)}>
+              <TableCell>
                 <input
                   type="checkbox"
-                  checked={selected.size === sampleData.length}
-                  onChange={toggleAll}
+                  checked={selected.has(row.id)}
+                  onChange={() => toggleRow(row.id)}
                 />
-              </TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
+              </TableCell>
+              <TableCell>{row.name}</TableCell>
+              <TableCell>{row.email}</TableCell>
+              <TableCell>{row.role}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sampleData.map((row) => (
-              <TableRow key={row.id} selected={selected.has(row.id)}>
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    checked={selected.has(row.id)}
-                    onChange={() => toggleRow(row.id)}
-                  />
-                </TableCell>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.email}</TableCell>
-                <TableCell>{row.role}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          ))}
+        </TableBody>
+      </Table>
 
-        <BulkActionBar
-          selectedCount={selected.size}
-          onClose={() => setSelected(new Set())}
-        >
-          <Button size="sm" variant="secondary">
-            Export
-          </Button>
-          <Button size="sm" variant="secondary">
-            Assign Role
-          </Button>
-          <Button size="sm" variant="destructive">
-            Delete
-          </Button>
-        </BulkActionBar>
-      </div>
-    )
-  },
+      <BulkActionBar
+        selectedCount={selected.size}
+        onClose={() => setSelected(new Set())}
+      >
+        <Button size="sm" variant="secondary">
+          Export
+        </Button>
+        <Button size="sm" variant="secondary">
+          Assign Role
+        </Button>
+        <Button size="sm" variant="destructive">
+          Delete
+        </Button>
+      </BulkActionBar>
+    </div>
+  )
+}
+
+export const WithTable: Story = {
+  render: () => <WithTableDemo />,
 }
 
 export const CustomSlots: Story = {
