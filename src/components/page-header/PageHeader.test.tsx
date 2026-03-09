@@ -1,8 +1,31 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi } from 'vitest'
 import { PageHeader } from './PageHeader'
 
 describe('PageHeader', () => {
+  it('renders back button when onBack is provided', () => {
+    render(<PageHeader title="Detail" onBack={vi.fn()} />)
+    expect(screen.getByLabelText('Go back')).toBeInTheDocument()
+  })
+
+  it('calls onBack when back button is clicked', async () => {
+    const onBack = vi.fn()
+    render(<PageHeader title="Detail" onBack={onBack} />)
+    await userEvent.click(screen.getByLabelText('Go back'))
+    expect(onBack).toHaveBeenCalledOnce()
+  })
+
+  it('does not render back button without onBack', () => {
+    render(<PageHeader title="List" />)
+    expect(screen.queryByLabelText('Go back')).not.toBeInTheDocument()
+  })
+
+  it('uses custom backLabel', () => {
+    render(<PageHeader title="Detail" onBack={vi.fn()} backLabel="返回列表" />)
+    expect(screen.getByLabelText('返回列表')).toBeInTheDocument()
+  })
+
   it('renders title', () => {
     render(<PageHeader title="Users" />)
     expect(screen.getByRole('heading', { name: 'Users' })).toBeInTheDocument()

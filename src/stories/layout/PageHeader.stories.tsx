@@ -36,6 +36,21 @@ export const WithBadge: StoryFn = () => (
   />
 )
 
+export const WithBackButton: StoryFn = () => (
+  <PageHeader
+    onBack={() => alert('Navigate back')}
+    title="User Detail"
+    description="View and edit user information."
+    badge={<Badge variant="success">Active</Badge>}
+    actions={
+      <>
+        <Button variant="outline">Reset Password</Button>
+        <Button variant="primary">Save</Button>
+      </>
+    }
+  />
+)
+
 export const WithBreadcrumb: StoryFn = () => (
   <PageHeader
     breadcrumb={
