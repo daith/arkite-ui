@@ -137,19 +137,85 @@ These are what make Arkite UI different from generic UI libraries.
 
 ## Usage Examples
 
-### Admin Layout with Sidebar
+### Admin Layout
 
 ```tsx
-import { AdminLayout, Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarItem } from '@arkite/ui'
-import { LayoutDashboard, Database } from 'lucide-react'
+import { AdminLayout, type AdminNavGroup } from '@arkite/ui'
+
+const navigation: AdminNavGroup[] = [
+  {
+    label: 'Overview',
+    items: [{ path: '/dashboard', label: 'Dashboard' }],
+  },
+  {
+    label: 'Data',
+    items: [
+      { path: '/sources', label: 'Sources', permissions: ['sources:view'] },
+      { path: '/runs', label: 'Runs' },
+    ],
+  },
+]
 
 function App() {
   return (
     <AdminLayout
       currentPath={location.pathname}
       onNavigate={(path) => navigate(path)}
+      navigation={navigation}
+      brand={{ name: 'My App', shortName: 'M' }}
+      user={{ name: 'John', email: 'john@example.com', roleLabel: 'Admin' }}
+      hasPermission={(perms) => checkPermissions(perms)}
+      onLogout={() => logout()}
     >
       <h1>Dashboard</h1>
+    </AdminLayout>
+  )
+}
+```
+
+#### React Router Integration
+
+```tsx
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+
+function App() {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  return (
+    <AdminLayout
+      currentPath={location.pathname}
+      onNavigate={navigate}
+      renderLink={({ href, children, className }) => (
+        <Link to={href} className={className}>{children}</Link>
+      )}
+      {/* ...other props */}
+    />
+  )
+}
+```
+
+#### Next.js Integration
+
+```tsx
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+
+function Layout({ children }) {
+  const pathname = usePathname()
+  const router = useRouter()
+
+  return (
+    <AdminLayout
+      currentPath={pathname}
+      onNavigate={router.push}
+      basePath="/admin"
+      renderLink={({ href, children, className }) => (
+        <Link href={href} className={className}>{children}</Link>
+      )}
+      {/* ...other props */}
+    >
+      {children}
     </AdminLayout>
   )
 }

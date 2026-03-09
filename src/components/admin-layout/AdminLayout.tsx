@@ -1,7 +1,3 @@
-// TODO: decouple from app-specific imports
-// This component uses react-router-dom (Outlet, useNavigate, useLocation)
-// and app-specific constants (PERMISSIONS). Consumers should configure these.
-
 import { type ReactNode } from 'react'
 import {
   Sidebar,
@@ -14,301 +10,273 @@ import {
   useSidebar,
 } from '../sidebar/Sidebar'
 import { Navbar, NavbarContent, NavbarSpacer } from '../navbar/Navbar'
-import { TenantSwitcher } from '../tenant-switcher/TenantSwitcher'
 import { Avatar } from '../avatar/Avatar'
-import { Badge } from '../badge/Badge'
+import { Badge, type BadgeVariant } from '../badge/Badge'
 import { ToastContainer } from '../toast/Toast'
-import { useAuthStore } from '../../stores/authStore'
-import { usePermission, type Permission } from '../../hooks/usePermission'
-import {
-  LayoutDashboard,
-  Database,
-  Play,
-  FileText,
-  Clock,
-  Users,
-  Building2,
-  Settings,
-  LogOut,
-  Webhook,
-  Key,
-  UserCog,
-  Activity,
-  ScrollText,
-  Languages,
-} from 'lucide-react'
+import { cn } from '../../utils/cn'
 
-interface NavItem {
+// --- Types ---
+
+export interface AdminNavItem {
+  /** Route path */
   path: string
+  /** Display label */
   label: string
-  icon: React.ReactNode
-  /** 需要的權限 (任一即可) */
-  permissions?: Permission[]
+  /** Icon element */
+  icon?: ReactNode
+  /** Badge content (e.g., notification count) */
+  badge?: ReactNode
+  /** Required permissions (any match grants access) */
+  permissions?: string[]
+  /** External link (opens new tab) */
+  external?: boolean
+  /** Disabled state */
+  disabled?: boolean
 }
 
-interface NavGroup {
+export interface AdminNavGroup {
+  /** Group heading label */
   label: string
-  items: NavItem[]
-  /** 只有平台管理員可見 */
-  platformOnly?: boolean
-  /** 只有租戶用戶可見 */
-  tenantOnly?: boolean
+  /** Navigation items in this group */
+  items: AdminNavItem[]
+  /** Only visible when `visibleWhen` returns true */
+  visibleWhen?: (context: AdminLayoutContext) => boolean
 }
 
-// Navigation items definition
-const allNavGroups: NavGroup[] = [
-  {
-    label: 'Overview',
-    items: [
-      {
-        path: '/dashboard',
-        label: 'Dashboard',
-        icon: <LayoutDashboard className="h-5 w-5" />,
-      },
-    ],
-  },
-  {
-    label: 'Platform',
-    platformOnly: true,
-    items: [
-      {
-        path: '/companies',
-        label: 'Tenants',
-        icon: <Building2 className="h-5 w-5" />,
-        permissions: ['companies:view'],
-      },
-      {
-        path: '/users',
-        label: 'Users',
-        icon: <UserCog className="h-5 w-5" />,
-        permissions: ['platform_users:view'],
-      },
-    ],
-  },
-  {
-    label: 'Data',
-    items: [
-      {
-        path: '/sources',
-        label: 'Sources',
-        icon: <Database className="h-5 w-5" />,
-        permissions: ['sources:view'],
-      },
-      {
-        path: '/runs',
-        label: 'Runs',
-        icon: <Play className="h-5 w-5" />,
-        permissions: ['runs:view'],
-      },
-      {
-        path: '/items',
-        label: 'Items',
-        icon: <FileText className="h-5 w-5" />,
-        permissions: ['items:view'],
-      },
-      {
-        path: '/schedules',
-        label: 'Schedules',
-        icon: <Clock className="h-5 w-5" />,
-        permissions: ['schedules:view'],
-      },
-    ],
-  },
-  {
-    label: 'Integrations',
-    items: [
-      {
-        path: '/webhooks',
-        label: 'Webhooks',
-        icon: <Webhook className="h-5 w-5" />,
-        permissions: ['webhooks:view'],
-      },
-      {
-        path: '/api-keys',
-        label: 'API Keys',
-        icon: <Key className="h-5 w-5" />,
-        permissions: ['api_keys:view'],
-      },
-    ],
-  },
-  {
-    label: 'System',
-    platformOnly: true,
-    items: [
-      {
-        path: '/usage',
-        label: 'Usage',
-        icon: <Activity className="h-5 w-5" />,
-        permissions: ['usage:view'],
-      },
-      {
-        path: '/audit-logs',
-        label: 'Audit Logs',
-        icon: <ScrollText className="h-5 w-5" />,
-        permissions: ['audit_logs:view'],
-      },
-      {
-        path: '/translations',
-        label: 'Translations',
-        icon: <Languages className="h-5 w-5" />,
-        permissions: ['settings:edit'],
-      },
-    ],
-  },
-  {
-    label: 'Manage',
-    items: [
-      {
-        path: '/team',
-        label: 'Team',
-        icon: <Users className="h-5 w-5" />,
-        permissions: ['team:view'],
-      },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      {
-        path: '/settings',
-        label: 'Settings',
-        icon: <Settings className="h-5 w-5" />,
-        permissions: ['settings:view'],
-      },
-    ],
-  },
-]
-
-// Sidebar Logo Header - handles collapsed state
-function SidebarLogoHeader() {
-  const { collapsed, setCollapsed } = useSidebar()
-
-  return (
-    <SidebarHeader className="flex items-center justify-between">
-      {collapsed ? (
-        // Collapsed: show icon as expand button
-        <button
-          type="button"
-          onClick={() => setCollapsed(false)}
-          className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors mx-auto"
-          title="Expand menu"
-        >
-          A
-        </button>
-      ) : (
-        // Expanded: show full logo and collapse button
-        <>
-          <div className="flex items-center gap-2 px-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
-              A
-            </div>
-            <span className="font-semibold">Ark Harvest</span>
-          </div>
-          <SidebarToggle />
-        </>
-      )}
-    </SidebarHeader>
-  )
+export interface AdminBrandConfig {
+  /** Brand name */
+  name: string
+  /** Short name or letter for collapsed state */
+  shortName?: string
+  /** Logo element (replaces default letter icon) */
+  logo?: ReactNode
+  /** Collapsed logo element */
+  collapsedLogo?: ReactNode
 }
 
-// 角色顯示名稱對照
-const ROLE_DISPLAY_NAMES: Record<string, string> = {
-  super_admin: 'Super Admin',
-  system_staff: 'Platform Staff',
-  tenant_admin: 'Tenant Admin',
-  member: 'Member',
-  viewer: 'Viewer',
+export interface AdminUserConfig {
+  /** User display name */
+  name?: string
+  /** User email */
+  email?: string
+  /** Avatar fallback (initials) */
+  avatarFallback?: string
+  /** Avatar image URL */
+  avatarSrc?: string
+  /** Role display name */
+  roleLabel?: string
+  /** Role badge variant */
+  roleBadgeVariant?: BadgeVariant
 }
 
-// 角色徽章顏色對照
-const ROLE_BADGE_VARIANTS: Record<string, 'default' | 'secondary' | 'success' | 'warning'> = {
-  super_admin: 'warning',
-  system_staff: 'success',
-  tenant_admin: 'default',
-  member: 'secondary',
-  viewer: 'secondary',
+export interface AdminLayoutContext {
+  /** Current path */
+  currentPath: string
+  /** Check if user has any of the given permissions */
+  hasPermission?: (permissions: string[]) => boolean
 }
 
 export interface AdminLayoutProps {
   /** Current pathname for active state */
   currentPath: string
-  /** Navigate function */
+  /** Navigation groups */
+  navigation: AdminNavGroup[]
+  /** Brand configuration */
+  brand: AdminBrandConfig
+  /** User info for navbar display */
+  user?: AdminUserConfig
+  /** Base path prefix for all routes */
+  basePath?: string
+  /** Navigate callback */
   onNavigate: (path: string) => void
+  /** Custom link renderer for framework integration (React Router, Next.js) */
+  renderLink?: (props: { href: string; children: ReactNode; className?: string; active?: boolean }) => ReactNode
+  /** Permission check function */
+  hasPermission?: (permissions: string[]) => boolean
+  /** Logout handler */
+  onLogout?: () => void
+  /** Extra content in the navbar (left side, after brand area) */
+  navbarLeft?: ReactNode
+  /** Extra content in the navbar (right side, before user info) */
+  navbarRight?: ReactNode
+  /** Sidebar footer content (replaces default logout button) */
+  sidebarFooter?: ReactNode
+  /** Toast position */
+  toastPosition?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center'
+  /** Hide toast container (if consumer manages their own) */
+  hideToast?: boolean
   /** Main content */
   children: ReactNode
+  className?: string
 }
 
-export function AdminLayout({ currentPath, onNavigate, children }: AdminLayoutProps) {
-  const { user, logout } = useAuthStore()
-  const { isPlatformAdmin, role, canAny } = usePermission()
+// --- Internal components ---
 
-  // 根據權限過濾導航
-  const navGroups = allNavGroups
+function SidebarBrand({ brand }: { brand: AdminBrandConfig }) {
+  const { collapsed, setCollapsed } = useSidebar()
+
+  if (collapsed) {
+    return (
+      <SidebarHeader className="flex items-center justify-center">
+        <button
+          type="button"
+          onClick={() => setCollapsed(false)}
+          className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors"
+          title="Expand menu"
+        >
+          {brand.collapsedLogo || brand.shortName || brand.name.charAt(0)}
+        </button>
+      </SidebarHeader>
+    )
+  }
+
+  return (
+    <SidebarHeader className="flex items-center justify-between">
+      <div className="flex items-center gap-2 px-2">
+        {brand.logo || (
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
+            {brand.shortName || brand.name.charAt(0)}
+          </div>
+        )}
+        <span className="font-semibold">{brand.name}</span>
+      </div>
+      <SidebarToggle />
+    </SidebarHeader>
+  )
+}
+
+function NavItemContent({ item }: { item: AdminNavItem }) {
+  return (
+    <>
+      {item.label}
+      {item.badge && (
+        <span className="ml-auto">{item.badge}</span>
+      )}
+    </>
+  )
+}
+
+// --- Main component ---
+
+export function AdminLayout({
+  currentPath,
+  navigation,
+  brand,
+  user,
+  basePath = '',
+  onNavigate,
+  renderLink,
+  hasPermission,
+  onLogout,
+  navbarLeft,
+  navbarRight,
+  sidebarFooter,
+  toastPosition = 'top-right',
+  hideToast = false,
+  children,
+  className,
+}: AdminLayoutProps) {
+  const context: AdminLayoutContext = { currentPath, hasPermission }
+
+  // Filter navigation based on permissions and visibility
+  const visibleGroups = navigation
     .filter((group) => {
-      // 平台專屬頁面
-      if (group.platformOnly && !isPlatformAdmin) return false
-      // 租戶專屬頁面
-      if (group.tenantOnly && isPlatformAdmin) return false
+      if (group.visibleWhen && !group.visibleWhen(context)) return false
       return true
     })
     .map((group) => ({
       ...group,
-      // 過濾沒有權限的項目
       items: group.items.filter((item) => {
-        if (!item.permissions || item.permissions.length === 0) return true
-        return canAny(item.permissions)
+        if (item.permissions && item.permissions.length > 0 && hasPermission) {
+          return hasPermission(item.permissions)
+        }
+        return true
       }),
     }))
-    // 移除沒有項目的群組
     .filter((group) => group.items.length > 0)
 
-  const handleLogout = () => {
-    logout()
-    onNavigate('/login')
+  const resolvePath = (path: string) => `${basePath}${path}`
+
+  const handleItemClick = (item: AdminNavItem) => {
+    if (item.external) {
+      window.open(resolvePath(item.path), '_blank', 'noopener,noreferrer')
+    } else {
+      onNavigate(resolvePath(item.path))
+    }
   }
 
-  // 取得角色顯示文字
-  const getRoleDisplay = () => {
-    if (!role) return 'Unknown'
-    return ROLE_DISPLAY_NAMES[role] || role
-  }
-
-  // 取得角色徽章顏色
-  const getRoleBadgeVariant = () => {
-    if (!role) return 'secondary' as const
-    return ROLE_BADGE_VARIANTS[role] || ('secondary' as const)
+  const isActive = (path: string) => {
+    const resolved = resolvePath(path)
+    return currentPath === resolved || currentPath.startsWith(`${resolved}/`)
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className={cn('flex h-screen bg-background', className)}>
       {/* Sidebar */}
       <Sidebar collapsible defaultCollapsed={false}>
-        <SidebarLogoHeader />
+        <SidebarBrand brand={brand} />
 
         <SidebarContent>
-          {navGroups.map((group) => (
+          {visibleGroups.map((group) => (
             <SidebarGroup key={group.label} label={group.label}>
-              {group.items.map((item) => (
-                <SidebarItem
-                  key={item.path}
-                  icon={item.icon}
-                  active={currentPath === item.path}
-                  onClick={() => onNavigate(item.path)}
-                >
-                  {item.label}
-                </SidebarItem>
-              ))}
+              {group.items.map((item) => {
+                const active = isActive(item.path)
+
+                if (renderLink && !item.external) {
+                  return (
+                    <div key={item.path}>
+                      {renderLink({
+                        href: resolvePath(item.path),
+                        active,
+                        className: 'block',
+                        children: (
+                          <SidebarItem
+                            icon={item.icon}
+                            active={active}
+                            disabled={item.disabled}
+                          >
+                            <NavItemContent item={item} />
+                          </SidebarItem>
+                        ),
+                      })}
+                    </div>
+                  )
+                }
+
+                return (
+                  <SidebarItem
+                    key={item.path}
+                    icon={item.icon}
+                    active={active}
+                    disabled={item.disabled}
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <NavItemContent item={item} />
+                    {item.external && (
+                      <svg width="12" height="12" viewBox="0 0 15 15" fill="none" className="ml-1 opacity-50">
+                        <path
+                          d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 12.7761 8 12.5 8C12.2239 8 12 8.22386 12 8.5V12H3V3H6.5C6.77614 3 7 2.77614 7 2.5C7 2.22386 6.77614 2 6.5 2H3ZM12.8536 2.14645C12.9015 2.19439 12.9377 2.24964 12.9621 2.30861C12.9861 2.36669 12.9996 2.4303 13 2.497L13 2.5V2.50049V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3.70711L6.85355 8.85355C6.65829 9.04882 6.34171 9.04882 6.14645 8.85355C5.95118 8.65829 5.95118 8.34171 6.14645 8.14645L11.2929 3H9.5C9.22386 3 9 2.77614 9 2.5C9 2.22386 9.22386 2 9.5 2H12.4999H12.5C12.5678 2 12.6324 2.01349 12.6914 2.03794C12.7504 2.06234 12.8056 2.09851 12.8536 2.14645Z"
+                          fill="currentColor"
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                  </SidebarItem>
+                )
+              })}
             </SidebarGroup>
           ))}
         </SidebarContent>
 
         <SidebarFooter>
-          <SidebarItem
-            icon={<LogOut className="h-5 w-5" />}
-            onClick={handleLogout}
-          >
-            Logout
-          </SidebarItem>
+          {sidebarFooter || (
+            onLogout && (
+              <SidebarItem onClick={onLogout}>
+                Logout
+              </SidebarItem>
+            )
+          )}
         </SidebarFooter>
       </Sidebar>
 
@@ -317,32 +285,33 @@ export function AdminLayout({ currentPath, onNavigate, children }: AdminLayoutPr
         {/* Navbar */}
         <Navbar sticky bordered>
           <NavbarContent align="left">
-            {/* Tenant Switcher - Platform Admin Only */}
-            {isPlatformAdmin && <TenantSwitcher />}
-            {/* Tenant Name - Tenant Users */}
-            {!isPlatformAdmin && user?.tenant_name && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-secondary/50 rounded-md">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{user.tenant_name}</span>
-              </div>
-            )}
+            {navbarLeft}
           </NavbarContent>
           <NavbarSpacer />
           <NavbarContent align="right">
-            <div className="flex items-center gap-3">
-              <Avatar fallback={user?.name?.charAt(0) || 'U'} size="sm" />
-              <div className="hidden md:block">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium">{user?.name || user?.email}</p>
-                  <Badge variant={getRoleBadgeVariant()} className="text-xs">
-                    {getRoleDisplay()}
-                  </Badge>
+            {navbarRight}
+            {user && (
+              <div className="flex items-center gap-3">
+                <Avatar
+                  fallback={user.avatarFallback || user.name?.charAt(0) || 'U'}
+                  src={user.avatarSrc}
+                  size="sm"
+                />
+                <div className="hidden md:block">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">{user.name || user.email}</p>
+                    {user.roleLabel && (
+                      <Badge variant={user.roleBadgeVariant || 'secondary'} className="text-xs">
+                        {user.roleLabel}
+                      </Badge>
+                    )}
+                  </div>
+                  {user.email && user.name && (
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  )}
                 </div>
-                {user?.email && user?.name && (
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                )}
               </div>
-            </div>
+            )}
           </NavbarContent>
         </Navbar>
 
@@ -353,7 +322,7 @@ export function AdminLayout({ currentPath, onNavigate, children }: AdminLayoutPr
       </div>
 
       {/* Toast Container */}
-      <ToastContainer position="top-right" />
+      {!hideToast && <ToastContainer position={toastPosition} />}
     </div>
   )
 }
