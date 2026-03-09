@@ -4,6 +4,7 @@ export { getBreadcrumbItems, getSimpleBreadcrumbItems } from './utils/breadcrumb
 export type { BreadcrumbItem as BreadcrumbConfigItem } from './utils/breadcrumb'
 
 // UI Primitives
+export * from './components/view-toggle'
 export * from './components/button'
 export * from './components/input'
 export * from './components/badge'

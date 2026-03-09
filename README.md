@@ -95,6 +95,7 @@ import { AdminLayout, DataTable, Button, Badge } from '@arkite/ui'
 | `StatusDot` | Presence indicator (online/offline/busy/away) with pulse animation |
 | `Spinner` | Loading indicator (sm/md/lg) |
 | `Kbd` | Keyboard shortcut display (sm/md) |
+| `ViewToggle` | Table/card view mode switcher (sm/md) |
 
 ### Layout
 

@@ -61,8 +61,8 @@ src/
 
 ## Component Categories
 
-### Primitives (13)
-Button, Input, Textarea, Badge, Select, Checkbox, Radio, Toggle, Switch, Avatar, StatusDot, Spinner, Kbd, Label
+### Primitives (14)
+Button, Input, Textarea, Badge, Select, Checkbox, Radio, Toggle, Switch, Avatar, StatusDot, Spinner, Kbd, Label, ViewToggle
 
 ### Layout (5)
 AdminLayout, Card, Container, Stack (HStack/VStack), Divider

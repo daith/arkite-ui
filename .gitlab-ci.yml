@@ -102,8 +102,8 @@ chromatic:
     - npm ci --ignore-scripts
     - npm run chromatic
   rules:
-    - if: $CI_MERGE_REQUEST_IID
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_MERGE_REQUEST_IID && $CHROMATIC_PROJECT_TOKEN
+    - if: $CI_COMMIT_BRANCH == "main" && $CHROMATIC_PROJECT_TOKEN
   variables:
     CHROMATIC_PROJECT_TOKEN: $CHROMATIC_PROJECT_TOKEN
   allow_failure: true
@@ -163,6 +163,6 @@ publish:npm:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
     - npm publish --access public
   rules:
-    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_TAG && $NPM_TOKEN
       when: manual
       allow_failure: true

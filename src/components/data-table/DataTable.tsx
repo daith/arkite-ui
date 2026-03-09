@@ -170,7 +170,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('rounded-md border', className)}>
       <Table>
         <TableHeader>
           <TableRow>
@@ -245,7 +245,7 @@ export function DataTable<T>({
       </Table>
 
       {pagination && sortedData.length > 0 && (
-        <div className="flex items-center justify-between px-2">
+        <div className="flex items-center justify-between border-t px-4 py-3">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Rows per page:</span>
             <select
@@ -270,47 +270,50 @@ export function DataTable<T>({
               )}{' '}
               of {sortedData.length}
             </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(0)}
-                disabled={!canPreviousPage}
-                className="h-8 w-8"
-              >
-                <ChevronsLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(paginationState.pageIndex - 1)}
-                disabled={!canPreviousPage}
-                className="h-8 w-8"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="flex h-8 min-w-[4rem] items-center justify-center text-sm">
-                {paginationState.pageIndex + 1} / {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(paginationState.pageIndex + 1)}
-                disabled={!canNextPage}
-                className="h-8 w-8"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => goToPage(totalPages - 1)}
-                disabled={!canNextPage}
-                className="h-8 w-8"
-              >
-                <ChevronsRight className="h-4 w-4" />
-              </Button>
-            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(0)}
+                  disabled={!canPreviousPage}
+                  className="h-8 w-8"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(paginationState.pageIndex - 1)}
+                  disabled={!canPreviousPage}
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="flex h-8 min-w-[4rem] items-center justify-center text-sm">
+                  {paginationState.pageIndex + 1} / {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(paginationState.pageIndex + 1)}
+                  disabled={!canNextPage}
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(totalPages - 1)}
+                  disabled={!canNextPage}
+                  className="h-8 w-8"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
