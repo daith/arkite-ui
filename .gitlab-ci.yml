@@ -104,8 +104,6 @@ chromatic:
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CHROMATIC_PROJECT_TOKEN
     - if: $CI_COMMIT_BRANCH == "main" && $CHROMATIC_PROJECT_TOKEN
-  variables:
-    CHROMATIC_PROJECT_TOKEN: $CHROMATIC_PROJECT_TOKEN
   allow_failure: true
 
 # -------------------------------------------------------------------
