@@ -30,6 +30,24 @@ typecheck:
     - npm ci --ignore-scripts
     - npm run typecheck
 
+test:
+  stage: check
+  image: node:20-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  script:
+    - npm ci --ignore-scripts
+    - npm run test
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    when: always
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
 build:
   stage: build
   image: node:20-alpine
