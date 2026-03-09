@@ -13,6 +13,25 @@ const preview: Preview = {
       test: 'todo',
     },
     layout: 'centered',
+    options: {
+      storySort: {
+        order: [
+          'Introduction',
+          'Getting Started',
+          'Component Guidelines',
+          'Foundation',
+          'Form Patterns',
+          'Primitives',
+          'Form',
+          'Layout',
+          'Navigation',
+          'Data Display',
+          'Overlay',
+          'Feedback',
+          '*',
+        ],
+      },
+    },
   },
   tags: ['autodocs'],
 }

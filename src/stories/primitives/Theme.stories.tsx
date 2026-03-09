@@ -15,7 +15,7 @@ import { Input } from '../../components/input'
 import { Alert } from '../../components/alert'
 
 const meta: Meta = {
-  title: 'Theme/Presets',
+  title: 'Foundation/Theme Presets',
   parameters: { layout: 'padded' },
 }
 
