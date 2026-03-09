@@ -76,3 +76,28 @@ export const Empty: StoryFn = () => (
 
 export const NoPagination = Template.bind({})
 NoPagination.args = { pagination: false }
+
+export const ErrorState: StoryFn = () => (
+  <DataTable<User>
+    data={[]}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    emptyContent={
+      <div className="flex flex-col items-center gap-2 py-4 text-center">
+        <span className="text-destructive font-medium">Failed to load data</span>
+        <span className="text-sm text-muted-foreground">Please check your connection and try again.</span>
+      </div>
+    }
+  />
+)
+
+export const LoadingWithData: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData.slice(0, 3)}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    loading
+    pagination
+    defaultPageSize={5}
+  />
+)

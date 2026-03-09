@@ -68,3 +68,51 @@ const WithErrorDemo = () => {
 }
 
 export const WithError: StoryFn = () => <WithErrorDemo />
+
+const LoadingDemo = () => {
+  const [value, setValue] = useState<string>('')
+  return (
+    <div className="w-72">
+      <Combobox
+        options={[]}
+        value={value}
+        onChange={(v) => setValue(v as string)}
+        placeholder="Fetching options..."
+        loading
+      />
+    </div>
+  )
+}
+
+export const Loading: StoryFn = () => <LoadingDemo />
+
+const NoResultsDemo = () => {
+  const [value, setValue] = useState<string>('')
+  return (
+    <div className="w-72">
+      <Combobox
+        options={[]}
+        value={value}
+        onChange={(v) => setValue(v as string)}
+        placeholder="Search..."
+        emptyMessage="No matching frameworks found."
+      />
+    </div>
+  )
+}
+
+export const NoResults: StoryFn = () => <NoResultsDemo />
+
+const DisabledDemo = () => (
+  <div className="w-72">
+    <Combobox
+      options={frameworks}
+      value="react"
+      onChange={() => {}}
+      placeholder="Select framework..."
+      disabled
+    />
+  </div>
+)
+
+export const Disabled: StoryFn = () => <DisabledDemo />

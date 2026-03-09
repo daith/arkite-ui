@@ -33,3 +33,25 @@ export const ButtonVariant: Story = {
     </FileUploadButton>
   ),
 }
+
+export const Disabled: Story = {
+  args: { disabled: true },
+  decorators: [(Story) => <div className="w-96">{Story()}</div>],
+}
+
+export const WithErrorCallback: Story = {
+  args: {
+    maxSize: 1024, // 1KB — easy to trigger error
+    onError: (error: string) => alert(error),
+  },
+  decorators: [(Story) => <div className="w-96">{Story()}</div>],
+}
+
+export const SmallMaxFiles: Story = {
+  args: {
+    multiple: true,
+    maxFiles: 2,
+    onError: (error: string) => alert(error),
+  },
+  decorators: [(Story) => <div className="w-96">{Story()}</div>],
+}

@@ -64,6 +64,29 @@ export const Loading: StoryFn = () => (
   />
 )
 
+export const EmptyList: StoryFn = () => (
+  <TenantSwitcher
+    tenants={[]}
+    currentTenant={null}
+    onSelect={() => {}}
+  />
+)
+
+const SearchNoResultsDemo = () => {
+  const [current, setCurrent] = useState<TenantItem | null>(sampleTenants[0])
+  return (
+    <TenantSwitcher
+      tenants={sampleTenants}
+      currentTenant={current}
+      onSelect={setCurrent}
+      onSearch={() => {}}
+      searchPlaceholder="Try searching 'xyz'..."
+    />
+  )
+}
+
+export const WithSearch: StoryFn = () => <SearchNoResultsDemo />
+
 const CustomRenderDemo = () => {
   const [current, setCurrent] = useState<TenantItem | null>(null)
   return (
