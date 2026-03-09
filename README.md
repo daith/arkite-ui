@@ -1,11 +1,13 @@
 # Arkite UI
 
-Production-ready React components for SaaS admin panels. Built with Tailwind CSS.
+Production-ready React components for SaaS admin panels. Built with Tailwind CSS v4.
 
 [![pipeline](https://gitlab.com/foson.co/arkite-ui/badges/main/pipeline.svg)](https://gitlab.com/foson.co/arkite-ui/-/pipelines)
 [![coverage](https://gitlab.com/foson.co/arkite-ui/badges/main/coverage.svg)](https://gitlab.com/foson.co/arkite-ui/-/pipelines)
 
-Arkite UI is not another generic component library. It focuses on the components you actually need to build multi-tenant SaaS admin panels — tenant switchers, permission-aware layouts, data tables, stat dashboards, and more.
+Arkite UI is not another generic component library. It focuses on the components you actually need to build multi-tenant SaaS admin panels — tenant switchers, data tables, stat dashboards, filter bars, and more.
+
+> **Design Principle:** Pure UI only. No business logic, no auth, no stores. Domain-specific logic belongs in your project (e.g. `@ark-crm/auth`).
 
 **Links:**
 
@@ -17,14 +19,15 @@ Arkite UI is not another generic component library. It focuses on the components
 
 ## Features
 
-- **SaaS-First** — AdminLayout, TenantSwitcher, permission system built-in
-- **Multi-Tenant Ready** — Tenant store, tenant switching, role-based rendering
-- **Tailwind CSS** — CSS Variables theming with dark mode support
-- **TypeScript** — Full type safety with exported types
-- **Accessible** — Focus traps, ARIA attributes, keyboard navigation
+- **SaaS-First** — AdminLayout, TenantSwitcher, FilterBar, BulkActionBar
+- **Tailwind CSS v4** — CSS-first configuration with `@theme`, `@custom-variant`, `@utility`
+- **TypeScript** — Full type safety with exported types and JSDoc on all components
+- **Accessible** — Focus traps, ARIA attributes, keyboard navigation, a11y-tested
 - **Framer Motion** — Optional animation system for Modal, Drawer, Toast
-- **Theme System** — 4 built-in presets + `createTheme()` utility
-- **Tested** — Unit tests with Vitest + Testing Library
+- **Theme System** — 4 built-in presets + `createTheme()` utility with CSS Variables
+- **Density System** — Consistent `sm/md/lg` sizing across all interactive components
+- **Tested** — 412 unit tests with Vitest + Testing Library
+- **Bundle Monitoring** — size-limit budget (< 300 KB)
 
 ## Installation
 
@@ -38,7 +41,7 @@ npm install @arkite/ui
 npm install react react-dom tailwindcss zustand lucide-react
 ```
 
-### Optional Peer Dependencies
+### Optional
 
 ```bash
 npm install framer-motion    # For AnimatedModal, AnimatedDrawer, AnimatedToast
@@ -46,116 +49,98 @@ npm install framer-motion    # For AnimatedModal, AnimatedDrawer, AnimatedToast
 
 ## Quick Start
 
-### 1. Tailwind Configuration
-
-```ts
-// tailwind.config.ts
-import type { Config } from 'tailwindcss'
-import arkitePreset from '@arkite/ui/tailwind'
-
-export default {
-  presets: [arkitePreset],
-  content: [
-    './src/**/*.{ts,tsx}',
-    './node_modules/@arkite/ui/dist/**/*.{js,cjs}',
-  ],
-} satisfies Config
-```
-
-### 2. Import Styles
+### 1. Import Styles
 
 ```tsx
-// main.tsx
+// main.tsx or app.tsx
 import '@arkite/ui/styles.css'
+```
+
+### 2. Tailwind Configuration (v4)
+
+With Tailwind CSS v4, import the preset in your CSS:
+
+```css
+/* app.css */
+@import "tailwindcss";
+@import "@arkite/ui/styles.css";
+```
+
+Or use the JS preset for Tailwind v4 config:
+
+```ts
+import arkitePreset from '@arkite/ui/tailwind'
 ```
 
 ### 3. Use Components
 
 ```tsx
-import { AdminLayout, DataTable, Button, usePermission } from '@arkite/ui'
+import { AdminLayout, DataTable, Button, Badge } from '@arkite/ui'
 ```
 
-## Components
-
-### SaaS Components
-
-These are what make Arkite UI different from generic UI libraries.
-
-| Component | Description |
-|-----------|-------------|
-| `AdminLayout` | Full admin page layout with sidebar, navbar, and content area |
-| `Sidebar` | Collapsible sidebar with grouped navigation items |
-| `TenantSwitcher` | Dropdown for switching between tenants with search and status badges |
-| `DataTable` | Table with sorting, pagination, loading states, and custom cell renderers |
-| `VirtualList` | Virtualized scrolling for 10,000+ items (via @tanstack/react-virtual) |
-| `InfiniteScroll` | Cursor-based pagination with scroll threshold detection |
-| `StatCard` / `StatGroup` | Metrics display with trend indicators |
-| `EmptyState` | Pre-configured empty states (no data, no results, error) |
-| `SearchInput` | Search field with debounce and clear button |
-| `FileUpload` | Drag-and-drop file upload with validation |
-
-### Overlay / Composite
-
-| Component | Description |
-|-----------|-------------|
-| `Popover` | Radix-based popover with arrow support |
-| `Tooltip` / `SimpleTooltip` | Radix-based tooltip with convenience wrapper |
-| `DropdownMenu` | Full Radix dropdown with checkbox, radio, sub-menu |
-| `Combobox` | Searchable select with single/multi-select, tags, async search |
-| `CommandPalette` | Cmd+K command palette (cmdk-based) |
-
-### Process / Timeline
-
-| Component | Description |
-|-----------|-------------|
-| `Calendar` | Month view with date selection, constraints, highlighted dates |
-| `Timeline` | Vertical timeline for audit logs and activity feeds |
-| `Steps` | Step indicator for onboarding and wizard flows |
-
-### Hooks
-
-| Hook | Description |
-|------|-------------|
-| `usePermission` | Role-based permission checks (`can`, `canAny`, `canAll`) |
-| `useDataFetch` | Data fetching with loading/error states and refresh |
-| `useReducedMotion` | Detect `prefers-reduced-motion` system setting |
-
-### Stores
-
-| Store | Description |
-|-------|-------------|
-| `useAuthStore` | Authentication state, login/logout, user management |
-| `useTenantStore` | Current tenant, tenant list, tenant switching |
+## Components (55+)
 
 ### UI Primitives
 
 | Component | Description |
 |-----------|-------------|
-| `Button` | 6 variants (primary, secondary, outline, ghost, destructive, gradient) |
-| `Input` | Text input with addons, error state |
-| `Badge` | Status badges (default, success, warning, destructive, info) |
-| `Select` | Dropdown select |
-| `Checkbox` / `Radio` / `Toggle` | Selection controls |
-| `Label` | Form labels |
-| `Avatar` | User profile images |
-| `Spinner` | Loading indicator |
+| `Button` | 6 variants (primary, secondary, outline, ghost, destructive, gradient), sm/md/lg |
+| `Input` | Text input with addons, error state, sm/md/lg |
+| `Textarea` | Multi-line input with autoResize, sm/md/lg |
+| `Badge` | Status badges with sm/md sizes (default, success, warning, destructive, info) |
+| `Select` | Native select dropdown with icon and error state |
+| `Checkbox` / `Radio` / `Toggle` / `Switch` | Selection controls |
+| `Label` | Form labels with required/optional indicators |
+| `Avatar` | Profile images with StatusDot integration and AvatarGroup |
+| `StatusDot` | Presence indicator (online/offline/busy/away) with pulse animation |
+| `Spinner` | Loading indicator (sm/md/lg) |
+| `Kbd` | Keyboard shortcut display (sm/md) |
 
 ### Layout
 
 | Component | Description |
 |-----------|-------------|
+| `AdminLayout` | Full admin layout with sidebar, navbar, and content area |
 | `Card` | Card with header, content, footer sub-components |
-| `Container` | Max-width content wrapper |
+| `Container` | Max-width content wrapper (sm/md/lg/xl/2xl/full) |
 | `Stack` / `HStack` / `VStack` | Flexbox layout utilities |
-| `Divider` | Visual separator |
+| `Divider` | Visual separator with optional label |
 
 ### Navigation
 
 | Component | Description |
 |-----------|-------------|
+| `Sidebar` | Collapsible sidebar with grouped navigation items |
+| `TenantSwitcher` | Dropdown for switching between tenants with search |
 | `Navbar` | Top navigation bar with brand and content areas |
 | `Breadcrumb` | Path breadcrumbs with truncation |
 | `Tabs` | Tab navigation |
+
+### Data Display
+
+| Component | Description |
+|-----------|-------------|
+| `DataTable` | Table with sorting, pagination, loading states, custom cells |
+| `Table` | Composable table with `stickyHeader` and `stickyAction` columns |
+| `FilterBar` | Responsive slot-based toolbar (search + filters + actions) |
+| `BulkActionBar` | Floating overlay bar for bulk selection actions |
+| `VirtualList` | Virtualized scrolling for 10,000+ items (@tanstack/react-virtual) |
+| `InfiniteScroll` | Cursor-based pagination with scroll detection |
+| `StatCard` / `StatGroup` | Metrics display with trend indicators |
+| `EmptyState` | Pre-configured empty states (no data, no results, error, 404/403/500) |
+| `Calendar` | Month view with date selection and constraints |
+| `Timeline` | Vertical timeline for audit logs and activity feeds |
+| `Steps` | Step indicator for wizard flows |
+
+### Form
+
+| Component | Description |
+|-----------|-------------|
+| `Form` | Context-based form with FormField, FormLabel, FormControl, FormMessage |
+| `SearchInput` | Search field with debounce and clear button |
+| `FileUpload` | Drag-and-drop file upload with validation |
+| `DatePicker` | Date selection with calendar popover (sm/md/lg) |
+| `Combobox` | Searchable select with single/multi-select, tags, async (sm/md/lg) |
 
 ### Feedback
 
@@ -164,17 +149,39 @@ These are what make Arkite UI different from generic UI libraries.
 | `Modal` | Dialog with focus trap, portal rendering, escape to close |
 | `Drawer` | Slide-out panel (left, right, top, bottom) |
 | `Toast` | Notification system with Zustand store (`useToast`) |
-| `AnimatedModal` / `AnimatedDrawer` / `AnimatedToastContainer` | Framer Motion versions |
-| `Alert` | Inline alert messages |
-| `Progress` | Progress bar with indeterminate mode |
-| `Skeleton` | Loading placeholder |
+| `ConfirmDialog` | Confirmation modal (destructive/warning variants) |
+| `DeleteConfirmDialog` | Pre-configured destructive confirm with `itemName` |
+| `Alert` | Inline alert messages (info, success, warning, destructive) |
+| `Progress` / `CircularProgress` | Progress bars (determinate, indeterminate, striped) |
+| `Skeleton` | Loading placeholders (text, avatar, card, table patterns) |
 
-### Form
+### Overlay
 
 | Component | Description |
 |-----------|-------------|
-| `Form` | Context-based form with field, label, control, message, section |
-| `DatePicker` | Date selection |
+| `Popover` | Radix-based popover with arrow support |
+| `Tooltip` / `SimpleTooltip` | Radix-based tooltip with convenience wrapper |
+| `DropdownMenu` | Full Radix dropdown with checkbox, radio, sub-menu |
+| `CommandPalette` | Cmd+K command palette (cmdk-based) |
+
+### Actions
+
+| Component | Description |
+|-----------|-------------|
+| `ActionButtons` | Grouped action buttons for page headers |
+| `Pagination` | Page navigation with size selector |
+| `PageHeader` | Page header with title, breadcrumb, and actions |
+| `ErrorBoundary` | React error boundary with fallback UI |
+
+### Motion (Optional)
+
+Requires `framer-motion` peer dependency.
+
+| Component | Description |
+|-----------|-------------|
+| `AnimatedModal` | Modal with scale and fade animations |
+| `AnimatedDrawer` | Slide-in drawer with spring transitions |
+| `AnimatedToastContainer` | Animated toast notifications |
 
 ## Usage Examples
 
@@ -191,7 +198,7 @@ const navigation: AdminNavGroup[] = [
   {
     label: 'Data',
     items: [
-      { path: '/sources', label: 'Sources', permissions: ['sources:view'] },
+      { path: '/sources', label: 'Sources' },
       { path: '/runs', label: 'Runs' },
     ],
   },
@@ -205,7 +212,6 @@ function App() {
       navigation={navigation}
       brand={{ name: 'My App', shortName: 'M' }}
       user={{ name: 'John', email: 'john@example.com', roleLabel: 'Admin' }}
-      hasPermission={(perms) => checkPermissions(perms)}
       onLogout={() => logout()}
     >
       <h1>Dashboard</h1>
@@ -214,58 +220,10 @@ function App() {
 }
 ```
 
-#### React Router Integration
-
-```tsx
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-
-function App() {
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  return (
-    <AdminLayout
-      currentPath={location.pathname}
-      onNavigate={navigate}
-      renderLink={({ href, children, className }) => (
-        <Link to={href} className={className}>{children}</Link>
-      )}
-      {/* ...other props */}
-    />
-  )
-}
-```
-
-#### Next.js Integration
-
-```tsx
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-
-function Layout({ children }) {
-  const pathname = usePathname()
-  const router = useRouter()
-
-  return (
-    <AdminLayout
-      currentPath={pathname}
-      onNavigate={router.push}
-      basePath="/admin"
-      renderLink={({ href, children, className }) => (
-        <Link href={href} className={className}>{children}</Link>
-      )}
-      {/* ...other props */}
-    >
-      {children}
-    </AdminLayout>
-  )
-}
-```
-
 ### Data Table
 
 ```tsx
-import { DataTable } from '@arkite/ui'
+import { DataTable, Badge } from '@arkite/ui'
 
 const columns = [
   { key: 'name', header: 'Name', sortable: true },
@@ -276,75 +234,27 @@ const columns = [
 <DataTable columns={columns} data={items} getRowKey={(row) => row.id} />
 ```
 
-### Virtual List (10,000+ items)
+### Filter Bar + Bulk Actions
 
 ```tsx
-import { VirtualList } from '@arkite/ui'
+import { FilterBar, FilterBarSearch, FilterBarFilters, FilterBarActions, BulkActionBar, Button } from '@arkite/ui'
 
-<VirtualList
-  items={largeDataset}
-  getItemKey={(item) => item.id}
-  estimateSize={48}
-  height={400}
-  renderItem={(item) => <div className="px-4 py-3">{item.name}</div>}
-/>
-```
+<FilterBar>
+  <FilterBarSearch value={search} onChange={setSearch} placeholder="Search users..." />
+  <FilterBarFilters>
+    <Select options={roles} value={role} onChange={setRole} />
+  </FilterBarFilters>
+  <FilterBarActions>
+    <Button>Add User</Button>
+  </FilterBarActions>
+</FilterBar>
 
-### Infinite Scroll
-
-```tsx
-import { InfiniteScroll } from '@arkite/ui'
-
-<InfiniteScroll
-  items={items}
-  hasMore={hasNextPage}
-  onLoadMore={fetchNextPage}
-  loadingMore={isFetchingNextPage}
-  renderItem={(item) => <div>{item.name}</div>}
-/>
-```
-
-### Permission-Based Rendering
-
-```tsx
-import { usePermission, Can } from '@arkite/ui'
-
-function Page() {
-  const { can } = usePermission()
-
-  return (
-    <div>
-      <Can permission="manage_users">
-        <Button>Add User</Button>
-      </Can>
-
-      {can('view_audit_logs') && <AuditLogTable />}
-    </div>
-  )
-}
-```
-
-### Stats Dashboard
-
-```tsx
-import { StatGroup, StatCard } from '@arkite/ui'
-import { Database, Activity } from 'lucide-react'
-
-<StatGroup columns={4}>
-  <StatCard
-    label="Total Sources"
-    value="128"
-    change="+12%"
-    trend="up"
-    icon={<Database />}
-  />
-  <StatCard
-    label="Active Runs"
-    value="24"
-    trend="neutral"
-    icon={<Activity />}
-  />
-</StatGroup>
+<BulkActionBar
+  selectedCount={selected.length}
+  onClear={() => setSelected([])}
+>
+  <Button variant="destructive" size="sm">Delete</Button>
+</BulkActionBar>
 ```
 
 ### Toast Notifications
@@ -357,28 +267,37 @@ function App() {
 
   return (
     <>
-      <Button onClick={() => toast.success('Saved successfully')}>
-        Save
-      </Button>
+      <Button onClick={() => toast.success('Saved successfully')}>Save</Button>
       <ToastContainer position="top-right" />
     </>
   )
 }
 ```
 
+### Stats Dashboard
+
+```tsx
+import { StatGroup, StatCard } from '@arkite/ui'
+import { Database, Activity } from 'lucide-react'
+
+<StatGroup columns={4}>
+  <StatCard label="Total Sources" value="128" change="+12%" trend="up" icon={<Database />} />
+  <StatCard label="Active Runs" value="24" trend="neutral" icon={<Activity />} />
+</StatGroup>
+```
+
 ## Theming
 
 ### Built-in Presets
 
-Arkite UI ships with 4 theme presets: **Default** (Stripe-inspired), **Neutral** (Zinc), **Ocean** (Blue), **Forest** (Green).
+4 theme presets: **Default** (Stripe-inspired), **Neutral** (Zinc), **Ocean** (Blue), **Forest** (Green).
 
 ```tsx
 import { applyTheme, themePresets } from '@arkite/ui'
-
 applyTheme(themePresets.ocean)
 ```
 
-### Custom Theme from Brand Colors
+### Custom Theme
 
 ```tsx
 import { createTheme, applyTheme } from '@arkite/ui'
@@ -398,94 +317,70 @@ applyTheme(myTheme)
 :root {
   --primary: 250 100% 65%;
   --accent: 168 80% 45%;
-  --background: 0 0% 100%;
-  --foreground: 220 15% 20%;
   --radius: 0.5rem;
+  --status-online: 145 65% 42%;
+  --status-offline: 220 9% 46%;
+  --status-busy: 0 72% 51%;
+  --status-away: 38 92% 50%;
 }
-
-.dark {
-  --primary: 250 100% 70%;
-  --background: 220 20% 10%;
-  --foreground: 0 0% 95%;
-}
-```
-
-### SSR / Static Theme
-
-```tsx
-import { themeToCSS, createTheme } from '@arkite/ui'
-
-const css = themeToCSS(createTheme({ primary: '#FF6B00' }))
-// Inject into <style> tag or write to file
 ```
 
 ## Project Structure
 
 ```
 src/
-├── components/       # All components (flat directory)
-├── hooks/            # useDataFetch, usePermission
-├── stores/           # Zustand stores (auth, tenant)
-├── theme/            # Theme presets, createTheme, applyTheme
-├── styles/           # CSS Variables and Tailwind layers
-├── utils/            # cn() utility
+├── components/       # All components (flat directory, 55+ components)
+│   ├── button/       # Button.tsx, Button.test.tsx, index.ts
+│   ├── sidebar/
+│   └── ...
+├── theme/            # Theme presets, createTheme, applyTheme, chart colors
+├── styles/           # CSS variables, Tailwind layers, status/chart tokens
+├── utils/            # cn() utility, breadcrumb helpers
+├── stories/          # Storybook stories (by category) + MDX docs
 ├── tailwind-preset.ts
-└── index.ts
+└── index.ts          # Public API barrel export
 ```
 
 ## Development
 
 ```bash
 npm install              # Install dependencies
-npm run build            # Build the package
+npm run build            # Build the package (tsup)
 npm run dev              # Watch mode
 npm run storybook        # Launch Storybook (http://localhost:6006)
-npm run test             # Run unit tests
-npm run test:watch       # Run tests in watch mode
-npm run test:coverage    # Run tests with coverage report
+npm run test             # Run unit tests (412 tests)
+npm run test:watch       # Tests in watch mode
+npm run test:coverage    # Tests with coverage report
 npm run lint             # Lint source code
 npm run typecheck        # Type check
+npm run size             # Check bundle size budget
+npm run chromatic        # Visual regression testing
 npm run clean            # Clean dist/
-npm run build-storybook  # Build static Storybook site
 ```
-
-### Storybook
-
-Run `npm run storybook` to browse all components interactively at `http://localhost:6006`. Stories are organized by category: Primitives, Layout, Data Display, Form, Navigation, Feedback, Overlay, and Theme.
 
 ## CI/CD Pipeline
 
-Every push triggers **lint**, **typecheck**, and **test** stages. On git tags, the pipeline also:
+Every push triggers **lint**, **typecheck**, **test**, and **size** checks. On merge requests, **changeset:check** verifies a changeset is present and **chromatic** runs visual regression tests.
+
+On git tags:
 
 1. **Builds Storybook** and deploys to GitLab Pages
 2. **Publishes** to GitLab Package Registry (automatic)
 3. **Publishes** to npm public registry (manual trigger)
 
-### Release Process
+### Release Process (Changesets)
 
 ```bash
-# 1. Bump version
-npm version patch    # or minor / major
+# 1. Add a changeset for your changes
+npx changeset
 
-# 2. Push with tags
-git push --follow-tags
+# 2. When ready to release, version and update CHANGELOG
+npm run version-packages
 
-# 3. CI automatically:
-#    - Runs lint + typecheck + tests
-#    - Builds dist/ and Storybook
-#    - Deploys Storybook to GitLab Pages
-#    - Publishes to GitLab Package Registry
-#    - (Manual) Publishes to npm
+# 3. Commit and push with tag
+git add . && git commit -m "chore: release"
+git tag v0.x.x && git push --follow-tags
 ```
-
-### npm Public Publish Setup
-
-To enable publishing to npm:
-
-1. Create the `@arkite` org on [npmjs.com](https://www.npmjs.com/)
-2. Generate an npm access token (Automation type)
-3. Add `NPM_TOKEN` to GitLab CI/CD Settings > Variables (masked, protected)
-4. After tagging a release, manually trigger the `publish:npm` job in the pipeline
 
 ## Contributing
 
