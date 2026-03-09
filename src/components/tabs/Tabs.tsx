@@ -41,6 +41,7 @@ export interface TabsProps extends HTMLAttributes<HTMLDivElement> {
   size?: TabsSize
 }
 
+/** Tabbed navigation container supporting default, pill, and underline variants. */
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
   (
     {
@@ -85,6 +86,7 @@ const listVariantStyles: Record<TabsVariant, string> = {
   underline: 'border-b gap-4',
 }
 
+/** Container for tab trigger buttons. */
 export const TabsList = forwardRef<HTMLDivElement, TabsListProps>(
   ({ className, ...props }, ref) => {
     const { variant } = useTabsContext()
@@ -136,6 +138,7 @@ const triggerVariantStyles: Record<TabsVariant, { base: string; active: string }
   },
 }
 
+/** Clickable tab button that activates its associated content panel. */
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className, value, disabled, icon, children, ...props }, ref) => {
     const { value: selectedValue, onValueChange, variant, size } = useTabsContext()
@@ -178,6 +181,7 @@ export interface TabsContentProps extends HTMLAttributes<HTMLDivElement> {
   forceMount?: boolean
 }
 
+/** Panel that displays content for the currently active tab. */
 export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, value, forceMount, children, ...props }, ref) => {
     const { value: selectedValue } = useTabsContext()

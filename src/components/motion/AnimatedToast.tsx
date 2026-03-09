@@ -125,6 +125,7 @@ export interface AnimatedToastContainerProps {
   className?: string
 }
 
+/** Container that renders animated toast notifications at a configurable screen position. */
 export function AnimatedToastContainer({
   position = 'top-right',
   className,

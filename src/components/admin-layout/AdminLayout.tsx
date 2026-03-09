@@ -158,6 +158,7 @@ function NavItemContent({ item }: { item: AdminNavItem }) {
 
 // --- Main component ---
 
+/** Full admin page layout with a collapsible sidebar, top navbar, and permission-aware navigation. */
 export function AdminLayout({
   currentPath,
   navigation,

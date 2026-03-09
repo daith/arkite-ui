@@ -42,6 +42,7 @@ const iconMap: Record<AlertVariant, typeof Info> = {
   error: AlertCircle,
 }
 
+/** Contextual feedback message with variant-based styling, optional icon, and dismissible support. */
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(
   (
     {

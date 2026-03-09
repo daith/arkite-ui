@@ -36,6 +36,7 @@ const sizeStyles: Record<ModalSize, string> = {
   full: 'max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]',
 }
 
+/** Modal dialog with framer-motion scale and fade animations. */
 export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
   (
     {

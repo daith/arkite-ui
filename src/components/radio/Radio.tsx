@@ -33,6 +33,7 @@ const sizeStyles: Record<RadioSize, { outer: string; inner: string; text: string
   },
 }
 
+/** Single radio button input with optional label and description. */
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
   (
     {
@@ -137,6 +138,7 @@ export interface RadioGroupProps {
   className?: string
 }
 
+/** Group of radio buttons rendered from an options array. */
 export const RadioGroup = ({
   name,
   options,

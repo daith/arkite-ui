@@ -10,6 +10,7 @@ export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   description?: string
 }
 
+/** Form label with optional required/optional indicators and description text. */
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, children, required, optional, description, ...props }, ref) => {
     return (

@@ -20,6 +20,7 @@ const sizeStyles: Record<TextareaSize, string> = {
   lg: 'min-h-[120px] px-4 py-3 text-base',
 }
 
+/** Multi-line text input with optional auto-resize and error state. */
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (
     {

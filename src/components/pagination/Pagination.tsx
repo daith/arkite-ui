@@ -93,6 +93,7 @@ function getPageRange(currentPage: number, totalPages: number, siblingCount: num
   return pages
 }
 
+/** Page navigation control with page buttons, size selector, and item count display. */
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(
   (
     {

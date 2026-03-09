@@ -24,6 +24,7 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   renderLink?: (item: BreadcrumbItem, isLast: boolean) => ReactNode
 }
 
+/** Navigation breadcrumb trail with collapsible items, custom separators, and link rendering. */
 export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
   (
     {
@@ -124,6 +125,7 @@ Breadcrumb.displayName = 'Breadcrumb'
 // Compound component approach
 export type BreadcrumbRootProps = HTMLAttributes<HTMLElement>
 
+/** Root nav wrapper for composing breadcrumb parts individually. */
 export const BreadcrumbRoot = forwardRef<HTMLElement, BreadcrumbRootProps>(
   ({ className, ...props }, ref) => (
     <nav ref={ref} aria-label="Breadcrumb" className={className} {...props} />
@@ -134,6 +136,7 @@ BreadcrumbRoot.displayName = 'BreadcrumbRoot'
 
 export type BreadcrumbListProps = HTMLAttributes<HTMLOListElement>
 
+/** Ordered list container for breadcrumb items. */
 export const BreadcrumbList = forwardRef<HTMLOListElement, BreadcrumbListProps>(
   ({ className, ...props }, ref) => (
     <ol
@@ -148,6 +151,7 @@ BreadcrumbList.displayName = 'BreadcrumbList'
 
 export type BreadcrumbItemProps = HTMLAttributes<HTMLLIElement>
 
+/** Individual list item within a breadcrumb list. */
 export const BreadcrumbItemComponent = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   ({ className, ...props }, ref) => (
     <li
@@ -165,6 +169,7 @@ export interface BreadcrumbLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   asChild?: boolean
 }
 
+/** Clickable anchor link within a breadcrumb item. */
 export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
   ({ className, href, children, ...props }, ref) => (
     <a
@@ -185,6 +190,7 @@ BreadcrumbLink.displayName = 'BreadcrumbLink'
 
 export type BreadcrumbPageProps = HTMLAttributes<HTMLSpanElement>
 
+/** Non-interactive span representing the current page in a breadcrumb trail. */
 export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
   ({ className, ...props }, ref) => (
     <span
@@ -202,6 +208,7 @@ BreadcrumbPage.displayName = 'BreadcrumbPage'
 
 export type BreadcrumbSeparatorProps = HTMLAttributes<HTMLSpanElement>
 
+/** Visual separator between breadcrumb items, defaults to a chevron icon. */
 export const BreadcrumbSeparator = forwardRef<HTMLSpanElement, BreadcrumbSeparatorProps>(
   ({ className, children, ...props }, ref) => (
     <span
@@ -220,6 +227,7 @@ BreadcrumbSeparator.displayName = 'BreadcrumbSeparator'
 
 export type BreadcrumbEllipsisProps = HTMLAttributes<HTMLSpanElement>
 
+/** Ellipsis indicator for collapsed breadcrumb items. */
 export const BreadcrumbEllipsis = forwardRef<HTMLSpanElement, BreadcrumbEllipsisProps>(
   ({ className, ...props }, ref) => (
     <span

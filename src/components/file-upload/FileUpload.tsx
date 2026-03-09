@@ -54,6 +54,7 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+/** Drag-and-drop file upload zone with validation and a file list preview. */
 export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
   (
     {
@@ -270,6 +271,7 @@ export interface FileUploadButtonProps
   disabled?: boolean
 }
 
+/** Compact button variant that opens a native file picker on click. */
 export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonProps>(
   (
     {

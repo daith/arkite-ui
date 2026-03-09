@@ -38,6 +38,7 @@ function WarningIcon({ className }: { className?: string }) {
   )
 }
 
+/** Modal dialog prompting the user to confirm or cancel an action. */
 export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
   (
     {
@@ -126,19 +127,7 @@ export interface DeleteConfirmDialogProps extends Omit<ConfirmDialogProps, 'vari
   confirmLabel?: string
 }
 
-/**
- * Pre-configured destructive ConfirmDialog for delete operations.
- *
- * @example
- * ```tsx
- * <DeleteConfirmDialog
- *   open={open}
- *   onClose={() => setOpen(false)}
- *   itemName="this user"
- *   onConfirm={handleDelete}
- * />
- * ```
- */
+/** Pre-configured destructive ConfirmDialog for delete operations. */
 export const DeleteConfirmDialog = forwardRef<HTMLDivElement, DeleteConfirmDialogProps>(
   (
     {

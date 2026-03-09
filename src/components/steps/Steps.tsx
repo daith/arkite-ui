@@ -34,6 +34,7 @@ function CheckIcon() {
   )
 }
 
+/** Multi-step progress indicator with horizontal or vertical orientation. */
 export const Steps = forwardRef<HTMLDivElement, StepsProps>(
   ({ steps, currentStep, orientation = 'horizontal', size = 'md', className, ...props }, ref) => {
     const isVertical = orientation === 'vertical'

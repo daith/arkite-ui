@@ -42,6 +42,7 @@ const clearPositionStyles = {
   lg: 'right-3',
 }
 
+/** Search text input with icon, clear button, and optional debounced change. */
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   (
     {

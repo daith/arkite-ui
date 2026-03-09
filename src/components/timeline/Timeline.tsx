@@ -29,6 +29,7 @@ const variantStyles: Record<string, string> = {
   destructive: 'bg-destructive',
 }
 
+/** Vertical timeline displaying a sequence of events with dots and connecting lines. */
 export const Timeline = forwardRef<HTMLDivElement, TimelineProps>(
   ({ items, size = 'md', className, ...props }, ref) => {
     const dotSize = size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3'

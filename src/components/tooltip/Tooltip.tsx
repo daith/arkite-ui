@@ -14,6 +14,7 @@ export const TooltipTrigger = TooltipPrimitive.Trigger
 
 export type TooltipContentProps = ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
 
+/** Styled tooltip content panel with enter/exit animations. */
 export const TooltipContent = forwardRef<
   HTMLDivElement,
   TooltipContentProps
@@ -54,6 +55,7 @@ export interface SimpleTooltipProps {
   children: ReactNode
 }
 
+/** Convenient wrapper that adds a tooltip to any child element on hover. */
 export function SimpleTooltip({
   content,
   side = 'top',

@@ -10,6 +10,7 @@ import { cn } from '../../utils/cn'
 
 // --- Command (root) ---
 
+/** Root container for a cmdk-powered command menu. */
 export const Command = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -27,6 +28,7 @@ Command.displayName = 'Command'
 
 // --- Input ---
 
+/** Search input field for filtering command palette items. */
 export const CommandInput = forwardRef<
   HTMLInputElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
@@ -58,6 +60,7 @@ CommandInput.displayName = 'CommandInput'
 
 // --- List ---
 
+/** Scrollable list container for command palette items. */
 export const CommandList = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.List>
@@ -72,6 +75,7 @@ CommandList.displayName = 'CommandList'
 
 // --- Empty ---
 
+/** Empty state placeholder shown when no command palette results match. */
 export const CommandEmpty = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
@@ -86,6 +90,7 @@ CommandEmpty.displayName = 'CommandEmpty'
 
 // --- Group ---
 
+/** Labeled group of related items within the command palette. */
 export const CommandGroup = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
@@ -106,6 +111,7 @@ CommandGroup.displayName = 'CommandGroup'
 
 // --- Separator ---
 
+/** Horizontal divider line between command palette groups. */
 export const CommandSeparator = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
@@ -120,6 +126,7 @@ CommandSeparator.displayName = 'CommandSeparator'
 
 // --- Item ---
 
+/** Selectable action item within the command palette. */
 export const CommandItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
@@ -139,6 +146,7 @@ CommandItem.displayName = 'CommandItem'
 
 // --- Shortcut ---
 
+/** Displays keyboard shortcut hints alongside a command item. */
 export function CommandShortcut({
   className,
   children,
@@ -170,6 +178,7 @@ export interface CommandDialogProps {
   children: ReactNode
 }
 
+/** Modal overlay that wraps a Command component for use as a Cmd+K palette. */
 export function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
   // Close on escape
   useEffect(() => {

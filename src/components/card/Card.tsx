@@ -39,6 +39,7 @@ const shadowStyles = {
   lg: 'shadow-lg',
 }
 
+/** Styled container surface with configurable padding, shadow, and hover effects. */
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   (
     {
@@ -73,6 +74,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
 
 Card.displayName = 'Card'
 
+/** Card header section with title, description, and an optional action slot. */
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ className, title, description, action, children, ...props }, ref) => {
     return (
@@ -100,6 +102,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
 
 CardHeader.displayName = 'CardHeader'
 
+/** Main body section of a Card. */
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   ({ className, ...props }, ref) => {
     return (
@@ -110,6 +113,7 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
 
 CardContent.displayName = 'CardContent'
 
+/** Bottom section of a Card, typically used for actions or metadata. */
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ className, ...props }, ref) => {
     return (

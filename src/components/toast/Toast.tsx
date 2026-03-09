@@ -84,6 +84,7 @@ export interface ToastProps extends ToastData {
   onClose: () => void
 }
 
+/** Individual toast notification with auto-dismiss and variant styling. */
 export function Toast({
   id: _id,
   title,
@@ -156,6 +157,7 @@ export interface ToastContainerProps {
   className?: string
 }
 
+/** Fixed-position container that renders active toasts from the toast store. */
 export function ToastContainer({
   position = 'top-right',
   className,

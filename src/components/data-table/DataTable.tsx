@@ -69,6 +69,7 @@ export interface DataTableProps<T> {
   className?: string
 }
 
+/** Feature-rich data table with sorting, pagination, and custom cell rendering. */
 export function DataTable<T>({
   data,
   columns,

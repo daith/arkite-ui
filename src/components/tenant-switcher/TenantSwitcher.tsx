@@ -148,6 +148,7 @@ function GlobeIcon({ className }: { className?: string }) {
 
 // --- Component ---
 
+/** Dropdown for switching between tenants with search and optional "All Tenants" view. */
 export function TenantSwitcher({
   tenants = [],
   currentTenant = null,

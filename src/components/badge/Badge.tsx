@@ -41,6 +41,7 @@ const sizeStyles: Record<BadgeSize, string> = {
   md: 'px-2.5 py-0.5 text-xs',
 }
 
+/** Small inline label for status, categories, or counts with multiple color variants. */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant = 'default', size = 'md', ...props }, ref) => {
     return (

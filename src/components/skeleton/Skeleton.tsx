@@ -12,6 +12,7 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
   height?: string | number
 }
 
+/** Animated loading placeholder with pulse or wave animation. */
 export const Skeleton = forwardRef<HTMLDivElement, SkeletonProps>(
   (
     {
@@ -74,6 +75,7 @@ const spacingStyles = {
   lg: 'space-y-3',
 }
 
+/** Renders multiple skeleton lines to simulate a block of text. */
 export const SkeletonText = forwardRef<HTMLDivElement, SkeletonTextProps>(
   ({ lines = 3, spacing = 'md', className, ...props }, ref) => (
     <div ref={ref} className={cn(spacingStyles[spacing], className)}>
@@ -105,6 +107,7 @@ const avatarSizes = {
   xl: 'h-16 w-16',
 }
 
+/** Circular skeleton placeholder for avatar loading states. */
 export const SkeletonAvatar = forwardRef<HTMLDivElement, SkeletonAvatarProps>(
   ({ size = 'md', className, ...props }, ref) => (
     <Skeleton
@@ -127,6 +130,7 @@ export interface SkeletonCardProps extends HTMLAttributes<HTMLDivElement> {
   lines?: number
 }
 
+/** Card-shaped skeleton with optional image, avatar, and text placeholders. */
 export const SkeletonCard = forwardRef<HTMLDivElement, SkeletonCardProps>(
   ({ showImage = true, showAvatar = false, lines = 3, className, ...props }, ref) => (
     <div
@@ -160,6 +164,7 @@ export interface SkeletonTableProps extends HTMLAttributes<HTMLDivElement> {
   columns?: number
 }
 
+/** Table-shaped skeleton with configurable rows and columns. */
 export const SkeletonTable = forwardRef<HTMLDivElement, SkeletonTableProps>(
   ({ rows = 5, columns = 4, className, ...props }, ref) => (
     <div ref={ref} className={cn('space-y-3', className)} {...props}>

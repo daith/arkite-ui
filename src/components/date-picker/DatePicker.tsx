@@ -85,6 +85,7 @@ const iconSizeStyles: Record<DatePickerSize, string> = {
   lg: 'h-5 w-5',
 }
 
+/** Date input with an inline calendar dropdown for selecting dates. */
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
   (
     {

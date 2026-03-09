@@ -2,6 +2,7 @@ import { forwardRef, type ComponentPropsWithoutRef } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { cn } from '../../utils/cn'
 
+/** Root component for a dropdown menu powered by Radix UI. */
 export const DropdownMenu = DropdownMenuPrimitive.Root
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -16,6 +17,7 @@ export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 // --- Content ---
 
+/** Animated popover container that holds dropdown menu items. */
 export const DropdownMenuContent = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
@@ -44,6 +46,7 @@ DropdownMenuContent.displayName = 'DropdownMenuContent'
 
 // --- Item ---
 
+/** Interactive menu item within a dropdown menu. */
 export const DropdownMenuItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
@@ -67,6 +70,7 @@ DropdownMenuItem.displayName = 'DropdownMenuItem'
 
 // --- Checkbox Item ---
 
+/** Menu item with a checkbox indicator for toggling options. */
 export const DropdownMenuCheckboxItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
@@ -101,6 +105,7 @@ DropdownMenuCheckboxItem.displayName = 'DropdownMenuCheckboxItem'
 
 // --- Radio Item ---
 
+/** Menu item with a radio indicator for single-selection groups. */
 export const DropdownMenuRadioItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
@@ -129,6 +134,7 @@ DropdownMenuRadioItem.displayName = 'DropdownMenuRadioItem'
 
 // --- Label ---
 
+/** Non-interactive label used to title a group of menu items. */
 export const DropdownMenuLabel = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
@@ -149,6 +155,7 @@ DropdownMenuLabel.displayName = 'DropdownMenuLabel'
 
 // --- Separator ---
 
+/** Horizontal rule separating groups of menu items. */
 export const DropdownMenuSeparator = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
@@ -177,6 +184,7 @@ export function DropdownMenuShortcut({
 
 // --- Sub Content ---
 
+/** Trigger that opens a nested submenu within a dropdown menu. */
 export const DropdownMenuSubTrigger = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
@@ -209,6 +217,7 @@ export const DropdownMenuSubTrigger = forwardRef<
 ))
 DropdownMenuSubTrigger.displayName = 'DropdownMenuSubTrigger'
 
+/** Animated content container for a dropdown submenu. */
 export const DropdownMenuSubContent = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>

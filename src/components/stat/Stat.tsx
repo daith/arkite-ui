@@ -33,6 +33,7 @@ const trendIcons: Record<StatTrend, typeof TrendingUp> = {
   neutral: Minus,
 }
 
+/** Displays a key metric with optional trend indicator and help text. */
 export const Stat = forwardRef<HTMLDivElement, StatProps>(
   (
     {
@@ -105,6 +106,7 @@ export interface StatCardProps extends StatProps {
   variant?: 'default' | 'bordered' | 'filled'
 }
 
+/** Stat wrapped in a styled card container. */
 export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
   ({ className, variant = 'default', ...props }, ref) => {
     const variantStyles = {
@@ -135,6 +137,7 @@ export interface StatGroupProps extends HTMLAttributes<HTMLDivElement> {
   columns?: 2 | 3 | 4
 }
 
+/** Responsive grid container for laying out multiple Stat components. */
 export const StatGroup = forwardRef<HTMLDivElement, StatGroupProps>(
   ({ className, columns = 4, children, ...props }, ref) => {
     const columnStyles = {

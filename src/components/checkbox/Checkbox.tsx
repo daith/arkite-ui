@@ -34,6 +34,7 @@ const sizeStyles: Record<CheckboxSize, { box: string; icon: string; text: string
   },
 }
 
+/** Styled checkbox input with optional label, description, and error state. */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {

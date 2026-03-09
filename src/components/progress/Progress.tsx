@@ -36,6 +36,7 @@ const variantStyles: Record<ProgressVariant, string> = {
   error: 'bg-destructive',
 }
 
+/** Horizontal progress bar with determinate, indeterminate, and striped modes. */
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   (
     {
@@ -112,6 +113,7 @@ export interface CircularProgressProps extends HTMLAttributes<HTMLDivElement> {
   indeterminate?: boolean
 }
 
+/** SVG-based circular progress indicator with optional percentage label. */
 export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps>(
   (
     {

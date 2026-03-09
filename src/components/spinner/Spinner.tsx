@@ -14,6 +14,7 @@ const sizeStyles: Record<SpinnerSize, string> = {
   lg: 'h-8 w-8 border-[3px]',
 }
 
+/** Circular spinning indicator for loading states. */
 export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
   ({ className, size = 'md', ...props }, ref) => {
     return (

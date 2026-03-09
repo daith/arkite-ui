@@ -101,6 +101,7 @@ const translateStyles: Record<DrawerPosition, { open: string; closed: string }> 
   bottom: { open: 'translate-y-0', closed: 'translate-y-full' },
 }
 
+/** Sliding panel overlay that opens from any edge of the viewport. */
 export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
   (
     {
@@ -249,6 +250,7 @@ Drawer.displayName = 'Drawer'
 // Convenience components for custom layouts
 export type DrawerHeaderProps = HTMLAttributes<HTMLDivElement>
 
+/** Header section for a custom Drawer layout. */
 export const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -263,6 +265,7 @@ DrawerHeader.displayName = 'DrawerHeader'
 
 export type DrawerBodyProps = HTMLAttributes<HTMLDivElement>
 
+/** Scrollable body section for a custom Drawer layout. */
 export const DrawerBody = forwardRef<HTMLDivElement, DrawerBodyProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -277,6 +280,7 @@ DrawerBody.displayName = 'DrawerBody'
 
 export type DrawerFooterProps = HTMLAttributes<HTMLDivElement>
 
+/** Footer section for a custom Drawer layout with right-aligned actions. */
 export const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(
   ({ className, ...props }, ref) => (
     <div

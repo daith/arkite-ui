@@ -31,6 +31,7 @@ const sizeStyles: Record<ToggleSize, { track: string; thumb: string; translate: 
   },
 }
 
+/** On/off switch input with optional label and description. */
 export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
   (
     {

@@ -49,6 +49,7 @@ const sizeStyles: Record<ButtonSize, string> = {
   icon: 'h-10 w-10 rounded-md',
 }
 
+/** General-purpose button with multiple style variants, sizes, loading state, and icon slots. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {

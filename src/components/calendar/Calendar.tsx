@@ -61,6 +61,7 @@ function ChevronRightIcon() {
   )
 }
 
+/** Month-view date picker with selectable, highlighted, and disabled dates. */
 export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
   (
     {

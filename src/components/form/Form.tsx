@@ -26,6 +26,7 @@ export interface FormProps extends HTMLAttributes<HTMLFormElement> {
   disabled?: boolean
 }
 
+/** Form wrapper that provides shared disabled state to all child fields. */
 export const Form = forwardRef<HTMLFormElement, FormProps>(
   ({ className, disabled, children, ...props }, ref) => (
     <FormContext.Provider value={{ disabled }}>
@@ -66,6 +67,7 @@ export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
   disabled?: boolean
 }
 
+/** Form field container that provides id, name, and error context to its children. */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
   ({ className, name, error, disabled, children, ...props }, ref) => {
     const id = useId()
@@ -92,6 +94,7 @@ export interface FormLabelProps extends HTMLAttributes<HTMLLabelElement> {
   optional?: boolean
 }
 
+/** Label that auto-links to its parent FormField input via context. */
 export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
   ({ className, required, optional, children, ...props }, ref) => {
     const { id, disabled } = useFormFieldContext()
@@ -116,6 +119,7 @@ FormLabel.displayName = 'FormLabel'
 // FormControl component - wrapper for form inputs
 export type FormControlProps = HTMLAttributes<HTMLDivElement>
 
+/** Wrapper for form input elements within a FormField. */
 export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
   ({ className, children, ...props }, ref) => {
     return (
@@ -131,6 +135,7 @@ FormControl.displayName = 'FormControl'
 // FormDescription component
 export type FormDescriptionProps = HTMLAttributes<HTMLParagraphElement>
 
+/** Helper text displayed below a form field. */
 export const FormDescription = forwardRef<HTMLParagraphElement, FormDescriptionProps>(
   ({ className, ...props }, ref) => (
     <p
@@ -149,6 +154,7 @@ export interface FormMessageProps extends HTMLAttributes<HTMLParagraphElement> {
   error?: string
 }
 
+/** Validation error message displayed below a form field. */
 export const FormMessage = forwardRef<HTMLParagraphElement, FormMessageProps>(
   ({ className, error: errorProp, children, ...props }, ref) => {
     const context = useContext(FormFieldContext)
@@ -178,6 +184,7 @@ export interface FormSectionProps extends Omit<HTMLAttributes<HTMLFieldSetElemen
   description?: ReactNode
 }
 
+/** Fieldset grouping related form fields under an optional title and description. */
 export const FormSection = forwardRef<HTMLFieldSetElement, FormSectionProps>(
   ({ className, title, description, children, ...props }, ref) => (
     <fieldset
@@ -208,6 +215,7 @@ export interface FormActionsProps extends HTMLAttributes<HTMLDivElement> {
   align?: 'left' | 'center' | 'right' | 'between'
 }
 
+/** Row of action buttons at the bottom of a form. */
 export const FormActions = forwardRef<HTMLDivElement, FormActionsProps>(
   ({ className, align = 'right', children, ...props }, ref) => {
     const alignStyles = {

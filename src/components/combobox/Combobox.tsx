@@ -54,6 +54,7 @@ const searchSizeStyles: Record<ComboboxSize, string> = {
   lg: 'h-12 text-base',
 }
 
+/** Searchable select dropdown with single or multi-select, async search, and custom option rendering. */
 export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
   (
     {

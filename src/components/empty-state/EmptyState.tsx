@@ -47,6 +47,7 @@ const sizeStyles = {
   },
 }
 
+/** Placeholder display for empty views with an icon, message, and optional action. */
 export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
   (
     {
@@ -108,6 +109,7 @@ export interface EmptyStatePresetProps extends Omit<EmptyStateProps, 'variant' |
   description?: ReactNode
 }
 
+/** Preset empty state for search queries that returned no results. */
 export const NoResults = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
   ({ title = 'No results found', description = 'Try adjusting your search or filters.', ...props }, ref) => (
     <EmptyState
@@ -122,6 +124,7 @@ export const NoResults = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
 
 NoResults.displayName = 'NoResults'
 
+/** Preset empty state prompting the user to create their first item. */
 export const NoData = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
   ({ title = 'No data yet', description = 'Get started by creating your first item.', ...props }, ref) => (
     <EmptyState
@@ -137,6 +140,7 @@ export const NoData = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
 
 NoData.displayName = 'NoData'
 
+/** Preset empty state indicating a data loading error occurred. */
 export const ErrorState = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
   ({ title = 'Something went wrong', description = 'An error occurred while loading the data.', ...props }, ref) => (
     <EmptyState

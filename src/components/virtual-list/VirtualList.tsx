@@ -30,6 +30,7 @@ export interface VirtualListProps<T> {
   innerClassName?: string
 }
 
+/** Efficiently renders large lists by only mounting visible items. */
 export function VirtualList<T>({
   items,
   getItemKey,
@@ -129,6 +130,7 @@ export interface InfiniteScrollProps<T> extends Omit<VirtualListProps<T>, 'loadi
   loadingMoreContent?: ReactNode
 }
 
+/** Virtualized list with automatic loading of additional items on scroll. */
 export function InfiniteScroll<T>({
   items,
   hasMore,

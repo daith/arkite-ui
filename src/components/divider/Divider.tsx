@@ -12,6 +12,7 @@ export interface DividerProps extends HTMLAttributes<HTMLDivElement> {
   labelPosition?: 'left' | 'center' | 'right'
 }
 
+/** Visual separator supporting horizontal and vertical orientations with an optional label. */
 export const Divider = forwardRef<HTMLDivElement, DividerProps>(
   (
     {

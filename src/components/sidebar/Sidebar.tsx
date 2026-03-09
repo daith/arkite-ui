@@ -42,6 +42,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   collapsedWidth?: string
 }
 
+/** Collapsible sidebar navigation panel with controlled or uncontrolled state. */
 export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
   (
     {
@@ -93,6 +94,7 @@ Sidebar.displayName = 'Sidebar'
 // Sidebar Header
 export type SidebarHeaderProps = HTMLAttributes<HTMLDivElement>
 
+/** Header area at the top of the sidebar. */
 export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(
   ({ className, ...props }, ref) => {
     const { collapsed } = useSidebar()
@@ -116,6 +118,7 @@ SidebarHeader.displayName = 'SidebarHeader'
 // Sidebar Content
 export type SidebarContentProps = HTMLAttributes<HTMLDivElement>
 
+/** Scrollable main content area of the sidebar. */
 export const SidebarContent = forwardRef<HTMLDivElement, SidebarContentProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -131,6 +134,7 @@ SidebarContent.displayName = 'SidebarContent'
 // Sidebar Footer
 export type SidebarFooterProps = HTMLAttributes<HTMLDivElement>
 
+/** Footer area at the bottom of the sidebar. */
 export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(
   ({ className, ...props }, ref) => {
     const { collapsed } = useSidebar()
@@ -157,6 +161,7 @@ export interface SidebarGroupProps extends HTMLAttributes<HTMLDivElement> {
   label?: ReactNode
 }
 
+/** Labeled group of sidebar items. */
 export const SidebarGroup = forwardRef<HTMLDivElement, SidebarGroupProps>(
   ({ className, label, children, ...props }, ref) => {
     const { collapsed } = useSidebar()
@@ -188,6 +193,7 @@ export interface SidebarItemProps extends HTMLAttributes<HTMLButtonElement> {
   href?: string
 }
 
+/** Clickable navigation item within the sidebar, rendered as a button or link. */
 export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
   (
     {
@@ -253,6 +259,7 @@ SidebarItem.displayName = 'SidebarItem'
 // Sidebar Toggle
 export type SidebarToggleProps = HTMLAttributes<HTMLButtonElement>
 
+/** Button that toggles the sidebar between collapsed and expanded states. */
 export const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(
   ({ className, ...props }, ref) => {
     const { collapsed, setCollapsed, collapsible } = useSidebar()

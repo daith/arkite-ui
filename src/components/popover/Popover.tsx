@@ -20,6 +20,7 @@ export interface PopoverContentProps
   showArrow?: boolean
 }
 
+/** Positioned popover content panel with optional arrow indicator. */
 export const PopoverContent = forwardRef<
   HTMLDivElement,
   PopoverContentProps

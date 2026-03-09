@@ -14,6 +14,7 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   stickyHeader?: boolean
 }
 
+/** Styled HTML table with support for striping, borders, and sticky headers. */
 export const Table = forwardRef<HTMLTableElement, TableProps>(
   ({ className, variant = 'default', compact, bordered, hoverable, stickyHeader, ...props }, ref) => (
     <div className="relative w-full overflow-auto">
@@ -38,6 +39,7 @@ Table.displayName = 'Table'
 
 export type TableHeaderProps = HTMLAttributes<HTMLTableSectionElement>
 
+/** Table header section with optional sticky positioning. */
 export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>(
   ({ className, ...props }, ref) => (
     <thead
@@ -57,6 +59,7 @@ TableHeader.displayName = 'TableHeader'
 
 export type TableBodyProps = HTMLAttributes<HTMLTableSectionElement>
 
+/** Table body section containing data rows. */
 export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
   ({ className, ...props }, ref) => (
     <tbody
@@ -71,6 +74,7 @@ TableBody.displayName = 'TableBody'
 
 export type TableFooterProps = HTMLAttributes<HTMLTableSectionElement>
 
+/** Table footer section for summary or aggregate content. */
 export const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>(
   ({ className, ...props }, ref) => (
     <tfoot
@@ -88,6 +92,7 @@ export interface TableRowProps extends HTMLAttributes<HTMLTableRowElement> {
   selected?: boolean
 }
 
+/** Table row with hover and selected state styling. */
 export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
   ({ className, selected, ...props }, ref) => (
     <tr
@@ -116,6 +121,7 @@ export interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
   stickyAction?: boolean
 }
 
+/** Table header cell with optional sort indicators and sticky positioning. */
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ className, sortable, sortDirection, stickyAction, children, ...props }, ref) => (
     <th
@@ -153,6 +159,7 @@ export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
   stickyAction?: boolean
 }
 
+/** Table data cell with optional sticky action column support. */
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ className, stickyAction, ...props }, ref) => (
     <td
@@ -172,6 +179,7 @@ TableCell.displayName = 'TableCell'
 
 export type TableCaptionProps = HTMLAttributes<HTMLTableCaptionElement>
 
+/** Table caption displayed below the table. */
 export const TableCaption = forwardRef<HTMLTableCaptionElement, TableCaptionProps>(
   ({ className, ...props }, ref) => (
     <caption

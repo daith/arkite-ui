@@ -41,6 +41,7 @@ function getInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
 }
 
+/** Displays a user avatar image with fallback initials and an optional status indicator. */
 export const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
   (
     {
@@ -120,6 +121,7 @@ const spacingStyles: Record<NonNullable<AvatarGroupProps['spacing']>, string> = 
   loose: '-space-x-1',
 }
 
+/** Renders a stack of overlapping avatars with a "+N" overflow indicator. */
 export function AvatarGroup({
   max = 5,
   children,

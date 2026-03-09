@@ -26,6 +26,7 @@ function ArrowLeftIcon() {
   )
 }
 
+/** Page header with title, description, breadcrumb, and action slots. */
 export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
   ({ title, description, actions, breadcrumb, badge, onBack, backLabel = 'Go back', className, children, ...props }, ref) => {
     return (

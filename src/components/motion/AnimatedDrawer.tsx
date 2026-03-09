@@ -63,6 +63,7 @@ const slideVariants: Record<DrawerPosition, { hidden: Record<string, number>; vi
   bottom: { hidden: { y: 100 }, visible: { y: 0 } },
 }
 
+/** Animated slide-in drawer panel with framer-motion transitions. */
 export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
   (
     {

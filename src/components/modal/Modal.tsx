@@ -43,6 +43,7 @@ const sizeStyles: Record<ModalSize, string> = {
   full: 'max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]',
 }
 
+/** Modal dialog overlay with title, description, and action footer. */
 export const Modal = forwardRef<HTMLDivElement, ModalProps>(
   (
     {
@@ -210,6 +211,7 @@ Modal.displayName = 'Modal'
 // Convenience components
 export type ModalHeaderProps = HTMLAttributes<HTMLDivElement>
 
+/** Header section for a modal with border separator. */
 export const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -224,6 +226,7 @@ ModalHeader.displayName = 'ModalHeader'
 
 export type ModalBodyProps = HTMLAttributes<HTMLDivElement>
 
+/** Body content area of a modal. */
 export const ModalBody = forwardRef<HTMLDivElement, ModalBodyProps>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('p-4', className)} {...props} />
@@ -234,6 +237,7 @@ ModalBody.displayName = 'ModalBody'
 
 export type ModalFooterProps = HTMLAttributes<HTMLDivElement>
 
+/** Footer section of a modal, typically used for action buttons. */
 export const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
   ({ className, ...props }, ref) => (
     <div

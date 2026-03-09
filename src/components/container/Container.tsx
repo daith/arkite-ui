@@ -21,6 +21,7 @@ const sizeStyles: Record<ContainerSize, string> = {
   full: 'max-w-full',
 }
 
+/** Responsive container with configurable max-width and padding. */
 export const Container = forwardRef<HTMLDivElement, ContainerProps>(
   (
     {

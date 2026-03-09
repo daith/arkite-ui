@@ -6,6 +6,7 @@ export interface KbdProps extends HTMLAttributes<HTMLElement> {
   size?: 'sm' | 'md'
 }
 
+/** Inline keyboard shortcut badge rendered as a styled kbd element. */
 export const Kbd = forwardRef<HTMLElement, KbdProps>(
   ({ className, size = 'sm', children, ...props }, ref) => {
     return (

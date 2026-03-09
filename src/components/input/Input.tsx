@@ -24,6 +24,7 @@ const sizeStyles: Record<InputSize, string> = {
   lg: 'h-12 px-4 text-base',
 }
 
+/** Text input field with optional left/right addons and error display. */
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {

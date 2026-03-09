@@ -61,6 +61,7 @@ function MoreHorizontalIcon({ className }: { className?: string }) {
   )
 }
 
+/** Renders a list of actions as inline buttons or a dropdown menu with optional confirmation dialogs. */
 export function ActionButtons({
   actions,
   mode = 'dropdown',

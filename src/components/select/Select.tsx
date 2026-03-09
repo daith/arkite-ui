@@ -44,6 +44,7 @@ const iconSizeStyles: Record<SelectSize, string> = {
   lg: 'right-4 h-5 w-5',
 }
 
+/** Native select dropdown with icon, error state, and placeholder support. */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
     {

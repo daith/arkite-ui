@@ -10,6 +10,7 @@ export interface NavbarProps extends HTMLAttributes<HTMLElement> {
   height?: string
 }
 
+/** Top navigation bar with optional sticky positioning and bottom border. */
 export const Navbar = forwardRef<HTMLElement, NavbarProps>(
   (
     {
@@ -51,6 +52,7 @@ export interface NavbarBrandProps extends HTMLAttributes<HTMLDivElement> {
   href?: string
 }
 
+/** Brand section of the navbar displaying a logo and/or name. */
 export const NavbarBrand = forwardRef<HTMLDivElement, NavbarBrandProps>(
   ({ className, logo, name, href, children, ...props }, ref) => {
     const content = (
@@ -87,6 +89,7 @@ export interface NavbarContentProps extends HTMLAttributes<HTMLDivElement> {
   align?: 'left' | 'center' | 'right'
 }
 
+/** Flexible content area within the navbar with configurable alignment. */
 export const NavbarContent = forwardRef<HTMLDivElement, NavbarContentProps>(
   ({ className, align = 'left', ...props }, ref) => {
     const alignStyles = {
@@ -113,6 +116,7 @@ export interface NavbarItemProps extends HTMLAttributes<HTMLDivElement> {
   active?: boolean
 }
 
+/** Individual item wrapper within the navbar. */
 export const NavbarItem = forwardRef<HTMLDivElement, NavbarItemProps>(
   ({ className, active, children, ...props }, ref) => (
     <div
@@ -139,6 +143,7 @@ export interface NavbarLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   active?: boolean
 }
 
+/** Styled anchor link for use within the navbar. */
 export const NavbarLink = forwardRef<HTMLAnchorElement, NavbarLinkProps>(
   ({ className, href, active, children, ...props }, ref) => (
     <a
@@ -161,6 +166,7 @@ NavbarLink.displayName = 'NavbarLink'
 // Navbar Divider
 export type NavbarDividerProps = HTMLAttributes<HTMLDivElement>
 
+/** Vertical divider line between navbar items. */
 export const NavbarDivider = forwardRef<HTMLDivElement, NavbarDividerProps>(
   ({ className, ...props }, ref) => (
     <div
@@ -176,6 +182,7 @@ NavbarDivider.displayName = 'NavbarDivider'
 // Navbar Spacer
 export type NavbarSpacerProps = HTMLAttributes<HTMLDivElement>
 
+/** Flexible spacer that pushes adjacent navbar items apart. */
 export const NavbarSpacer = forwardRef<HTMLDivElement, NavbarSpacerProps>(
   ({ className, ...props }, ref) => (
     <div ref={ref} className={cn('flex-1', className)} {...props} />
