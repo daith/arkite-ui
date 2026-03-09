@@ -62,6 +62,9 @@ export * from './components/admin-layout'
 export * from './hooks/useDataFetch'
 export * from './hooks/usePermission'
 
+// Motion (requires framer-motion peer dependency)
+export * from './components/motion'
+
 // Stores
 export * from './stores/authStore'
 export * from './stores/tenantStore'

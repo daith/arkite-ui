@@ -6,7 +6,7 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['react', 'react-dom', 'zustand', 'lucide-react'],
+  external: ['react', 'react-dom', 'zustand', 'lucide-react', 'framer-motion'],
   banner: {
     js: '"use client";',
   },
