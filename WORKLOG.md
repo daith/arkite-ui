@@ -126,18 +126,76 @@
 
 ---
 
+## 2026-03-10（Day 2）
+
+### ark-harvest 反饋驅動迭代
+
+根據 ark-harvest 專案的實際使用反饋，進行元件新增、Bug 修復、文件補充三方面的改善。
+
+---
+
+### 新增元件（4 個）
+
+| 元件 | 說明 | 位置 |
+|------|------|------|
+| `FilterSelect` | Filter toolbar 專用 Select wrapper，內建「全部」選項、簡化 onChange | `filter-bar/FilterSelect.tsx` |
+| `SegmentedControl` | 水平 pill bar，2-5 個互斥選項切換，支援 fullWidth、per-option disabled、泛型 value | `segmented-control/` |
+| `InlineCode` | 統一 `<code>` 樣式，取代各處手寫 `className="rounded bg-muted px-1.5..."` | `inline-code/` |
+| `PasswordInput` | Input + 眼睛 toggle，支援 controlled/uncontrolled visibility | `input/PasswordInput.tsx` |
+| `CheckboxCard` | Checkbox 卡片（label + description），用於功能開關、權限勾選 | `checkbox/CheckboxCard.tsx` |
+
+### 功能實作
+
+**DataTable row selection（重要）：**
+- 實作原本只宣告未實作的 `selectable` / `selectedRows` / `onSelectionChange` props
+- Header checkbox 支援全選/取消全選/indeterminate 狀態
+- Per-row checkbox，選中列高亮 `bg-primary/5`
+- `stopPropagation` 避免觸發 `onRowClick`
+- Selection 僅作用於當前分頁
+- 可搭配 `BulkActionBar` 使用
+
+### Bug 修復（3 個）
+
+| 修復 | 問題 | 原因 |
+|------|------|------|
+| Toggle 不可點擊 | 點擊 track 不會觸發 checkbox | track 是 `<div>` 不是 `<label>` |
+| Toggle 圓圈不移動 | 切換後 thumb 不動 | `peer-checked:` 只對 sibling 有效，thumb 在 label 內不是 sibling |
+| Toggle Tailwind v4 class 失效 | 動態拼接 `'peer-checked:' + styles.translate` | Tailwind v4 靜態分析無法解析動態字串 |
+
+**Toggle 最終結構：** input 放入 label 內部，用 `has-[:checked]` + `group-has-[:checked]` 取代 `peer-checked:`。
+
+### 型別與樣式修正
+
+- `Select` / `FilterSelect` 的 `options` 改為 `readonly SelectOption[]`，支援 `as const` 陣列
+- `SearchInput` sm 高度從 `h-8` 改為 `h-9`，對齊 `FilterBarSearch`
+
+### Storybook 文件
+
+**新增文件（2 份 MDX）：**
+- **Guides/Overlay Components** — Drawer vs Modal vs ConfirmDialog 使用時機、決策樹、Animated 版本說明
+- **Guides/Skeleton Loading** — 5 個 Skeleton 變體的 props 說明、Before/After 對比、實戰組合範例
+
+**Storybook 修復：**
+- 安裝 `remark-gfm` 並配置到 `addon-docs`，修復 MDX 中 Markdown table 不渲染的問題
+- `preview-head.html` 加入 `.sbdocs-content table` 樣式，覆蓋 Tailwind preflight reset
+
+**Stories 更新：**
+- `DataTable.stories` — 新增 Selectable story（checkbox + BulkActionBar 整合）
+- `BulkActionBar.stories` — WithTable 改用 DataTable selectable 取代手刻 raw Table
+- `TanStackTable.mdx` — 加入 DataTable 內建 selection 的 Tip block
+
+---
+
 ### 數據總結
 
-| 指標 | 數值 |
-|------|------|
-| 總 commits | 45 |
-| 元件數量 | 56+ |
-| 測試檔案 | 39 |
-| 測試案例 | 412 |
-| Bundle size (brotli) | ~36 KB |
-| Storybook stories | 70+ |
-| MDX 文件頁 | 7 |
-| GitLab Issues 處理 | 9/9 (100%) |
+| 指標 | Day 1 | Day 2 | 變化 |
+|------|-------|-------|------|
+| 總 commits | 45 | 57 | +12 |
+| 元件數量 | 56+ | 61+ | +5 |
+| 測試檔案 | 39 | 45 | +6 |
+| 測試案例 | 412 | 455 | +43 |
+| Storybook stories | 70+ | 72+ | +2 |
+| MDX 文件頁 | 7 | 9 | +2 |
 
 ### 技術棧
 
@@ -164,6 +222,8 @@
 
 - [ ] 設定 Chromatic project token 啟用視覺回歸
 - [ ] 首次使用 changesets 發布流程驗證
-- [ ] 考慮新增元件：Breadcrumb 增強、CommandPalette 快捷鍵綁定
-- [ ] 持續補充剩餘元件的測試（目前 71% 覆蓋）
+- [ ] 持續補充剩餘元件的測試（目前 45/61 覆蓋）
 - [ ] 效能優化：lazy import motion 元件、減少 Radix 打包體積
+- [ ] CopyButton / CopyInput — 目前只 1 處使用，待第 2 個專案需要再收錄
+- [ ] SegmentedControl icon + description 擴充 — 待需求明確再加
+- [ ] bump version to 0.4.0
