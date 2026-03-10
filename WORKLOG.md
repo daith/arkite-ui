@@ -169,6 +169,23 @@
 - `Select` / `FilterSelect` 的 `options` 改為 `readonly SelectOption[]`，支援 `as const` 陣列
 - `SearchInput` sm 高度從 `h-8` 改為 `h-9`，對齊 `FilterBarSearch`
 
+### 需求審核 — 不收錄的元件與原因
+
+以下為 ark-harvest 專案提出但經審核後決定不納入共用元件庫的需求：
+
+| 提出的元件 | 使用處 | 決定 | 原因 |
+|-----------|--------|------|------|
+| `CodeEditor` / `JsonEditor` | SourcesPage JSON headers/body 編輯 | **不收錄** | 需包 CodeMirror/Monaco，體積大依賴重；只有 1 處使用；建議專案層直接用 `@uiw/react-codemirror` |
+| `ListItem` / `ActivityCard` | DashboardPage running runs、failed runs、activity 等 | **不收錄** | 資料結構為 domain-specific（run status、schedule time），通用化後等於泛化的 flex div，無抽象價值；建議用現有 `Card` + `Stack` 組合 |
+| `CopyButton` / `CopyInput` | ApiKeysPage 複製 API Key | **不收錄** | 僅 1 處使用，未達 2+ 專案門檻；建議專案層用 `Button` + clipboard API 自行組合，待第 2 個專案需要再提上來 |
+| `StatusDot` 擴充 | 多處手寫 status badge | **不改動** | StatusDot 本身 4 種狀態沒問題，是 ark-harvest 該統一用 `Badge variant="success"` 的問題，不需要改元件庫 |
+
+**審核標準依據（見 ComponentGuidelines.mdx）：**
+- 純 UI / 框架無關 — 不綁定特定業務邏輯
+- 多專案可複用 — 至少 2 個以上專案會用到
+- 接受 callback / slot — 不內建業務行為
+- 不含 domain knowledge
+
 ### Storybook 文件
 
 **新增文件（2 份 MDX）：**
