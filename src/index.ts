@@ -5,9 +5,11 @@ export type { BreadcrumbItem as BreadcrumbConfigItem } from './utils/breadcrumb'
 
 // UI Primitives
 export * from './components/view-toggle'
+export * from './components/segmented-control'
 export * from './components/button'
 export * from './components/input'
 export * from './components/badge'
+export * from './components/inline-code'
 export * from './components/select'
 export * from './components/checkbox'
 export * from './components/radio'
