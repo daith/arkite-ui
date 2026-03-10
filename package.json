@@ -106,6 +106,7 @@
     "postcss": "^8.5.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "remark-gfm": "^4.0.1",
     "size-limit": "^12.0.1",
     "storybook": "^10.2.16",
     "tailwindcss": "^4.2.1",
