@@ -96,6 +96,139 @@ describe('DataTable', () => {
     expect(screen.getByText('Alice!')).toBeInTheDocument()
   })
 
+  // ─── Selection Tests ───
+
+  it('renders checkboxes when selectable', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set()}
+        onSelectionChange={() => {}}
+        pagination={false}
+      />
+    )
+    // 1 header checkbox + 3 row checkboxes
+    const checkboxes = screen.getAllByRole('checkbox')
+    expect(checkboxes).toHaveLength(4)
+  })
+
+  it('does not render checkboxes when not selectable', () => {
+    render(
+      <DataTable columns={columns} data={data} getRowKey={(r) => r.id} pagination={false} />
+    )
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
+  })
+
+  it('toggles a single row selection', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set()}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+    // Click the second row checkbox (index 1 = "Select row 2")
+    await user.click(screen.getByLabelText('Select row 2'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set([2]))
+  })
+
+  it('deselects a selected row', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set([2])}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Select row 2'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set())
+  })
+
+  it('selects all rows on header checkbox click', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set()}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Select all rows'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set([1, 2, 3]))
+  })
+
+  it('deselects all rows when all are selected', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set([1, 2, 3])}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Select all rows'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set())
+  })
+
+  it('shows indeterminate state when some rows selected', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set([1])}
+        onSelectionChange={() => {}}
+        pagination={false}
+      />
+    )
+    const headerCheckbox = screen.getByLabelText('Select all rows')
+    expect(headerCheckbox).toHaveAttribute('aria-checked', 'mixed')
+  })
+
+  it('highlights selected rows', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set([2])}
+        onSelectionChange={() => {}}
+        pagination={false}
+      />
+    )
+    const rows = screen.getAllByRole('row')
+    // rows[0] = header, rows[1] = Alice (id:1), rows[2] = Bob (id:2)
+    expect(rows[2]).toHaveAttribute('data-selected', 'true')
+    expect(rows[1]).not.toHaveAttribute('data-selected')
+  })
+
   it('paginates data with default page size', () => {
     const largeData = Array.from({ length: 25 }, (_, i) => ({
       id: i,

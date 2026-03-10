@@ -1,4 +1,4 @@
-import { useState, useMemo, type ReactNode } from 'react'
+import { useState, useMemo, useCallback, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import {
   Table,
@@ -9,7 +9,7 @@ import {
   TableCell,
 } from '../table/Table'
 import { Button } from '../button/Button'
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown, Check, Minus } from 'lucide-react'
 
 export interface Column<T> {
   /** Column key (should match data property) */
@@ -69,6 +69,47 @@ export interface DataTableProps<T> {
   className?: string
 }
 
+/* ─── Selection Checkbox ─── */
+
+type CheckState = 'checked' | 'indeterminate' | 'unchecked'
+
+function SelectionCheckbox({
+  state,
+  onChange,
+  disabled,
+  'aria-label': ariaLabel,
+}: {
+  state: CheckState
+  onChange: () => void
+  disabled?: boolean
+  'aria-label'?: string
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={state === 'indeterminate' ? 'mixed' : state === 'checked'}
+      aria-label={ariaLabel}
+      disabled={disabled}
+      onClick={(e) => {
+        e.stopPropagation()
+        onChange()
+      }}
+      className={cn(
+        'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        state !== 'unchecked'
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-input bg-background'
+      )}
+    >
+      {state === 'checked' && <Check className="h-3 w-3" />}
+      {state === 'indeterminate' && <Minus className="h-3 w-3" />}
+    </button>
+  )
+}
+
 /** Feature-rich data table with sorting, pagination, and custom cell rendering. */
 export function DataTable<T>({
   data,
@@ -80,6 +121,9 @@ export function DataTable<T>({
   loading = false,
   emptyContent,
   onRowClick,
+  selectable = false,
+  selectedRows,
+  onSelectionChange,
   className,
 }: DataTableProps<T>) {
   const [sortState, setSortState] = useState<SortState | null>(null)
@@ -150,6 +194,47 @@ export function DataTable<T>({
     setPaginationState({ pageIndex: 0, pageSize })
   }
 
+  // ─── Selection helpers ───
+  const selection = selectedRows ?? new Set<string | number>()
+
+  const allPageKeys = useMemo(
+    () => paginatedData.map((row, i) => getRowKey(row, paginationState.pageIndex * paginationState.pageSize + i)),
+    [paginatedData, getRowKey, paginationState]
+  )
+
+  const headerCheckState: CheckState = useMemo(() => {
+    if (!selectable || allPageKeys.length === 0) return 'unchecked'
+    const selectedOnPage = allPageKeys.filter((k) => selection.has(k)).length
+    if (selectedOnPage === 0) return 'unchecked'
+    if (selectedOnPage === allPageKeys.length) return 'checked'
+    return 'indeterminate'
+  }, [selectable, allPageKeys, selection])
+
+  const toggleAll = useCallback(() => {
+    if (!onSelectionChange) return
+    const next = new Set(selection)
+    if (headerCheckState === 'checked') {
+      allPageKeys.forEach((k) => next.delete(k))
+    } else {
+      allPageKeys.forEach((k) => next.add(k))
+    }
+    onSelectionChange(next)
+  }, [onSelectionChange, selection, headerCheckState, allPageKeys])
+
+  const toggleRow = useCallback(
+    (key: string | number) => {
+      if (!onSelectionChange) return
+      const next = new Set(selection)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      onSelectionChange(next)
+    },
+    [onSelectionChange, selection]
+  )
+
   const getSortIcon = (key: string) => {
     if (sortState?.key !== key) {
       return <ArrowUpDown className="h-4 w-4 opacity-50" />
@@ -174,6 +259,15 @@ export function DataTable<T>({
       <Table>
         <TableHeader>
           <TableRow>
+            {selectable && (
+              <TableHead style={{ width: 40 }} className="px-3">
+                <SelectionCheckbox
+                  state={headerCheckState}
+                  onChange={toggleAll}
+                  aria-label="Select all rows"
+                />
+              </TableHead>
+            )}
             {visibleColumns.map((column) => (
               <TableHead
                 key={column.key}
@@ -202,7 +296,7 @@ export function DataTable<T>({
           {loading ? (
             <TableRow>
               <TableCell
-                colSpan={visibleColumns.length}
+                colSpan={visibleColumns.length + (selectable ? 1 : 0)}
                 className="h-24 text-center"
               >
                 <div className="flex items-center justify-center gap-2">
@@ -214,19 +308,38 @@ export function DataTable<T>({
           ) : paginatedData.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={visibleColumns.length}
+                colSpan={visibleColumns.length + (selectable ? 1 : 0)}
                 className="h-24 text-center text-muted-foreground"
               >
                 {emptyContent || 'No results found.'}
               </TableCell>
             </TableRow>
           ) : (
-            paginatedData.map((row, index) => (
+            paginatedData.map((row, pageLocalIndex) => {
+              const globalIndex = pagination
+                ? paginationState.pageIndex * paginationState.pageSize + pageLocalIndex
+                : pageLocalIndex
+              const rowKey = getRowKey(row, globalIndex)
+              const isSelected = selectable && selection.has(rowKey)
+              return (
               <TableRow
-                key={getRowKey(row, index)}
-                onClick={onRowClick ? () => onRowClick(row, index) : undefined}
-                className={cn(onRowClick && 'cursor-pointer')}
+                key={rowKey}
+                onClick={onRowClick ? () => onRowClick(row, globalIndex) : undefined}
+                className={cn(
+                  onRowClick && 'cursor-pointer',
+                  isSelected && 'bg-primary/5'
+                )}
+                data-selected={isSelected || undefined}
               >
+                {selectable && (
+                  <TableCell className="px-3">
+                    <SelectionCheckbox
+                      state={isSelected ? 'checked' : 'unchecked'}
+                      onChange={() => toggleRow(rowKey)}
+                      aria-label={`Select row ${rowKey}`}
+                    />
+                  </TableCell>
+                )}
                 {visibleColumns.map((column) => (
                   <TableCell
                     key={column.key}
@@ -235,11 +348,12 @@ export function DataTable<T>({
                       column.align === 'right' && 'text-right'
                     )}
                   >
-                    {getCellValue(row, column, index)}
+                    {getCellValue(row, column, globalIndex)}
                   </TableCell>
                 ))}
               </TableRow>
-            ))
+              )
+            })
           )}
         </TableBody>
       </Table>
