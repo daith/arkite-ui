@@ -140,6 +140,27 @@ function SortableTable({ data, columns }) {
 
 ## Row Selection + BulkActionBar
 
+> **Tip:** For most cases, `DataTable` has **built-in row selection** — no TanStack Table needed:
+>
+> ```tsx
+> const [selected, setSelected] = useState(new Set())
+>
+> <DataTable
+>   selectable
+>   selectedRows={selected}
+>   onSelectionChange={setSelected}
+>   columns={columns}
+>   data={data}
+>   getRowKey={(row) => row.id}
+> />
+> <BulkActionBar selectedCount={selected.size} onClose={() => setSelected(new Set())}>
+>   <Button size="sm" variant="destructive">Delete</Button>
+> </BulkActionBar>
+> ```
+
+If you need TanStack Table's advanced selection (sub-row selection, row selection with server-side pagination, etc.),
+use Table primitives with TanStack's selection model:
+
 ```tsx
 import {
   useReactTable,

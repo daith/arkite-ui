@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import type { Meta, StoryFn } from '@storybook/react-vite'
 import { DataTable, type Column } from '../../components/data-table'
 import { Badge } from '../../components/badge'
+import { BulkActionBar } from '../../components/bulk-action-bar'
+import { Button } from '../../components/button'
 
 interface User {
   id: number
@@ -101,3 +104,38 @@ export const LoadingWithData: StoryFn = () => (
     defaultPageSize={5}
   />
 )
+
+function SelectableDemo() {
+  const [selected, setSelected] = useState<Set<string | number>>(new Set())
+
+  return (
+    <div>
+      <DataTable<User>
+        data={sampleData}
+        columns={columns}
+        getRowKey={(row) => row.id}
+        selectable
+        selectedRows={selected}
+        onSelectionChange={setSelected}
+        pagination
+        defaultPageSize={5}
+      />
+      <BulkActionBar
+        selectedCount={selected.size}
+        onClose={() => setSelected(new Set())}
+      >
+        <Button size="sm" variant="secondary">
+          Export
+        </Button>
+        <Button size="sm" variant="secondary">
+          Assign Role
+        </Button>
+        <Button size="sm" variant="destructive">
+          Delete
+        </Button>
+      </BulkActionBar>
+    </div>
+  )
+}
+
+export const Selectable: StoryFn = () => <SelectableDemo />
