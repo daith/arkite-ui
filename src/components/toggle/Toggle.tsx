@@ -17,17 +17,17 @@ const sizeStyles: Record<ToggleSize, { track: string; thumb: string; translate: 
   sm: {
     track: 'h-5 w-9',
     thumb: 'h-4 w-4',
-    translate: 'translate-x-4',
+    translate: 'translate-x-0.5 peer-checked:translate-x-4',
   },
   md: {
     track: 'h-6 w-11',
     thumb: 'h-5 w-5',
-    translate: 'translate-x-5',
+    translate: 'translate-x-0.5 peer-checked:translate-x-5',
   },
   lg: {
     track: 'h-7 w-14',
     thumb: 'h-6 w-6',
-    translate: 'translate-x-7',
+    translate: 'translate-x-0.5 peer-checked:translate-x-7',
   },
 }
 
@@ -72,7 +72,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           <div
             className={cn(
               'rounded-full bg-background shadow-sm transition-transform duration-200',
-              'translate-x-0.5 peer-checked:' + styles.translate,
+              styles.translate,
               styles.thumb,
               'mt-0.5'
             )}
