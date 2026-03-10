@@ -21,7 +21,7 @@ export interface SelectProps
   /** Placeholder text */
   placeholder?: string
   /** Options list */
-  options?: SelectOption[]
+  options?: readonly SelectOption[]
   /** Error state */
   error?: boolean
   /** Error message */

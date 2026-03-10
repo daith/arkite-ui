@@ -7,7 +7,7 @@ export interface FilterSelectProps
   /** Filter label — shown as prefix in the "all" option (e.g. "狀態: 全部") */
   label?: string
   /** Options list */
-  options?: SelectOption[]
+  options?: readonly SelectOption[]
   /** Text for the "all" option — pass `false` to hide it. @default "全部" */
   allLabel?: string | false
   /** Select size @default "sm" */

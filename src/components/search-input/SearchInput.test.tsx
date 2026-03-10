@@ -65,7 +65,7 @@ describe('SearchInput', () => {
   it('applies sm size variant classes', () => {
     render(<SearchInput size="sm" />)
     const input = screen.getByRole('searchbox')
-    expect(input.className).toContain('h-8')
+    expect(input.className).toContain('h-9')
   })
 
   it('applies md size variant classes by default', () => {

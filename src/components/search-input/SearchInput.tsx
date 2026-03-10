@@ -19,7 +19,7 @@ export interface SearchInputProps
 }
 
 const sizeStyles = {
-  sm: 'h-8 text-sm pl-8 pr-8',
+  sm: 'h-9 text-sm pl-8 pr-8',
   md: 'h-10 text-sm pl-10 pr-10',
   lg: 'h-12 text-base pl-12 pr-12',
 }
