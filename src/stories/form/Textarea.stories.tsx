@@ -44,6 +44,7 @@ export const Disabled: Story = {
   args: {
     disabled: true,
     defaultValue: 'This textarea is disabled.',
+    'aria-label': 'Description',
   },
 }
 

@@ -141,7 +141,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
               'flex items-center justify-between rounded-md border bg-background py-2',
               fullWidth ? 'w-full' : 'w-fit',
               triggerSizeStyles[size],
-              'ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+              'ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring/40 focus:ring-offset-0',
               'disabled:cursor-not-allowed disabled:opacity-50',
               error && 'border-destructive focus:ring-destructive',
               !error && 'border-input',

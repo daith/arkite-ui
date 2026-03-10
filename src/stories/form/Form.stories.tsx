@@ -197,10 +197,12 @@ const ValidationDemo = () => {
 
         <FormField name="agree" error={errors.agree}>
           <div className="flex items-center gap-2">
-            <Checkbox
-              checked={values.agree}
-              onChange={(e) => setValues((v) => ({ ...v, agree: e.target.checked }))}
-            />
+            <FormControl>
+              <Checkbox
+                checked={values.agree}
+                onChange={(e) => setValues((v) => ({ ...v, agree: e.target.checked }))}
+              />
+            </FormControl>
             <FormLabel>I agree to the terms and conditions</FormLabel>
           </div>
           <FormMessage />
@@ -243,13 +245,17 @@ export const MultiSection: StoryFn = () => (
     <FormSection title="Preferences" description="Notification preferences">
       <FormField name="notifications">
         <div className="flex items-center gap-2">
-          <Checkbox />
+          <FormControl>
+            <Checkbox />
+          </FormControl>
           <FormLabel>Email notifications</FormLabel>
         </div>
       </FormField>
       <FormField name="marketing">
         <div className="flex items-center gap-2">
-          <Checkbox />
+          <FormControl>
+            <Checkbox />
+          </FormControl>
           <FormLabel optional>Marketing emails</FormLabel>
         </div>
       </FormField>

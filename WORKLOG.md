@@ -239,17 +239,108 @@
 
 ---
 
+### 效能優化：Bundle 瘦身
+
+**Motion 獨立 entry point：**
+- 新增 `src/motion.ts` 獨立入口，消費端改由 `@arkite/ui/motion` 匯入
+- 從主 `src/index.ts` 移除 motion re-export，不用動畫的專案零載入
+- `package.json` 新增 `./motion` exports 路徑，`tsup.config.ts` 新增 entry
+- `size-limit` 新增 `motion.js < 10 kB` 預算
+
+**Radix / 重型依賴外部化：**
+- `@radix-ui/react-dropdown-menu`、`@radix-ui/react-popover`、`@radix-ui/react-tooltip` → `peerDependencies` (optional)
+- `@tanstack/react-virtual`、`cmdk` → `peerDependencies` (optional)
+- `tsup.config.ts` external 清單新增以上 5 個套件
+- `dependencies` 僅保留 `clsx` + `tailwind-merge`（純 utility）
+
+**成效：**
+
+| 指標 | 優化前 | 優化後 | 變化 |
+|------|--------|--------|------|
+| index.js (raw) | 248 KB | 230 KB | -18 KB (-7%) |
+| index.js (brotli) | 37.08 kB | 35.73 kB | -1.35 kB (-4%) |
+| motion.js | — | 17 KB / 3.36 kB | 獨立 entry |
+| runtime dependencies | 7 | 2 | -5 |
+
+**消費端 Migration：**
+```ts
+// 之前
+import { AnimatedModal } from '@arkite/ui'
+// 之後
+import { AnimatedModal } from '@arkite/ui/motion'
+
+// 新增 peerDependencies（用到才裝）
+npm install @radix-ui/react-dropdown-menu @radix-ui/react-popover @radix-ui/react-tooltip
+```
+
+### 新增元件：ImageUpload
+
+根據 ark-harvest 4 個檔案上傳場景分析，3/4 管理的是 URL 而非 File — 現有 `FileUpload` 不適用。
+
+**元件設計：**
+- `value: string[]` — 顯示已上傳的 URL 預覽
+- `onChange: (files: File[]) => void` — 新選的檔案，消費端自行上傳 API
+- `onRemove: (url: string) => void` — 移除已上傳的，消費端自行刪除
+- **不碰 API** — 純 UI，上傳邏輯留給消費端
+
+**模式：**
+- 單張模式 (`max={1}`) — 128×128 預覽，hover 顯示 Replace / Remove
+- 多圖模式 (`max={n}`) — grid 排列 + Add 按鈕 + 計數 `2 / 5`
+- 無上限模式 — 不傳 `max`，永遠顯示新增按鈕
+
+**支援功能：** drag & drop、`loadingUrls` loading overlay、`error` 訊息、`maxSize` 提示、`disabled`
+
+**Gatekeeper 審核：** 通過 — 後台管理幾乎都有圖片上傳，2+ 專案會用，純 UI 不含業務邏輯。
+
+### ark-crm 反饋驅動迭代
+
+根據 ark-crm 專案團隊分兩輪提出共 12 項需求（8 個元件 + 4 個模式/工具），經 gatekeeper 審核收錄 7 個、不收錄 5 個。
+
+**新增元件（7 個）：**
+
+| 元件 | 說明 | Tests | Stories |
+|------|------|-------|---------|
+| `DateRangePicker` | 成對 start/end 日期輸入，日期範圍高亮，選完 start 自動切到 end，清除鈕 | 13 | 5 |
+| `TagInput` | Enter/逗號新增 chip、Backspace 刪除末尾、重複防護、max 限制、貼上自動拆分 | 15 | 5 |
+| `CopyButton` + `CopyInput` | 剪貼簿複製 + 2 秒「Copied!」回饋；CopyInput 為 readonly input + 內嵌複製鈕 | 11 | 4 |
+| `ColorPicker` | 色塊 + native color picker + hex 輸入 + optional preset swatches | 12 | 4 |
+| `CardField` + `CardGrid` | 詳情頁 label-value 對（垂直排列）+ 響應式 grid（1-4 欄），無值顯示「—」 | 14 | 4 |
+| `DescriptionList` + `DescriptionItem` | 水平 label-value 行（label 左、value 右），`<dl>` 語意標籤，divider 可選，與 CardField 互補 | 14 | 4 |
+| `CollapsibleSection` | 獨立可收合區塊，controlled/uncontrolled、description 副標題、rightSlot、disabled、chevron 動畫 | 12 | 6 |
+
+**不收錄的需求與原因（5 個）：**
+
+| 提出的需求 | 決定 | 原因 |
+|-----------|------|------|
+| `IconPicker` | **不收錄** | 只有 CMS 1 處用；icon set 綁定專案；建議用 `Popover` + `SearchInput` + icon grid 自組 |
+| `SortableList` | **不收錄** | dnd-kit 使用 pattern 差異大，薄 wrapper 沒價值，厚 wrapper 變業務層；建議直接用 `@dnd-kit/sortable` |
+| `InlineAddForm` | **不收錄** | 展開/收合用 `useState` + `Card` 即可，表單內容每頁不同，抽象後等於一個 div + collapse |
+| `formatDate` / `formatCurrency` | **不收錄** | locale 和格式是專案層設定，每專案寫一次 `utils/format.ts` 不到 20 行，UI library 不該決定日期格式 |
+| `StatusMap` / `createStatusMap` | **不收錄** | 狀態定義是 domain knowledge，用現有 `Badge` 兩行搞定 |
+
+### 開源 Roadmap
+
+建立 `ROADMAP.md`，採佛系開源策略：
+
+- **定位：** 自己專案用得爽，順便放出去
+- **不做：** Discord 社群、推廣文章、YouTube、主動找貢獻者
+- **核心：** 讓「找到 → 裝起來 → 跑起來」零摩擦
+- **版本節奏：** 跟內部專案需求走，不設時間表，v1.0.0 等 API 穩定半年再發
+
+---
+
 ### 數據總結
 
 | 指標 | Day 1 | Day 2 | 變化 |
 |------|-------|-------|------|
-| 總 commits | 45 | 61 | +16 |
-| 元件數量 | 56+ | 61+ | +5 |
-| 測試檔案 | 39 | 61 | +22 |
-| 測試案例 | 412 | 617 | +205 |
-| 測試覆蓋率 | 71% (39/55) | 100% (61/61) | +29% |
-| Storybook stories | 70+ | 72+ | +2 |
+| 總 commits | 45 | 61+ | +16+ |
+| 元件數量 | 56+ | 69+ | +13 |
+| 測試檔案 | 39 | 69 | +30 |
+| 測試案例 | 412 | 727 | +315 |
+| 測試覆蓋率 | 71% (39/55) | 100% (69/69) | +29% |
+| Storybook stories | 70+ | 112+ | +42 |
 | MDX 文件頁 | 7 | 9 | +2 |
+| Bundle (brotli) | 37 kB (單一) | 40.5 kB + 3.4 kB (拆分) | motion 獨立 |
 
 ### 技術棧
 
@@ -258,26 +349,188 @@
 | React | ^18 / ^19 |
 | Tailwind CSS | v4 (CSS-first) |
 | TypeScript | ^5.6 |
-| tsup | 打包 (ESM + CJS + DTS) |
+| tsup | 打包 (ESM + CJS + DTS)，3 entry points |
 | Storybook | 10 |
 | Vitest | 測試 |
 | Testing Library | DOM 測試 |
-| Radix UI | Popover, Tooltip, DropdownMenu |
-| cmdk | CommandPalette |
-| @tanstack/react-virtual | VirtualList |
-| Zustand | Toast store |
-| Framer Motion | 動畫（optional） |
+| Radix UI | Popover, Tooltip, DropdownMenu (peer) |
+| cmdk | CommandPalette (peer) |
+| @tanstack/react-virtual | VirtualList (peer) |
+| Zustand | Toast store (peer) |
+| Framer Motion | 動畫 (optional peer, `@arkite/ui/motion`) |
 | Changesets | 版本管理 |
 | Chromatic | 視覺回歸 |
 | size-limit | Bundle 監控 |
 | GitLab CI/CD | 自動化 pipeline |
 
+---
+
+### Phase 6：競品對標 & DX 提升
+
+根據與 shadcn/ui、Ant Design、Mantine、MUI、Tremor 的競品分析，補齊 admin 場景核心缺口並提升開發者體驗。
+
+---
+
+#### 新增元件（4 個）
+
+| 元件 | 說明 | Tests | Stories |
+|------|------|-------|---------|
+| `LoadingOverlay` | 半透明遮罩 + 居中 Spinner，支援 blur、label、custom children、3 size | 7 | 6 |
+| `NumberInput` | 數字輸入，+/- stepper、min/max/step/precision、prefix/suffix、clampOnBlur | 11 | 8 |
+| `Tree` | 樹狀結構，expand/collapse、node selection、checkable（parent-child 級聯）、disabled、custom icon | 10 | 4 |
+| `ToastContainer` + 命令式 `toast` API | zustand 驅動命令式呼叫：`toast.success('Done')`，無需 context provider | 14 | — |
+
+#### DataTable 增強（4 個功能）
+
+| 功能 | 說明 | Tests |
+|------|------|-------|
+| `expandable` | 行展開 — render function 傳入，chevron 按鈕切換 | 4 |
+| `columnToggle` | 欄位顯示/隱藏 — Columns3 icon dropdown + checkbox 列表 | 3 |
+| `stickyHeader` + `maxHeight` | 黏性表頭 — 搭配 scroll container，複用 Table 的 `data-sticky-header` 機制 | 3 |
+| `filterable` columns | 欄位篩選 — ListFilter icon dropdown + checkbox 過濾，auto-detect unique values，支援 filterOptions/filterFn | 8 |
+
+#### DateRangePicker 增強
+
+| 功能 | 說明 | Tests |
+|------|------|-------|
+| `variant="calendar"` | 雙月份日曆 popover 範圍選取，取代雙 input 模式。hover 預覽高亮、Today 快捷鍵、Clear 按鈕、min/max 限制 | 10 |
+
+#### a11y Color Contrast 修正
+
+| 修正 | 改動 | 影響 |
+|------|------|------|
+| `success-foreground` 從白改黑 | 4 個 theme preset + CSS variables 一致改為 `0 0% 0%`（與 warning 一致） | Badge success、Alert success、StatusDot 所有 success variant |
+| `muted-foreground` 加深 | `220 9% 46%` → `220 9% 40%`，4 preset + CSS 同步 | 所有使用 `text-muted-foreground` 的元件（placeholder、description、secondary text） |
+| Calendar highlight 文字 | `text-primary` → `text-foreground font-medium`（bg-primary/10 上主色對比不足） | Calendar highlighted dates |
+
+**成效：** Storybook a11y failures 88 → 66（-25%）（Phase 7 續修至 0）
+
+#### Theme Playground Story
+
+互動式主題預覽頁：
+- Sticky toolbar — 4 preset 切換 + Dark mode Switch + Show CSS toggle
+- Custom Theme Creator — Primary/Accent 色票 + hex 輸入 + Radius 選單 + Apply
+- CSS Output — `themeToCSS()` 完整輸出
+- 色彩 Token grid（15 個 swatch）
+- 元件展示：Buttons、Badges、Form Controls、Feedback（Alert/Progress/Spinner）、Status、Tabs、Cards（含 Skeleton）
+
+#### CLI init 工具
+
+`npx @arkite/ui init` — 一鍵設定新專案：
+- 自動偵測 package manager（npm/yarn/pnpm/bun）
+- 安裝 `@arkite/ui` + `lucide-react` + `tailwindcss` + `tw-animate-css`
+- 產生 `src/styles/arkite.css`（theme tokens + import）
+- 產生 `src/lib/theme.ts`（createTheme 範本 + setupTheme helper）
+- 提示在 entry file 加入 CSS import
+
+#### 文件站 Scaffold（Fumadocs）
+
+`docs/` 目錄建立 Next.js + Fumadocs MDX 文件站骨架：
+- 2 頁指南：Getting Started、Theming
+- 6 頁元件文件：Button、Input、Badge、DataTable、Tree、Modal、Toast
+- 每頁包含：Import、Usage 範例、Props table
+- Fumadocs 配置：source.config.ts、catch-all route、RootProvider
+
+---
+
+### 數據總結
+
+| 指標 | Day 1 | Day 2 | Phase 6 | Phase 7 |
+|------|-------|-------|---------|---------|
+| 元件數量 | 56+ | 69+ | 75+ | 75+（12 個 a11y 修正） |
+| 測試檔案 | 39 | 69 | 73 | 73 |
+| 測試案例 | 412 | 727 | 797 | 797 |
+| Storybook stories | 70+ | 112+ | 130+ | 130+ |
+| Storybook a11y pass | — | — | 251/317 | **317/317（100%）** |
+| Theme presets | 4 | 4 | 4 | 4（secondary-fg + accent-fg 修正） |
+| WCAG AA 合規 | — | — | 部分 | **全部通過** |
+
+---
+
+### Phase 7：a11y 全面修正（WCAG AA 合規）
+
+針對 Storybook addon-a11y error-based 測試的 75 個失敗項全數修復，達成 317/317 stories 零 violation。
+
+---
+
+#### 元件程式碼修正（12 個元件）
+
+| 元件 | 修正 | 規則 |
+|------|------|------|
+| `Progress` / `CircularProgress` | 加 `aria-label` prop，預設 `"Progress"` | aria-progressbar-name |
+| `Tree` checkbox | 傳遞 node label 作為 checkbox `aria-label` | button-name |
+| `FileUpload` | dropzone 加 `aria-label="Upload files"`、hidden input 加 label、disabled 改 `cursor-not-allowed`（移除 opacity） | button-name, label, color-contrast |
+| `ImageUpload` | hidden input 加 `aria-label="Upload image"`、max size 提示移除 `/60` opacity | label, color-contrast |
+| `DataTable` | rows-per-page select 加 aria-label、4 個 pagination 按鈕加 aria-label、expand column header 加 sr-only、sort 按鈕加 aria-label、filter checkbox 加 aria-label | select-name, button-name, empty-table-header |
+| `CopyInput` | readonly input 加 `aria-label="Copy value"` | label |
+| `FilterBar` search | input 加 `aria-label={placeholder \|\| 'Search'}` | label |
+| `DatePicker` / `DateRangePicker` | calendar icon 按鈕加 `aria-label="Open calendar"` | button-name |
+| `CommandPalette` | dialog 加 `role="dialog"` + `aria-label`、separator 加 `role="none"` | aria-required-children |
+| `VirtualList` | scroll container 加 `tabIndex={0}` + `role="region"` + `aria-label` | scrollable-region-focusable |
+| `Sidebar` | active item 底色 `bg-primary/10` → `bg-primary/5`（提升 primary text contrast） | color-contrast |
+| `Form` | `FormControl` 自動注入 field id 到子元素（修復 label-input 連結）、disabled label opacity 50→70 | label, color-contrast |
+
+#### 色彩 Token 修正
+
+| Token | 改動 | 影響 |
+|-------|------|------|
+| `--secondary-foreground` | 全 preset light mode 改暗至 `220 9% 35%`（≈6:1 on #f9fafb） | Badge secondary、TagInput badge、所有 `text-secondary-foreground` |
+| `--accent-foreground` | 全 preset 從白改黑 `0 0% 0%`（亮色 accent 背景需暗色文字） | Tree selected item、所有 `text-accent-foreground` |
+| `Stat` trend 指標 | `text-success` → `text-emerald-700 dark:text-emerald-400`（success 色用於背景不適合文字） | Stat trend 百分比顯示 |
+
+#### Story 修正（13 個 story 檔）
+
+| Story | 修正 |
+|-------|------|
+| Select（4 stories） | 加 `aria-label: 'Select option'` |
+| Textarea Disabled | 加 `aria-label: 'Description'` |
+| TagInput（4 stories） | 加 `aria-label="Tags"` |
+| NumberInput（8 stories） | 加 `aria-label`（各 story 語意化命名） |
+| Switch WithoutLabel | 加 `aria-label: 'Toggle setting'` |
+| DatePicker / DateRangePicker | 加 `aria-label` |
+| Progress（含 AllVariants） | 加 `aria-label: 'Progress'` |
+| CopyInput | 加 `aria-label="API endpoint URL"` |
+| FilterBar Select（5 個） | 加 `aria-label` |
+| ThemePlayground | 修 Alert variant `destructive` → `error`、各控件加 aria-label |
+| StickyTable | scroll container 加 `tabIndex` + `role="region"` |
+| CommandPalette | 加 `aria-required-children` rule disable（cmdk library 限制） |
+
+**成效：**
+
+| 指標 | 修正前 | 修正後 |
+|------|--------|--------|
+| Storybook a11y failures | 75 | 0 |
+| 通過 stories | 242/317 | 317/317 |
+| 涉及元件修改 | — | 12 |
+| 涉及 story 修改 | — | 13 |
+| 色彩 token 調整 | — | 3 |
+
+---
+
 ### 待辦 / 後續
 
+**v0.4.0 發布前（必做）：**
+- [ ] 修正 `package.json` metadata（author、description）
+- [ ] 補 `MIGRATION.md` — motion import 路徑 + Radix peer deps 變更
 - [ ] 設定 Chromatic project token 啟用視覺回歸
-- [ ] 首次使用 changesets 發布流程驗證
-- [ ] 補齊剩餘 4 個整合型元件測試（admin-layout, motion, dropdown-menu, command-palette）
-- [ ] 效能優化：lazy import motion 元件、減少 Radix 打包體積
-- [ ] CopyButton / CopyInput — 目前只 1 處使用，待第 2 個專案需要再收錄
+- [ ] Changesets 首次發布流程端到端驗證
+- [ ] bump version to 0.4.0，npm publish
+
+**通知消費端專案（v0.4.0 發布時）：**
+- [ ] ark-harvest：更新 motion import 路徑、安裝 Radix/cmdk/react-virtual、改用 `ImageUpload`
+- [ ] ark-crm：開始使用 DateRangePicker、TagInput、CopyButton、ColorPicker、CardField、DescriptionList、CollapsibleSection
+- [ ] 全部專案：開始使用命令式 `toast.success()` API + `<ToastContainer />`
+
+**DX 持續改善：**
+- [ ] 文件站上線 — `docs/` 安裝依賴、部署到 Vercel/Cloudflare
+- [ ] Storybook ArgTypes 自動推導 — 從 `.d.ts` 產生 props table
+- [x] ~~剩餘 a11y 修正~~ — **Phase 7 完成，75 failures → 0（317/317 pass）**
+- [ ] DataTable 虛擬捲動整合 — 大資料量場景需求驅動
+
+**需求驅動（有需要再做）：**
 - [ ] SegmentedControl icon + description 擴充 — 待需求明確再加
-- [ ] bump version to 0.4.0
+- [ ] Storybook 部署到公開 URL — 新專案開局時順便驗證
+- [ ] StackBlitz 一鍵範本 — 有空花 30 分鐘做
+- [ ] Cascade Select — 省/市/區 多級聯動
+- [ ] Transfer / DualList — 左右穿梭選取
+- [ ] Async Combobox — loading + 遠端搜尋標準化

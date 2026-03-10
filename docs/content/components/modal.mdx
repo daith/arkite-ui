@@ -1,0 +1,57 @@
+---
+title: Modal
+description: Dialog overlay with title, description, and action footer.
+---
+
+## Import
+
+```tsx
+import { Modal } from '@arkite/ui'
+```
+
+## Usage
+
+```tsx
+const [open, setOpen] = useState(false)
+
+<Button onClick={() => setOpen(true)}>Open Modal</Button>
+
+<Modal
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Confirm Action"
+  description="Are you sure you want to proceed?"
+  footer={
+    <>
+      <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+      <Button onClick={handleConfirm}>Confirm</Button>
+    </>
+  }
+>
+  <p>Modal body content goes here.</p>
+</Modal>
+```
+
+## Sizes
+
+```tsx
+<Modal size="sm" />   {/* max-w-sm */}
+<Modal size="md" />   {/* max-w-md (default) */}
+<Modal size="lg" />   {/* max-w-lg */}
+<Modal size="xl" />   {/* max-w-xl */}
+<Modal size="full" /> {/* near full-screen */}
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `open` | `boolean` | Required | Show/hide modal |
+| `onClose` | `() => void` | Required | Close callback |
+| `title` | `ReactNode` | - | Modal title |
+| `description` | `ReactNode` | - | Subtitle text |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl' \| '4xl' \| 'full'` | `'md'` | Modal width |
+| `showCloseButton` | `boolean` | `true` | Show X button |
+| `closeOnBackdropClick` | `boolean` | `true` | Close on overlay click |
+| `closeOnEscape` | `boolean` | `true` | Close on Escape key |
+| `footer` | `ReactNode` | - | Footer content |

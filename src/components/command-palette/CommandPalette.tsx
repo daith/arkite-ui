@@ -118,6 +118,7 @@ export const CommandSeparator = forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive.Separator
     ref={ref}
+    role="none"
     className={cn('-mx-1 h-px bg-border', className)}
     {...props}
   />
@@ -203,7 +204,7 @@ export function CommandDialog({ open, onOpenChange, children }: CommandDialogPro
         onClick={() => onOpenChange(false)}
       />
       {/* Dialog */}
-      <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95">
+      <div role="dialog" aria-label="Command palette" className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95">
         <Command className="rounded-lg border shadow-2xl">
           {children}
         </Command>

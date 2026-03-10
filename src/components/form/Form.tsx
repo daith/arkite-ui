@@ -1,6 +1,9 @@
 import {
+  Children,
+  cloneElement,
   createContext,
   forwardRef,
+  isValidElement,
   useContext,
   useId,
   type HTMLAttributes,
@@ -105,7 +108,7 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
         htmlFor={id}
         required={required}
         optional={optional}
-        className={cn(disabled && 'opacity-50', className)}
+        className={cn(disabled && 'opacity-70', className)}
         {...props}
       >
         {children}
@@ -119,12 +122,25 @@ FormLabel.displayName = 'FormLabel'
 // FormControl component - wrapper for form inputs
 export type FormControlProps = HTMLAttributes<HTMLDivElement>
 
-/** Wrapper for form input elements within a FormField. */
+/** Wrapper for form input elements within a FormField. Injects field id into the first child element. */
 export const FormControl = forwardRef<HTMLDivElement, FormControlProps>(
   ({ className, children, ...props }, ref) => {
+    const context = useContext(FormFieldContext)
+    const id = context?.id
+
+    // Inject id into the first valid element child so label htmlFor connects properly
+    const enhancedChildren = id
+      ? Children.map(children, (child, index) => {
+          if (index === 0 && isValidElement(child)) {
+            return cloneElement(child as React.ReactElement<{ id?: string }>, { id })
+          }
+          return child
+        })
+      : children
+
     return (
       <div ref={ref} className={className} {...props}>
-        {children}
+        {enhancedChildren}
       </div>
     )
   }

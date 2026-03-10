@@ -193,7 +193,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                   'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
                   !isSelected && isToday && 'border border-primary text-primary font-medium',
-                  !isSelected && highlighted && 'bg-primary/10 text-primary',
+                  !isSelected && highlighted && 'bg-primary/10 text-foreground font-medium',
                   disabled && 'opacity-30 pointer-events-none'
                 )}
               >

@@ -164,7 +164,7 @@ describe('SidebarItem', () => {
       </Sidebar>
     )
     const item = screen.getByRole('button', { name: 'Active Item' })
-    expect(item.className).toContain('bg-primary/10')
+    expect(item.className).toContain('bg-primary/5')
     expect(item.className).toContain('text-primary')
   })
 

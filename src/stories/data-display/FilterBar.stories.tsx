@@ -24,13 +24,13 @@ export const Default: Story = {
     <FilterBar>
       <FilterBarSearch placeholder="Search orders..." />
       <FilterBarFilters>
-        <Select size="sm">
+        <Select size="sm" aria-label="Filter by status">
           <option value="">All Status</option>
           <option value="active">Active</option>
           <option value="pending">Pending</option>
           <option value="completed">Completed</option>
         </Select>
-        <Select size="sm">
+        <Select size="sm" aria-label="Filter by type">
           <option value="">All Types</option>
           <option value="standard">Standard</option>
           <option value="express">Express</option>
@@ -74,6 +74,7 @@ function ActiveFiltersDemo() {
             size="sm"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
+            aria-label="Filter by status"
           >
             <option value="">All Status</option>
             <option value="in-stock">In Stock</option>
@@ -115,13 +116,13 @@ export const FiltersOnly: Story = {
   render: () => (
     <FilterBar>
       <FilterBarFilters>
-        <Select size="sm">
+        <Select size="sm" aria-label="Filter by department">
           <option value="">Department</option>
           <option value="engineering">Engineering</option>
           <option value="design">Design</option>
           <option value="marketing">Marketing</option>
         </Select>
-        <Select size="sm">
+        <Select size="sm" aria-label="Filter by role">
           <option value="">Role</option>
           <option value="admin">Admin</option>
           <option value="editor">Editor</option>

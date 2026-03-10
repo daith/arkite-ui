@@ -1,0 +1,12 @@
+{
+  "title": "Components",
+  "pages": [
+    "button",
+    "input",
+    "badge",
+    "data-table",
+    "tree",
+    "modal",
+    "toast"
+  ]
+}

@@ -1,0 +1,81 @@
+---
+title: Getting Started
+description: Install and set up Arkite UI in your React project.
+---
+
+## Installation
+
+### Quick Setup (Recommended)
+
+```bash
+npx @arkite/ui init
+```
+
+This will:
+1. Install `@arkite/ui` and required peer dependencies
+2. Create a CSS file with theme tokens at `src/styles/arkite.css`
+3. Create a theme setup helper at `src/lib/theme.ts`
+
+### Manual Installation
+
+```bash
+npm install @arkite/ui lucide-react
+```
+
+## CSS Setup
+
+Import the CSS file in your app's entry point:
+
+```tsx title="src/main.tsx"
+import './styles/arkite.css'
+// or import directly:
+// import '@arkite/ui/styles.css'
+```
+
+Arkite UI uses **Tailwind CSS v4** with CSS-first configuration. All theme tokens are defined as CSS custom properties.
+
+## Usage
+
+```tsx
+import { Button, Badge, Input } from '@arkite/ui'
+
+function App() {
+  return (
+    <div>
+      <h1>My Admin Panel</h1>
+      <Input placeholder="Search..." />
+      <Button>Save</Button>
+      <Badge variant="success">Active</Badge>
+    </div>
+  )
+}
+```
+
+## Theming
+
+Customize colors with `createTheme()`:
+
+```tsx title="src/lib/theme.ts"
+import { createTheme, applyTheme } from '@arkite/ui'
+
+const theme = createTheme({
+  primary: '#FF6B00',
+  accent: '#00B4D8',
+})
+
+// Apply on app mount
+applyTheme(theme)
+```
+
+See the [Theming guide](/docs/theming) for more details.
+
+## Dark Mode
+
+Toggle dark mode by adding the `dark` class to `<html>`:
+
+```ts
+import { applyDarkTheme } from '@arkite/ui'
+
+document.documentElement.classList.add('dark')
+applyDarkTheme(theme)
+```

@@ -66,7 +66,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           <div
             className={cn(
               'flex shrink-0 items-center justify-center rounded-full border',
-              'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2',
+              'peer-focus-visible:ring-1 peer-focus-visible:ring-ring/40 peer-focus-visible:ring-offset-0',
               'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
               'transition-colors duration-200',
               styles.outer,

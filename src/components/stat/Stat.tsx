@@ -22,7 +22,7 @@ export interface StatProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const trendStyles: Record<StatTrend, string> = {
-  up: 'text-success',
+  up: 'text-emerald-700 dark:text-emerald-400',
   down: 'text-destructive',
   neutral: 'text-muted-foreground',
 }

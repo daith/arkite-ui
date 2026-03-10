@@ -24,6 +24,8 @@ export interface VirtualListProps<T> {
   loading?: boolean
   /** Empty state content */
   emptyContent?: ReactNode
+  /** Accessible label for the scrollable region */
+  'aria-label'?: string
   /** Container className */
   className?: string
   /** Inner list className */
@@ -42,6 +44,7 @@ export function VirtualList<T>({
   overscan = 5,
   loading = false,
   emptyContent,
+  'aria-label': ariaLabel,
   className,
   innerClassName,
 }: VirtualListProps<T>) {
@@ -87,6 +90,9 @@ export function VirtualList<T>({
       ref={parentRef}
       className={cn('overflow-auto', className)}
       style={{ height }}
+      tabIndex={0}
+      role="region"
+      aria-label={ariaLabel || 'Scrollable list'}
     >
       <div
         className={cn('relative w-full', innerClassName)}
@@ -224,6 +230,9 @@ export function InfiniteScroll<T>({
       ref={parentRef}
       className={cn('overflow-auto', className)}
       style={{ height }}
+      tabIndex={0}
+      role="region"
+      aria-label="Scrollable list"
     >
       <div className={cn('relative w-full', innerClassName)} style={containerStyle}>
         {virtualItems.map((virtualItem) => (

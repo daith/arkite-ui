@@ -288,7 +288,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               'flex w-full rounded-md border border-input bg-background',
               inputSizeStyles[size],
               'ring-offset-background placeholder:text-muted-foreground',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0',
               'disabled:cursor-not-allowed disabled:opacity-50',
               error && 'border-destructive focus-visible:ring-destructive'
             )}
@@ -296,6 +296,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           />
           <button
             type="button"
+            aria-label="Open calendar"
             onClick={() => !disabled && setIsOpen(!isOpen)}
             className={cn(
               'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',

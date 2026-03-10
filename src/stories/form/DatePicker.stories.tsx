@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>
 
 const DefaultDemo = () => {
   const [date, setDate] = useState<Date | null>(null)
-  return <DatePicker value={date} onChange={setDate} />
+  return <DatePicker value={date} onChange={setDate} aria-label="Select date" />
 }
 
 export const Default: Story = {
@@ -49,7 +49,7 @@ export const WithMinMax: Story = {
 
 const WithErrorDemo = () => {
   const [date, setDate] = useState<Date | null>(null)
-  return <DatePicker value={date} onChange={setDate} error />
+  return <DatePicker value={date} onChange={setDate} error aria-label="Select date" />
 }
 
 export const WithError: Story = {

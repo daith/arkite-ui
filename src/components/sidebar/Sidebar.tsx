@@ -225,7 +225,7 @@ export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
       'flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
       'hover:bg-muted hover:text-foreground',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-      active && 'bg-primary/10 text-primary',
+      active && 'bg-primary/5 text-primary',
       disabled && 'pointer-events-none opacity-50',
       collapsed && 'justify-center px-2',
       className

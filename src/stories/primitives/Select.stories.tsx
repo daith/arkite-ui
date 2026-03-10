@@ -24,6 +24,7 @@ const meta = {
     options: sampleOptions,
     placeholder: 'Select framework...',
     size: 'md',
+    'aria-label': 'Select option',
   },
 } satisfies Meta<typeof Select>
 
@@ -43,9 +44,9 @@ export const Disabled: Story = {
 export const AllSizes: Story = {
   render: () => (
     <div className="flex flex-col gap-3 w-72">
-      <Select size="sm" options={sampleOptions} placeholder="Small" />
-      <Select size="md" options={sampleOptions} placeholder="Medium" />
-      <Select size="lg" options={sampleOptions} placeholder="Large" />
+      <Select size="sm" options={sampleOptions} placeholder="Small" aria-label="Small select" />
+      <Select size="md" options={sampleOptions} placeholder="Medium" aria-label="Medium select" />
+      <Select size="lg" options={sampleOptions} placeholder="Large" aria-label="Large select" />
     </div>
   ),
 }

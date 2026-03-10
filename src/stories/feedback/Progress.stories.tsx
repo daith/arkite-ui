@@ -17,6 +17,7 @@ const meta = {
     value: 60,
     size: 'md',
     variant: 'default',
+    'aria-label': 'Progress',
   },
 } satisfies Meta<typeof Progress>
 
@@ -45,10 +46,10 @@ export const Striped: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="space-y-3 w-72">
-      <Progress value={80} variant="default" showLabel />
-      <Progress value={60} variant="success" showLabel />
-      <Progress value={40} variant="warning" showLabel />
-      <Progress value={20} variant="error" showLabel />
+      <Progress value={80} variant="default" showLabel aria-label="Default progress" />
+      <Progress value={60} variant="success" showLabel aria-label="Success progress" />
+      <Progress value={40} variant="warning" showLabel aria-label="Warning progress" />
+      <Progress value={20} variant="error" showLabel aria-label="Error progress" />
     </div>
   ),
 }
@@ -56,10 +57,10 @@ export const AllVariants: Story = {
 export const Circular: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <CircularProgress value={25} showLabel />
-      <CircularProgress value={50} variant="success" showLabel />
-      <CircularProgress value={75} variant="warning" showLabel />
-      <CircularProgress indeterminate />
+      <CircularProgress value={25} showLabel aria-label="Progress at 25%" />
+      <CircularProgress value={50} variant="success" showLabel aria-label="Success progress" />
+      <CircularProgress value={75} variant="warning" showLabel aria-label="Warning progress" />
+      <CircularProgress indeterminate aria-label="Loading" />
     </div>
   ),
 }

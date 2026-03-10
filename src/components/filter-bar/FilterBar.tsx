@@ -80,10 +80,11 @@ export const FilterBarSearch = forwardRef<HTMLDivElement, FilterBarSearchProps>(
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
+        aria-label={placeholder || 'Search'}
         className={cn(
           'flex h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm',
           'placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+          'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0'
         )}
       />
     </div>

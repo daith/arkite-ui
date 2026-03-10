@@ -1,0 +1,127 @@
+---
+title: DataTable
+description: Feature-rich data table with sorting, pagination, filtering, row selection, and expandable rows.
+---
+
+## Import
+
+```tsx
+import { DataTable, type Column } from '@arkite/ui'
+```
+
+## Basic Usage
+
+```tsx
+interface User {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
+const columns: Column<User>[] = [
+  { key: 'name', header: 'Name', sortable: true },
+  { key: 'email', header: 'Email', sortable: true },
+  { key: 'role', header: 'Role', filterable: true },
+]
+
+<DataTable
+  data={users}
+  columns={columns}
+  getRowKey={(row) => row.id}
+  pagination
+  defaultPageSize={10}
+/>
+```
+
+## Sorting
+
+Add `sortable: true` to a column definition. Click headers to cycle through ascending, descending, and unsorted.
+
+## Filtering
+
+Add `filterable: true` to a column. A filter icon appears in the header; clicking it opens a dropdown with unique values as checkboxes.
+
+```tsx
+{ key: 'status', header: 'Status', filterable: true }
+{ key: 'role', header: 'Role', filterable: true, filterOptions: ['Admin', 'Editor', 'Viewer'] }
+```
+
+## Row Selection
+
+```tsx
+const [selected, setSelected] = useState(new Set())
+
+<DataTable
+  selectable
+  selectedRows={selected}
+  onSelectionChange={setSelected}
+/>
+```
+
+## Expandable Rows
+
+```tsx
+<DataTable
+  expandable={(row) => (
+    <div>Details for {row.name}</div>
+  )}
+/>
+```
+
+## Column Visibility Toggle
+
+```tsx
+<DataTable columnToggle />
+```
+
+## Sticky Header
+
+```tsx
+<DataTable stickyHeader maxHeight="400px" />
+```
+
+## Custom Cell Rendering
+
+```tsx
+{
+  key: 'status',
+  header: 'Status',
+  cell: (row) => <Badge variant={row.active ? 'success' : 'secondary'}>{row.status}</Badge>
+}
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `T[]` | Required | Table data array |
+| `columns` | `Column<T>[]` | Required | Column definitions |
+| `pagination` | `boolean` | `true` | Enable pagination |
+| `defaultPageSize` | `number` | `10` | Initial page size |
+| `pageSizeOptions` | `number[]` | `[10,20,50,100]` | Page size dropdown options |
+| `getRowKey` | `(row, index) => string \| number` | index | Unique key extractor |
+| `loading` | `boolean` | `false` | Show loading state |
+| `emptyContent` | `ReactNode` | `'No results found.'` | Empty state content |
+| `selectable` | `boolean` | `false` | Enable row checkboxes |
+| `selectedRows` | `Set<string \| number>` | - | Controlled selection |
+| `onSelectionChange` | `(Set) => void` | - | Selection callback |
+| `expandable` | `(row, index) => ReactNode` | - | Expandable row renderer |
+| `columnToggle` | `boolean` | `false` | Show column visibility toggle |
+| `stickyHeader` | `boolean` | `false` | Stick header on scroll |
+| `maxHeight` | `string \| number` | - | Scroll container max height |
+| `onRowClick` | `(row, index) => void` | - | Row click handler |
+
+## Column Definition
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `key` | `string` | Data property key |
+| `header` | `ReactNode` | Column header content |
+| `cell` | `(row, index) => ReactNode` | Custom cell renderer |
+| `sortable` | `boolean` | Enable sorting |
+| `filterable` | `boolean` | Enable filter dropdown |
+| `filterOptions` | `string[]` | Custom filter values |
+| `width` | `string \| number` | Column width |
+| `align` | `'left' \| 'center' \| 'right'` | Text alignment |
+| `hidden` | `boolean` | Hide column |

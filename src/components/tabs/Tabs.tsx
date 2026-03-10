@@ -156,7 +156,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
         onClick={() => onValueChange(value)}
         className={cn(
           'inline-flex items-center justify-center gap-2 font-medium transition-all',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40 focus-visible:ring-offset-0',
           'disabled:pointer-events-none disabled:opacity-50',
           triggerSizeStyles[size],
           styles.base,
@@ -198,7 +198,7 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
         tabIndex={0}
         hidden={!isActive}
         className={cn(
-          'mt-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'mt-2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40 focus-visible:ring-offset-0',
           className
         )}
         {...props}

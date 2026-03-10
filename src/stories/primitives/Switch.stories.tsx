@@ -54,5 +54,7 @@ export const CheckedDisabled: Story = {
 }
 
 export const WithoutLabel: Story = {
-  args: {},
+  args: {
+    'aria-label': 'Toggle setting',
+  },
 }

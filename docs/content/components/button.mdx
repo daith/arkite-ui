@@ -1,0 +1,52 @@
+---
+title: Button
+description: Clickable button with multiple variants, sizes, and states.
+---
+
+## Import
+
+```tsx
+import { Button } from '@arkite/ui'
+```
+
+## Usage
+
+```tsx
+<Button>Click me</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="destructive">Delete</Button>
+```
+
+## Sizes
+
+```tsx
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+<Button size="icon"><PlusIcon /></Button>
+```
+
+## Loading State
+
+```tsx
+<Button loading>Saving...</Button>
+```
+
+## As Link
+
+```tsx
+<Button as="a" href="/dashboard">Go to Dashboard</Button>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'destructive'` | `'primary'` | Visual variant |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'icon'` | `'md'` | Button size |
+| `loading` | `boolean` | `false` | Show loading spinner |
+| `disabled` | `boolean` | `false` | Disable interaction |
+| `as` | `React.ElementType` | `'button'` | Render as different element |
+| `className` | `string` | - | Additional CSS classes |

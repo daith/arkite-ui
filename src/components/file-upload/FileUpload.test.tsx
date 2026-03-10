@@ -84,7 +84,7 @@ describe('FileUpload', () => {
 
     const dropzone = screen.getByRole('button')
     expect(dropzone.className).toContain('pointer-events-none')
-    expect(dropzone.className).toContain('opacity-50')
+    expect(dropzone.className).toContain('cursor-not-allowed')
   })
 
   it('shows file list after upload', () => {

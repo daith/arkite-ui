@@ -1,0 +1,98 @@
+---
+title: Theming
+description: Customize colors, fonts, and spacing with CSS variables and createTheme().
+---
+
+## Theme System
+
+Arkite UI uses **HSL CSS custom properties** for all colors. This means you can customize the entire look by overriding a few CSS variables.
+
+## Built-in Presets
+
+Four presets are included:
+
+| Preset | Description |
+|--------|-------------|
+| `default` | Stripe-inspired purple with teal accent |
+| `neutral` | Zinc/slate monochrome |
+| `ocean` | Blue tones |
+| `forest` | Green tones |
+
+```tsx
+import { themePresets, applyTheme } from '@arkite/ui'
+
+applyTheme(themePresets.ocean)
+```
+
+## createTheme()
+
+Generate a complete theme from just 1-2 colors:
+
+```tsx
+import { createTheme, applyTheme } from '@arkite/ui'
+
+const theme = createTheme({
+  primary: '#FF6B00',   // Required: brand color (hex)
+  accent: '#00B4D8',    // Optional: accent color
+  radius: '0.75rem',    // Optional: border radius
+})
+
+applyTheme(theme)       // Light mode
+applyDarkTheme(theme)   // Dark mode
+```
+
+`createTheme` automatically derives:
+- Primary/accent foreground colors (black or white based on contrast)
+- Dark mode variants (slightly lighter)
+- Ring color (matches primary)
+
+## CSS Variables
+
+Override individual tokens in your CSS:
+
+```css
+:root {
+  --primary: 250 100% 65%;
+  --primary-foreground: 0 0% 100%;
+  --success: 145 65% 42%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --primary: 250 100% 70%;
+  --background: 220 20% 10%;
+}
+```
+
+## Token Reference
+
+| Token | Description |
+|-------|-------------|
+| `--primary` | Brand/primary color |
+| `--secondary` | Secondary surfaces |
+| `--accent` | Accent highlights |
+| `--destructive` | Error/danger actions |
+| `--success` | Success states |
+| `--warning` | Warning states |
+| `--background` | Page background |
+| `--foreground` | Default text |
+| `--muted` | Subtle backgrounds |
+| `--muted-foreground` | Secondary text |
+| `--card` | Card backgrounds |
+| `--border` | Border color |
+| `--input` | Input border color |
+| `--ring` | Focus ring color |
+| `--radius` | Base border radius |
+
+Each color token also has a `-foreground` variant for text on that color.
+
+## themeToCSS()
+
+Generate a CSS string for SSR or `<style>` injection:
+
+```tsx
+import { themeToCSS } from '@arkite/ui'
+
+const css = themeToCSS(myTheme)
+// Returns: ":root { --primary: ... } .dark { --primary: ... }"
+```

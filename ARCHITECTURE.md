@@ -135,18 +135,19 @@ Components are controlled or uncontrolled — they never manage global state. Th
 
 ### Optional Peer Dependencies
 
-`framer-motion` is an optional peer dependency. Motion components (`AnimatedModal`, `AnimatedDrawer`, `AnimatedToastContainer`) are only used when the consumer installs framer-motion. Non-animated equivalents exist for all motion components.
+`framer-motion` is an optional peer dependency. Motion components (`AnimatedModal`, `AnimatedDrawer`, `AnimatedToastContainer`) are exported from a separate entry point `@arkite/ui/motion` to avoid polluting the main bundle. Non-animated equivalents exist for all motion components.
 
 ## Build & Bundle
 
 - **Bundler:** tsup (ESM + CJS + DTS)
-- **Bundle Budget:** < 300 KB for `index.js`, < 10 KB for `tailwind-preset.js`
+- **Entry Points:** `index.ts` (main), `motion.ts` (animated overlays), `tailwind-preset.ts`
+- **Bundle Budget:** < 300 KB for `index.js`, < 10 KB for `motion.js`, < 10 KB for `tailwind-preset.js`
 - **Tree-shakeable:** Each component is independently importable via barrel exports
 - **Side effects:** Only CSS files are marked as side effects
 
 ## Testing Strategy
 
-- **Unit tests:** Vitest + @testing-library/react (412 tests, 39 files)
+- **Unit tests:** Vitest + @testing-library/react (617 tests, 61 files)
 - **Visual regression:** Chromatic (CI-integrated)
 - **Accessibility:** Storybook addon-a11y (error-based mode)
 - **Bundle size:** size-limit checks on every push
@@ -161,14 +162,14 @@ Tag     → build → build-storybook → pages (deploy) → publish:gitlab → 
 ## Dependencies
 
 ### Runtime (bundled)
-- `@radix-ui/react-dropdown-menu`, `@radix-ui/react-popover`, `@radix-ui/react-tooltip`
-- `@tanstack/react-virtual`
 - `clsx`, `tailwind-merge`
-- `cmdk`
 
 ### Peer (not bundled)
 - `react`, `react-dom` (^18 || ^19)
 - `tailwindcss` (^4)
 - `zustand` (^5)
 - `lucide-react` (^0.400)
-- `framer-motion` (^10 || ^11 || ^12, optional)
+- `@radix-ui/react-dropdown-menu`, `@radix-ui/react-popover`, `@radix-ui/react-tooltip` (optional)
+- `@tanstack/react-virtual` (optional)
+- `cmdk` (optional)
+- `framer-motion` (^10 || ^11 || ^12, optional — used by `@arkite/ui/motion`)

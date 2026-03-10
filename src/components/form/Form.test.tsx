@@ -173,7 +173,7 @@ describe('Form disabled propagation', () => {
       </Form>
     )
     const label = screen.getByText('Name').closest('label')!
-    expect(label.className).toContain('opacity-50')
+    expect(label.className).toContain('opacity-70')
   })
 
   it('FormField disabled overrides form context', () => {
@@ -185,6 +185,6 @@ describe('Form disabled propagation', () => {
       </Form>
     )
     const label = screen.getByText('Name').closest('label')!
-    expect(label.className).toContain('opacity-50')
+    expect(label.className).toContain('opacity-70')
   })
 })

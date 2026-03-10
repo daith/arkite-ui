@@ -139,3 +139,93 @@ function SelectableDemo() {
 }
 
 export const Selectable: StoryFn = () => <SelectableDemo />
+
+export const ExpandableRows: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    expandable={(row) => (
+      <div className="space-y-2 text-sm">
+        <p><strong>Full details for {row.name}</strong></p>
+        <p>Email: {row.email}</p>
+        <p>Role: {row.role}</p>
+        <p>Status: {row.status}</p>
+      </div>
+    )}
+    pagination
+    defaultPageSize={5}
+  />
+)
+
+export const ColumnToggle: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    columnToggle
+    pagination
+    defaultPageSize={5}
+  />
+)
+
+const stickyData: User[] = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  name: `User ${i + 1}`,
+  email: `user${i + 1}@example.com`,
+  role: ['Admin', 'Editor', 'Viewer'][i % 3],
+  status: (i % 4 === 0 ? 'inactive' : 'active') as 'active' | 'inactive',
+}))
+
+export const StickyHeader: StoryFn = () => (
+  <DataTable<User>
+    data={stickyData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    stickyHeader
+    maxHeight="400px"
+    pagination={false}
+  />
+)
+
+export const ExpandableWithColumnToggle: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    expandable={(row) => (
+      <div className="text-sm text-muted-foreground">
+        Additional details for <strong>{row.name}</strong> — {row.email}
+      </div>
+    )}
+    columnToggle
+    pagination
+    defaultPageSize={5}
+  />
+)
+
+const filterableColumns: Column<User>[] = [
+  { key: 'name', header: 'Name', sortable: true },
+  { key: 'email', header: 'Email', sortable: true },
+  { key: 'role', header: 'Role', filterable: true },
+  {
+    key: 'status',
+    header: 'Status',
+    filterable: true,
+    cell: (row) => (
+      <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>
+        {row.status}
+      </Badge>
+    ),
+  },
+]
+
+export const WithFilters: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={filterableColumns}
+    getRowKey={(row) => row.id}
+    pagination
+    defaultPageSize={5}
+  />
+)

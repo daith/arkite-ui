@@ -16,6 +16,12 @@ import { Kbd } from '../../components/kbd'
 
 const meta: Meta = {
   title: 'Overlay/CommandPalette',
+  parameters: {
+    a11y: {
+      // cmdk library renders role="separator" inside role="listbox" which axe flags
+      config: { rules: [{ id: 'aria-required-children', enabled: false }] },
+    },
+  },
 }
 
 export default meta

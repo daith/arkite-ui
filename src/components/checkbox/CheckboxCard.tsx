@@ -27,7 +27,7 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
           'relative flex items-start gap-3 rounded-lg border border-input bg-background p-4',
           'transition-colors duration-200',
           'has-[:checked]:border-primary has-[:checked]:bg-primary/5',
-          'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2',
+          'has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring/40 has-[:focus-visible]:ring-offset-0',
           disabled
             ? 'cursor-not-allowed opacity-50'
             : 'cursor-pointer hover:border-muted-foreground/50',

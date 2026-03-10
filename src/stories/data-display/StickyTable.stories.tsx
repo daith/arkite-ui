@@ -29,7 +29,7 @@ const rows = Array.from({ length: 30 }, (_, i) => ({
 
 export const StickyHeader: Story = {
   render: () => (
-    <div className="h-[400px] overflow-auto rounded-md border">
+    <div className="h-[400px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Sticky header table">
       <Table stickyHeader>
         <TableHeader>
           <TableRow>
@@ -60,7 +60,7 @@ export const StickyHeader: Story = {
 
 export const StickyActionColumn: Story = {
   render: () => (
-    <div className="max-w-[600px] overflow-auto rounded-md border">
+    <div className="max-w-[600px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Table with sticky action column">
       <Table>
         <TableHeader>
           <TableRow>
@@ -96,7 +96,7 @@ export const StickyActionColumn: Story = {
 export const StickyHeaderAndAction: Story = {
   name: 'Sticky Header + Action Column',
   render: () => (
-    <div className="h-[400px] max-w-[600px] overflow-auto rounded-md border">
+    <div className="h-[400px] max-w-[600px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Table with sticky header and action column">
       <Table stickyHeader>
         <TableHeader>
           <TableRow>

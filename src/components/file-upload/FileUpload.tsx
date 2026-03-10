@@ -175,6 +175,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           multiple={multiple}
           disabled={disabled}
           className="sr-only"
+          aria-label="Upload file"
           onChange={(e) => handleFiles(e.target.files)}
           {...props}
         />
@@ -182,6 +183,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         {/* Dropzone */}
         <div
           role="button"
+          aria-label="Upload files"
           tabIndex={0}
           onClick={handleClick}
           onKeyDown={(e) => {
@@ -198,7 +200,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             isDragging
               ? 'border-primary bg-primary/5'
               : 'border-muted-foreground/25 hover:border-muted-foreground/50',
-            disabled && 'pointer-events-none opacity-50',
+            disabled && 'pointer-events-none cursor-not-allowed',
             dropzoneClassName
           )}
         >
@@ -307,6 +309,7 @@ export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonPr
           multiple={multiple}
           disabled={disabled}
           className="sr-only"
+          aria-label="Upload file"
           onChange={handleChange}
         />
         <button

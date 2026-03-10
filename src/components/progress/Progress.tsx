@@ -21,6 +21,8 @@ export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
   striped?: boolean
   /** Animated stripes */
   animated?: boolean
+  /** Accessible label for the progress bar */
+  'aria-label'?: string
 }
 
 const sizeStyles: Record<ProgressSize, string> = {
@@ -49,6 +51,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       indeterminate = false,
       striped = false,
       animated = false,
+      'aria-label': ariaLabel = 'Progress',
       ...props
     },
     ref
@@ -69,6 +72,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           aria-valuenow={indeterminate ? undefined : value}
           aria-valuemin={0}
           aria-valuemax={max}
+          aria-label={ariaLabel}
           className={cn(
             'w-full overflow-hidden rounded-full bg-muted',
             sizeStyles[size]
@@ -111,6 +115,8 @@ export interface CircularProgressProps extends HTMLAttributes<HTMLDivElement> {
   showLabel?: boolean
   /** Indeterminate progress */
   indeterminate?: boolean
+  /** Accessible label for the progress bar */
+  'aria-label'?: string
 }
 
 /** SVG-based circular progress indicator with optional percentage label. */
@@ -125,6 +131,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
       variant = 'default',
       showLabel = false,
       indeterminate = false,
+      'aria-label': ariaLabel = 'Progress',
       ...props
     },
     ref
@@ -148,6 +155,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
         aria-valuenow={indeterminate ? undefined : value}
         aria-valuemin={0}
         aria-valuemax={max}
+        aria-label={ariaLabel}
         className={cn('relative inline-flex items-center justify-center', className)}
         style={{ width: size, height: size }}
         {...props}

@@ -56,7 +56,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           className={cn(
             'cursor-pointer rounded-full bg-input transition-colors duration-200',
             'has-[:checked]:bg-primary',
-            'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2',
+            'has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring/40 has-[:focus-visible]:ring-offset-0',
             'has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50',
             styles.track
           )}
