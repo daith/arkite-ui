@@ -201,16 +201,38 @@
 - `BulkActionBar.stories` — WithTable 改用 DataTable selectable 取代手刻 raw Table
 - `TanStackTable.mdx` — 加入 DataTable 內建 selection 的 Tip block
 
+### 測試覆蓋率大幅提升
+
+批次補齊 12 個元件的測試，覆蓋率從 74% 提升至 93%：
+
+| 元件 | Tests | 測試重點 |
+|------|-------|---------|
+| EmptyState | 11 | 4 種 variant、3 種 size、3 個 preset |
+| Stat | 13 | trend 樣式、loading skeleton、StatCard/StatGroup |
+| Switch | 3 | Toggle re-export 驗證 |
+| Steps | 9 | 水平/垂直、step 狀態、connector |
+| Timeline | 9 | variant 顏色、custom icon、最後一項無 connector |
+| Navbar | 19 | sticky/bordered、Brand/Content/Item/Divider/Spacer |
+| Breadcrumb | 9 | href link、aria-current、maxItems 折疊 |
+| Form | 19 | context 傳遞、error、disabled、FormSection/FormActions |
+| Calendar | 8 | 選取、月份導航、disabled/min/max |
+| DatePicker | 7 | 輸入框、dropdown、size、error |
+| Tooltip | 3 | compound exports、SimpleTooltip |
+| Popover | 2 | compound exports、trigger |
+
+**未覆蓋（4 個）：** `admin-layout`、`motion`、`dropdown-menu`、`command-palette` — 皆為整合型元件，需 mock portal / framer-motion / cmdk，複雜度高，優先級較低。
+
 ---
 
 ### 數據總結
 
 | 指標 | Day 1 | Day 2 | 變化 |
 |------|-------|-------|------|
-| 總 commits | 45 | 57 | +12 |
+| 總 commits | 45 | 59 | +14 |
 | 元件數量 | 56+ | 61+ | +5 |
-| 測試檔案 | 39 | 45 | +6 |
-| 測試案例 | 412 | 455 | +43 |
+| 測試檔案 | 39 | 57 | +18 |
+| 測試案例 | 412 | 567 | +155 |
+| 測試覆蓋率 | 71% (39/55) | 93% (57/61) | +22% |
 | Storybook stories | 70+ | 72+ | +2 |
 | MDX 文件頁 | 7 | 9 | +2 |
 
@@ -239,7 +261,7 @@
 
 - [ ] 設定 Chromatic project token 啟用視覺回歸
 - [ ] 首次使用 changesets 發布流程驗證
-- [ ] 持續補充剩餘元件的測試（目前 45/61 覆蓋）
+- [ ] 補齊剩餘 4 個整合型元件測試（admin-layout, motion, dropdown-menu, command-palette）
 - [ ] 效能優化：lazy import motion 元件、減少 Radix 打包體積
 - [ ] CopyButton / CopyInput — 目前只 1 處使用，待第 2 個專案需要再收錄
 - [ ] SegmentedControl icon + description 擴充 — 待需求明確再加
