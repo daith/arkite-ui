@@ -60,9 +60,10 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           className="peer sr-only"
           {...props}
         />
-        <div
+        <label
+          htmlFor={toggleId}
           className={cn(
-            'rounded-full bg-input transition-colors duration-200',
+            'cursor-pointer rounded-full bg-input transition-colors duration-200',
             'peer-checked:bg-primary',
             'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2',
             'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
@@ -71,13 +72,13 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
         >
           <div
             className={cn(
-              'rounded-full bg-background shadow-sm transition-transform duration-200',
+              'pointer-events-none rounded-full bg-background shadow-sm transition-transform duration-200',
               styles.translate,
               styles.thumb,
               'mt-0.5'
             )}
           />
-        </div>
+        </label>
       </div>
     )
 
