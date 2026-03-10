@@ -220,7 +220,22 @@
 | Tooltip | 3 | compound exports、SimpleTooltip |
 | Popover | 2 | compound exports、trigger |
 
-**未覆蓋（4 個）：** `admin-layout`、`motion`、`dropdown-menu`、`command-palette` — 皆為整合型元件，需 mock portal / framer-motion / cmdk，複雜度高，優先級較低。
+### 整合型元件測試補齊（100% 覆蓋）
+
+補齊最後 4 個整合型元件測試，達成 61/61 全覆蓋：
+
+| 元件 | Tests | 測試重點 |
+|------|-------|---------|
+| AdminLayout | 17 | 品牌、導航、basePath、權限過濾（hasPermission/visibleWhen）、onNavigate/onLogout、navbar/sidebar slots |
+| DropdownMenu | 9 | 15 個 Radix compound exports、觸發開啟、destructive 樣式、onSelect、label/separator |
+| CommandPalette | 13 | 9 個 cmdk exports、Input/Group/Item、Shortcut kbd 拆分、Dialog 開關/Escape/backdrop |
+| Motion | 11 | AnimatedModal/AnimatedDrawer 開關/Escape、useReducedMotion、5 個 exports、matchMedia mock |
+
+**技術細節：**
+- AdminLayout — 測試整體 composition，不重複測試 Sidebar/Navbar 子元件
+- DropdownMenu — Radix portal 渲染，使用 `screen.getByText` 搜尋整個 document
+- CommandPalette — polyfill `ResizeObserver` + `scrollIntoView`（cmdk 依賴、jsdom 缺失）
+- Motion — mock `window.matchMedia`（jsdom 不支援 `prefers-reduced-motion`）
 
 ---
 
@@ -228,11 +243,11 @@
 
 | 指標 | Day 1 | Day 2 | 變化 |
 |------|-------|-------|------|
-| 總 commits | 45 | 59 | +14 |
+| 總 commits | 45 | 61 | +16 |
 | 元件數量 | 56+ | 61+ | +5 |
-| 測試檔案 | 39 | 57 | +18 |
-| 測試案例 | 412 | 567 | +155 |
-| 測試覆蓋率 | 71% (39/55) | 93% (57/61) | +22% |
+| 測試檔案 | 39 | 61 | +22 |
+| 測試案例 | 412 | 617 | +205 |
+| 測試覆蓋率 | 71% (39/55) | 100% (61/61) | +29% |
 | Storybook stories | 70+ | 72+ | +2 |
 | MDX 文件頁 | 7 | 9 | +2 |
 
