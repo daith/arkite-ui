@@ -1,0 +1,145 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guides/Overlay Components" />
+
+# Overlay Components — Drawer vs Modal vs ConfirmDialog
+
+Arkite UI 提供多種 overlay 元件，各有適合的使用場景。以下是推薦的選用原則。
+
+## 一覽表
+
+| 元件 | 適用場景 | 位置 | 關閉方式 |
+|------|---------|------|---------|
+| **Drawer** | 表單編輯、Detail Panel、多步驟流程 | 側邊滑入（預設右側） | Backdrop / Escape / 關閉按鈕 |
+| **Modal** | 輕量資訊展示、確認操作、簡短表單 | 畫面正中央 | Backdrop / Escape / 關閉按鈕 |
+| **ConfirmDialog** | 操作確認（刪除、送出、變更） | 畫面正中央（小尺寸） | 取消 / 確認按鈕 |
+| **DeleteConfirmDialog** | 刪除確認（ConfirmDialog preset） | 畫面正中央（小尺寸） | 取消 / 刪除按鈕 |
+
+## 何時用 Drawer
+
+適合**內容較多、需要捲動、或需要同時參照主畫面**的場景：
+
+- 建立 / 編輯表單（e.g. 新增用戶、編輯設定）
+- Detail panel（e.g. 點擊列表項目查看詳情）
+- 多欄位篩選面板
+- 設定側欄
+
+```tsx
+import { Drawer } from '@arkite/ui'
+
+<Drawer
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Edit User"
+  size="lg"
+  footer={
+    <>
+      <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+      <Button onClick={handleSave}>Save</Button>
+    </>
+  }
+>
+  <form>...</form>
+</Drawer>
+```
+
+**尺寸建議：** 簡單表單用 `md`（320px），複雜表單用 `lg`（384px）或 `xl`（480px）。
+
+## 何時用 Modal
+
+適合**需要用戶專注處理、內容不多**的場景：
+
+- 確認訊息（非破壞性）
+- 簡短表單（1-3 個欄位）
+- 資訊展示（預覽、說明）
+- 選擇器（從列表中選取項目）
+
+```tsx
+import { Modal } from '@arkite/ui'
+
+<Modal
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Invite Member"
+  size="sm"
+  footer={
+    <>
+      <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+      <Button onClick={handleInvite}>Send Invite</Button>
+    </>
+  }
+>
+  <Input placeholder="Email address" />
+</Modal>
+```
+
+**尺寸建議：** 確認類用 `sm`，表單類用 `md`，內容展示用 `lg`。
+
+## 何時用 ConfirmDialog
+
+適合**需要用戶明確確認的操作**，特別是有副作用的動作：
+
+- 刪除資料 → 用 `variant="destructive"` 或直接用 `DeleteConfirmDialog`
+- 變更狀態（停用帳號、發佈上線）→ 用 `variant="warning"`
+- 一般確認（匯出、送出）→ 用 `variant="default"`
+
+```tsx
+import { DeleteConfirmDialog } from '@arkite/ui'
+
+<DeleteConfirmDialog
+  open={open}
+  onClose={() => setOpen(false)}
+  itemName="this webhook"
+  onConfirm={handleDelete}
+  loading={isDeleting}
+/>
+```
+
+**不要**用 Drawer 做刪除確認 — ConfirmDialog 提供更明確的視覺語義（圖示 + 顏色 + 雙按鈕）。
+
+## Animated 版本
+
+如果專案已安裝 `framer-motion`，可改用動畫版本獲得更流暢的過場：
+
+| CSS 版本 | Framer Motion 版本 | 差異 |
+|----------|-------------------|------|
+| `Drawer` | `AnimatedDrawer` | 滑入動畫更流暢，自動偵測 `prefers-reduced-motion` |
+| `Modal` | `AnimatedModal` | 縮放 + 淡入動畫，自動偵測 `prefers-reduced-motion` |
+
+Props 完全相同，可直接替換 import：
+
+```tsx
+// 替換前
+import { Drawer } from '@arkite/ui'
+
+// 替換後
+import { AnimatedDrawer as Drawer } from '@arkite/ui'
+```
+
+## 選擇決策樹
+
+```
+需要 overlay 嗎？
+├─ 內容多 / 需捲動 / 參照主畫面 → Drawer
+├─ 破壞性操作確認 → DeleteConfirmDialog
+├─ 非破壞性操作確認 → ConfirmDialog
+└─ 輕量內容 / 簡短表單 → Modal
+```
+
+## 子元件
+
+Drawer 和 Modal 都提供子元件，適合需要自訂 layout 的情況：
+
+```tsx
+// 使用 title/footer props（推薦，簡單場景）
+<Drawer title="Edit" footer={<Button>Save</Button>}>
+  <p>Content</p>
+</Drawer>
+
+// 使用子元件（需要自訂 layout）
+<Drawer open={open} onClose={onClose}>
+  <DrawerHeader>Custom header</DrawerHeader>
+  <DrawerBody>Scrollable content</DrawerBody>
+  <DrawerFooter>Custom footer</DrawerFooter>
+</Drawer>
+```

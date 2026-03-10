@@ -1,0 +1,259 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Guides/Skeleton Loading" />
+
+# Skeleton Loading — 預設變體與使用指南
+
+Arkite UI 除了基礎 `Skeleton` 元件外，還提供 4 個預設變體，可以快速搭建常見的 loading 骨架。
+
+## 元件總覽
+
+| 元件 | 用途 | 關鍵 Props |
+|------|------|-----------|
+| `Skeleton` | 基礎佔位元素 | `variant`, `animation`, `width`, `height` |
+| `SkeletonText` | 多行文字 | `lines`, `spacing` |
+| `SkeletonAvatar` | 圓形頭像 | `size` |
+| `SkeletonCard` | 卡片佈局 | `showImage`, `showAvatar`, `lines` |
+| `SkeletonTable` | 表格佈局 | `rows`, `columns` |
+
+## Skeleton（基礎）
+
+最底層的佔位元件，所有變體都基於它。
+
+```tsx
+import { Skeleton } from '@arkite/ui'
+
+// 自訂尺寸
+<Skeleton width={200} height={16} />
+
+// 圓形（頭像）
+<Skeleton variant="circular" width={40} height={40} />
+
+// 圓角
+<Skeleton variant="rounded" width="100%" height={120} />
+
+// 文字行
+<Skeleton variant="text" width="80%" />
+```
+
+### variant
+
+| 值 | 樣式 | 適用場景 |
+|---|------|---------|
+| `"default"` | `rounded-md` | 通用佔位 |
+| `"circular"` | `rounded-full` | 頭像、圖示 |
+| `"rounded"` | `rounded-lg` | 卡片、圖片 |
+| `"text"` | `rounded h-4` | 單行文字 |
+
+### animation
+
+| 值 | 效果 | 建議使用場景 |
+|---|------|------------|
+| `"pulse"` | 透明度閃爍（預設） | 一般場景 |
+| `"wave"` | 光暈掃過效果 | 需要更明顯的載入提示 |
+| `"none"` | 無動畫 | 靜態佔位、測試 |
+
+## SkeletonText
+
+模擬多行文字段落，最後一行自動縮短至 60%。
+
+```tsx
+import { SkeletonText } from '@arkite/ui'
+
+// 預設 3 行
+<SkeletonText />
+
+// 自訂行數和間距
+<SkeletonText lines={5} spacing="lg" />
+```
+
+| Prop | 預設值 | 說明 |
+|------|-------|------|
+| `lines` | `3` | 文字行數 |
+| `spacing` | `"md"` | 行距：`"sm"` (4px) / `"md"` (8px) / `"lg"` (12px) |
+
+### Before / After
+
+```tsx
+// Before — 手刻
+<div className="space-y-2">
+  <Skeleton className="h-4 w-full" />
+  <Skeleton className="h-4 w-full" />
+  <Skeleton className="h-4 w-3/5" />
+</div>
+
+// After — 一行搞定
+<SkeletonText lines={3} />
+```
+
+## SkeletonAvatar
+
+圓形頭像佔位。
+
+```tsx
+import { SkeletonAvatar } from '@arkite/ui'
+
+<SkeletonAvatar size="sm" />  // 32×32
+<SkeletonAvatar size="md" />  // 40×40（預設）
+<SkeletonAvatar size="lg" />  // 48×48
+<SkeletonAvatar size="xl" />  // 64×64
+```
+
+| size | 尺寸 |
+|------|------|
+| `"sm"` | 32px (h-8 w-8) |
+| `"md"` | 40px (h-10 w-10) |
+| `"lg"` | 48px (h-12 w-12) |
+| `"xl"` | 64px (h-16 w-16) |
+
+### Before / After
+
+```tsx
+// Before
+<Skeleton className="h-10 w-10 rounded-full" />
+
+// After
+<SkeletonAvatar />
+```
+
+## SkeletonCard
+
+卡片骨架，含可選的圖片區和頭像。
+
+```tsx
+import { SkeletonCard } from '@arkite/ui'
+
+// 帶圖片的卡片
+<SkeletonCard />
+
+// 不帶圖片、帶頭像
+<SkeletonCard showImage={false} showAvatar lines={2} />
+
+// 純文字卡片
+<SkeletonCard showImage={false} lines={4} />
+```
+
+| Prop | 預設值 | 說明 |
+|------|-------|------|
+| `showImage` | `true` | 顯示圖片佔位區 |
+| `showAvatar` | `false` | 顯示圓形頭像 |
+| `lines` | `3` | 文字行數 |
+
+### Before / After
+
+```tsx
+// Before — 手刻整張卡片
+<div className="rounded-lg border bg-card p-4 space-y-4">
+  <Skeleton className="h-40 w-full rounded-md" />
+  <div className="space-y-2">
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-3/5" />
+  </div>
+</div>
+
+// After
+<SkeletonCard />
+```
+
+## SkeletonTable
+
+表格骨架，含 header 和資料列。
+
+```tsx
+import { SkeletonTable } from '@arkite/ui'
+
+// 預設 5 行 4 欄
+<SkeletonTable />
+
+// 自訂行列數
+<SkeletonTable rows={10} columns={6} />
+```
+
+| Prop | 預設值 | 說明 |
+|------|-------|------|
+| `rows` | `5` | 資料列數（不含 header） |
+| `columns` | `4` | 欄數 |
+
+### Before / After
+
+```tsx
+// Before — 手刻表格骨架
+<div className="space-y-3">
+  <div className="flex gap-4">
+    <Skeleton className="h-4 flex-1" />
+    <Skeleton className="h-4 flex-1" />
+    <Skeleton className="h-4 flex-1" />
+  </div>
+  {Array.from({ length: 5 }).map((_, i) => (
+    <div key={i} className="flex gap-4">
+      <Skeleton className="h-4 flex-1" />
+      <Skeleton className="h-4 flex-1" />
+      <Skeleton className="h-4 flex-1" />
+    </div>
+  ))}
+</div>
+
+// After
+<SkeletonTable rows={5} columns={3} />
+```
+
+## 實戰組合範例
+
+### 列表頁 Loading State
+
+```tsx
+import { SkeletonTable, Skeleton } from '@arkite/ui'
+
+function UsersPageSkeleton() {
+  return (
+    <div className="space-y-4">
+      {/* FilterBar 區域 */}
+      <div className="flex gap-3">
+        <Skeleton width={240} height={36} />
+        <Skeleton width={120} height={36} />
+        <Skeleton width={120} height={36} />
+      </div>
+      {/* 表格 */}
+      <SkeletonTable rows={8} columns={5} />
+    </div>
+  )
+}
+```
+
+### Detail Panel Loading State
+
+```tsx
+import { SkeletonAvatar, SkeletonText, Skeleton } from '@arkite/ui'
+
+function UserDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <SkeletonAvatar size="xl" />
+        <div className="space-y-2">
+          <Skeleton width={160} height={20} />
+          <Skeleton width={200} height={14} />
+        </div>
+      </div>
+      <SkeletonText lines={4} />
+    </div>
+  )
+}
+```
+
+### 卡片網格 Loading State
+
+```tsx
+import { SkeletonCard } from '@arkite/ui'
+
+function DashboardSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <SkeletonCard key={i} showAvatar lines={2} />
+      ))}
+    </div>
+  )
+}
+```
