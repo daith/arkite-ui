@@ -24,7 +24,15 @@
       "Bash(npx:*)",
       "Bash(ls:*)",
       "Bash(do:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(grep -A3 '\"blocks\"' /Users/wilson/workspace/work/arkite-ui/node_modules/@storybook/addon-docs/package.json 2>&1; grep \"blocks\" /Users/wilson/workspace/work/arkite-ui/node_modules/@storybook/addon-docs/package.json 2>&1)",
+      "WebFetch(domain:localhost)",
+      "Bash(ls -d /Users/wilson/workspace/work/arkite-ui/src/components/*/ | xargs -I{} basename {} | sort)",
+      "Bash(npm test:*)",
+      "Bash(find /Users/wilson/workspace/work/arkite-ui -maxdepth 2 -name \".env*\" -o -name \"*.env*\" 2>/dev/null | grep -v node_modules)",
+      "Bash(for file:*)",
+      "Bash(find /Users/wilson/workspace/work/ark-harvest/web/src/components -type f -name \"*.tsx\" -o -name \"*.ts\" 2>/dev/null | head -20)",
+      "Bash(chmod +x /Users/wilson/workspace/work/arkite-ui/cli/init.mjs)"
     ]
   }
 }

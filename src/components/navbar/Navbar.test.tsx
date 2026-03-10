@@ -109,7 +109,7 @@ describe('NavbarItem', () => {
 
 describe('NavbarDivider', () => {
   it('renders', () => {
-    const { container } = render(<NavbarDivider data-testid="divider" />)
+    render(<NavbarDivider data-testid="divider" />)
     expect(screen.getByTestId('divider')).toBeInTheDocument()
     expect(screen.getByTestId('divider').className).toContain('bg-border')
   })

@@ -136,7 +136,7 @@ describe('Tree', () => {
 
     // Start with only child-2 checked (the only non-parent leaf under root
     // besides grandchild children) — we check grandchild-1 to then uncheck it
-    const { rerender } = render(
+    render(
       <Tree
         data={sampleData}
         defaultExpandedKeys={['root', 'child-1']}

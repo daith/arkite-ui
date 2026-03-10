@@ -194,7 +194,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     // Update viewDate when the active field or dates change (input variant)
     useEffect(() => {
       if (activeField === 'start' && startDate) {
-        setViewDate(startDate)
+        setViewDate(startDate) // eslint-disable-line react-hooks/set-state-in-effect -- syncing view to active field
       } else if (activeField === 'end' && endDate) {
         setViewDate(endDate)
       }

@@ -29,7 +29,7 @@ describe('CardField', () => {
   it('renders children when only children is provided', () => {
     render(
       <CardField label="Custom">
-        <a href="#">Link</a>
+        <a href="/test">Link</a>
       </CardField>
     )
     expect(screen.getByText('Link')).toBeInTheDocument()

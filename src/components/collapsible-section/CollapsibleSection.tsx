@@ -78,7 +78,6 @@ export const CollapsibleSection = forwardRef<
       >
         <button
           type="button"
-          role="button"
           aria-expanded={isOpen}
           disabled={disabled}
           onClick={handleToggle}
@@ -103,6 +102,7 @@ export const CollapsibleSection = forwardRef<
             )}
           </div>
           {rightSlot && (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
             <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
               {rightSlot}
             </div>

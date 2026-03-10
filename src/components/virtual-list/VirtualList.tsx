@@ -90,6 +90,7 @@ export function VirtualList<T>({
       ref={parentRef}
       className={cn('overflow-auto', className)}
       style={{ height }}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       role="region"
       aria-label={ariaLabel || 'Scrollable list'}
@@ -230,6 +231,7 @@ export function InfiniteScroll<T>({
       ref={parentRef}
       className={cn('overflow-auto', className)}
       style={{ height }}
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       role="region"
       aria-label="Scrollable list"

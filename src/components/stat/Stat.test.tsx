@@ -16,7 +16,7 @@ describe('Stat', () => {
   })
 
   it('renders trend up with success styling', () => {
-    const { container } = render(<Stat label="Sales" value="500" change="+8%" trend="up" />)
+    render(<Stat label="Sales" value="500" change="+8%" trend="up" />)
     const trendSpan = screen.getByText('+8%').closest('span')
     expect(trendSpan!.className).toContain('text-emerald-700')
     // Should render a TrendingUp icon (svg)

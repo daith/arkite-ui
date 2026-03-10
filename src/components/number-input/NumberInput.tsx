@@ -122,7 +122,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     useEffect(() => {
       if (isControlled && controlledValue !== prevControlledRef.current) {
         prevControlledRef.current = controlledValue
-        setDisplayValue(controlledValue != null ? String(controlledValue) : '')
+        setDisplayValue(controlledValue != null ? String(controlledValue) : '') // eslint-disable-line react-hooks/set-state-in-effect -- syncing display from controlled prop
       }
     }, [isControlled, controlledValue])
 

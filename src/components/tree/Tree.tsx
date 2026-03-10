@@ -168,6 +168,7 @@ function TreeNodeRow({
       aria-expanded={hasChildren ? expanded : undefined}
       aria-selected={isSelected}
       aria-disabled={node.disabled}
+      tabIndex={0}
       className={cn(
         'flex h-8 items-center gap-1 px-2 text-sm select-none',
         !node.disabled && 'cursor-pointer hover:bg-accent/50',
@@ -179,6 +180,13 @@ function TreeNodeRow({
       onClick={() => {
         if (node.disabled) return
         onSelect?.(node.key, node)
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          if (node.disabled) return
+          onSelect?.(node.key, node)
+        }
       }}
     >
       {/* Expand toggle */}

@@ -14,6 +14,7 @@ const meta = {
   args: {
     title: 'Section Title',
     defaultOpen: true,
+    children: 'Section content goes here.',
   },
 } satisfies Meta<typeof CollapsibleSection>
 

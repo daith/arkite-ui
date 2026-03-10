@@ -73,7 +73,7 @@ describe('DescriptionItem', () => {
     render(
       <DescriptionList>
         <DescriptionItem label="Link">
-          <a href="#">Click here</a>
+          <a href="/test">Click here</a>
         </DescriptionItem>
       </DescriptionList>
     )

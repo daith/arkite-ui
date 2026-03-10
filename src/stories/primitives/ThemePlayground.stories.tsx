@@ -128,7 +128,7 @@ function Playground() {
           {/* Dark mode toggle */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Dark</span>
-            <Switch checked={isDark} onCheckedChange={handleDark} aria-label="Dark mode" />
+            <Switch checked={isDark} onChange={(e) => handleDark(e.target.checked)} aria-label="Dark mode" />
           </div>
 
           <Divider orientation="vertical" className="h-6" />
@@ -149,9 +149,10 @@ function Playground() {
         <Section title="Create Custom Theme">
           <div className="flex flex-wrap items-end gap-4">
             <div>
-              <label className="mb-1 block text-xs font-medium text-foreground">Primary</label>
+              <label htmlFor="theme-primary-color" className="mb-1 block text-xs font-medium text-foreground">Primary</label>
               <div className="flex items-center gap-2">
                 <input
+                  id="theme-primary-color"
                   type="color"
                   value={customPrimary}
                   onChange={(e) => setCustomPrimary(e.target.value)}
@@ -167,9 +168,10 @@ function Playground() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-foreground">Accent</label>
+              <label htmlFor="theme-accent-color" className="mb-1 block text-xs font-medium text-foreground">Accent</label>
               <div className="flex items-center gap-2">
                 <input
+                  id="theme-accent-color"
                   type="color"
                   value={customAccent}
                   onChange={(e) => setCustomAccent(e.target.value)}
@@ -185,8 +187,9 @@ function Playground() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-foreground">Radius</label>
+              <label htmlFor="theme-radius" className="mb-1 block text-xs font-medium text-foreground">Radius</label>
               <select
+                id="theme-radius"
                 value={customRadius}
                 onChange={(e) => setCustomRadius(e.target.value)}
                 className="h-9 rounded-md border border-input bg-background px-2 text-sm"
@@ -303,20 +306,20 @@ function Playground() {
         <Section title="Status & Indicators">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <StatusDot status="success" />
+              <StatusDot status="online" />
               <span className="text-sm">Online</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <StatusDot status="warning" />
-              <span className="text-sm">Degraded</span>
+              <StatusDot status="busy" />
+              <span className="text-sm">Busy</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <StatusDot status="error" />
+              <StatusDot status="away" />
+              <span className="text-sm">Away</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <StatusDot status="offline" />
               <span className="text-sm">Offline</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <StatusDot status="inactive" />
-              <span className="text-sm">Unknown</span>
             </div>
             <Kbd>Ctrl+K</Kbd>
             <InlineCode>npm install @arkite/ui</InlineCode>
