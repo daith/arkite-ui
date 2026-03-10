@@ -13,21 +13,21 @@ export interface ToggleProps
   description?: string
 }
 
-const sizeStyles: Record<ToggleSize, { track: string; thumb: string; translate: string }> = {
+const sizeStyles: Record<ToggleSize, { track: string; thumb: string; checkedTranslate: string }> = {
   sm: {
     track: 'h-5 w-9',
     thumb: 'h-4 w-4',
-    translate: 'translate-x-0.5 peer-checked:translate-x-4',
+    checkedTranslate: 'group-has-[:checked]:translate-x-4',
   },
   md: {
     track: 'h-6 w-11',
     thumb: 'h-5 w-5',
-    translate: 'translate-x-0.5 peer-checked:translate-x-5',
+    checkedTranslate: 'group-has-[:checked]:translate-x-5',
   },
   lg: {
     track: 'h-7 w-14',
     thumb: 'h-6 w-6',
-    translate: 'translate-x-0.5 peer-checked:translate-x-7',
+    checkedTranslate: 'group-has-[:checked]:translate-x-7',
   },
 }
 
@@ -50,30 +50,31 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
     const toggleId = id || stableId
 
     const toggle = (
-      <div className="relative flex items-center">
-        <input
-          type="checkbox"
-          role="switch"
-          ref={ref}
-          id={toggleId}
-          disabled={disabled}
-          className="peer sr-only"
-          {...props}
-        />
+      <div className="group relative flex items-center">
         <label
           htmlFor={toggleId}
           className={cn(
             'cursor-pointer rounded-full bg-input transition-colors duration-200',
-            'peer-checked:bg-primary',
-            'peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2',
-            'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+            'has-[:checked]:bg-primary',
+            'has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2',
+            'has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50',
             styles.track
           )}
         >
+          <input
+            type="checkbox"
+            role="switch"
+            ref={ref}
+            id={toggleId}
+            disabled={disabled}
+            className="sr-only"
+            {...props}
+          />
           <div
             className={cn(
               'pointer-events-none rounded-full bg-background shadow-sm transition-transform duration-200',
-              styles.translate,
+              'translate-x-0.5',
+              styles.checkedTranslate,
               styles.thumb,
               'mt-0.5'
             )}
