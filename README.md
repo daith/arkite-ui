@@ -373,15 +373,40 @@ On git tags:
 
 ```bash
 # 1. Add a changeset for your changes
-npx changeset
+npm run changeset
 
 # 2. When ready to release, version and update CHANGELOG
 npm run version-packages
 
-# 3. Commit and push with tag
-git add . && git commit -m "chore: release"
-git tag v0.x.x && git push --follow-tags
+# 3. Verify + build + publish (一鍵完成)
+npm run publish-package
 ```
+
+### 本機發布前置需求
+
+發布到 GitLab Package Registry 需要設定環境變數 `NPM_TOKEN`。
+
+```bash
+export NPM_TOKEN=your_gitlab_personal_access_token
+```
+
+**Token 來源：**
+
+1. 前往 GitLab → 右上角頭像 → Edit profile → Access Tokens
+   或直接開啟：`https://foson.co/-/user_settings/personal_access_tokens`
+2. 建立新 token，設定：
+   - Name：`arkite-ui-publish`（任意命名）
+   - Scopes：勾選 **`api`**
+3. 複製產生的 token，設定為環境變數
+
+建議將 `export NPM_TOKEN=...` 加到你的 shell 設定檔（`~/.zshrc` 或 `~/.bashrc`）以永久生效：
+
+```bash
+echo 'export NPM_TOKEN=your_token_here' >> ~/.zshrc
+source ~/.zshrc
+```
+
+> CI/CD 環境不需要此步驟，pipeline 會自動使用 `$CI_JOB_TOKEN`。
 
 ## Contributing
 

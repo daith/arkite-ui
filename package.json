@@ -1,6 +1,6 @@
 {
   "name": "@arkite/ui",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Production-ready components for SaaS admin panels. Built on shadcn/ui.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -63,6 +63,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish",
+    "verify-changesets": "./scripts/verify-changesets.sh",
+    "publish-package": "./scripts/publish.sh",
     "chromatic": "chromatic --exit-zero-on-changes"
   },
   "size-limit": [
@@ -160,7 +162,8 @@
   ],
   "license": "MIT",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://gitlab.com/api/v4/projects/80092275/packages/npm/"
   },
   "repository": {
     "type": "git",
@@ -176,7 +179,7 @@
     "tailwindcss",
     "multi-tenant"
   ],
-  "author": "",
+  "author": "Wilson Hsieh <rin397@gmail.com>",
   "bugs": {
     "url": "https://gitlab.com/foson.co/arkite-ui/-/issues"
   },
