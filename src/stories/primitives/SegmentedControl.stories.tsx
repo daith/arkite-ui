@@ -21,6 +21,7 @@ const meta = {
       { value: 'board', label: 'Board' },
     ],
     value: 'list',
+    onChange: () => {},
   },
 } satisfies Meta<typeof SegmentedControl>
 
@@ -80,23 +81,25 @@ export const WithDisabledOption: Story = {
   render: ControlledDemo,
 }
 
-export const AllSizes: Story = {
-  render: () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-      { value: 'b', label: 'Option B' },
-      { value: 'c', label: 'Option C' },
-    ]
-    const [sm, setSm] = useState('a')
-    const [md, setMd] = useState('a')
-    const [lg, setLg] = useState('a')
+function AllSizesDemo() {
+  const options = [
+    { value: 'a', label: 'Option A' },
+    { value: 'b', label: 'Option B' },
+    { value: 'c', label: 'Option C' },
+  ]
+  const [sm, setSm] = useState('a')
+  const [md, setMd] = useState('a')
+  const [lg, setLg] = useState('a')
 
-    return (
-      <div className="flex flex-col gap-4 items-start">
-        <SegmentedControl size="sm" options={options} value={sm} onChange={setSm} />
-        <SegmentedControl size="md" options={options} value={md} onChange={setMd} />
-        <SegmentedControl size="lg" options={options} value={lg} onChange={setLg} />
-      </div>
-    )
-  },
+  return (
+    <div className="flex flex-col gap-4 items-start">
+      <SegmentedControl size="sm" options={options} value={sm} onChange={setSm} />
+      <SegmentedControl size="md" options={options} value={md} onChange={setMd} />
+      <SegmentedControl size="lg" options={options} value={lg} onChange={setLg} />
+    </div>
+  )
+}
+
+export const AllSizes: Story = {
+  render: AllSizesDemo,
 }
