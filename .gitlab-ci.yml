@@ -4,6 +4,10 @@ stages:
   - deploy
   - publish
 
+default:
+  tags:
+    - Ark-Stage
+
 # -------------------------------------------------------------------
 # CI: runs on every push and merge request
 # -------------------------------------------------------------------

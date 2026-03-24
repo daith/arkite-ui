@@ -162,8 +162,7 @@
   ],
   "license": "MIT",
   "publishConfig": {
-    "access": "public",
-    "registry": "https://gitlab.com/api/v4/projects/80092275/packages/npm/"
+    "access": "public"
   },
   "repository": {
     "type": "git",
