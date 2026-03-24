@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5
+
+### Patch Changes
+
+- relax lucide-react peer dependency to >=0.400.0
+
 ## 0.3.4
 
 ### Patch Changes

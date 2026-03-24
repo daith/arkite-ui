@@ -7,11 +7,27 @@
 
 ---
 
+## 現況快照（2026-03-24）
+
+| 指標 | 數據 |
+|------|------|
+| 版本 | v0.3.5 |
+| 元件數 | 67 個目錄、78 個匯出 |
+| 測試 | 73 檔、797 cases、100% 通過 |
+| Stories | 72 個、100% 元件覆蓋 |
+| a11y | 317/317 stories 零 violation（WCAG AA） |
+| Bundle | < 300 KB（size-limit 監控） |
+| 消費端 | 3 個 React 專案採用（ark-crm、ark-harvest、ark-rendoc-web） |
+
+> 完整採用數據見 [docs/ADOPTION_REPORT.md](docs/ADOPTION_REPORT.md)
+
+---
+
 ## 經營策略：佛系開源
 
 ### 為什麼開源？
 
-- **自己跨專案共用**才是主因（ark-harvest、未來新專案）
+- **自己跨專案共用**才是主因（ark-crm、ark-harvest、ark-rendoc-web）
 - 放在 npm 上自己裝也方便，順便公開而已
 - 如果真的有外部使用者，代表元件品質夠好 — 正向循環
 
@@ -37,7 +53,7 @@
 
 ---
 
-## Phase 1：放上去（v0.4.0）
+## Phase 1：放上去（v0.4.0） — 進行中
 
 > 花最少力氣，讓套件在 npm 上能被找到、裝起來能跑。
 
@@ -62,50 +78,49 @@
 
 ---
 
-## Phase 2：讓人跑得起來（v0.5.0）
+## Phase 2：內部品質鞏固（v0.5.0）
 
-> 如果有外部使用者，最常卡關的地方是「裝好了但不知道怎麼設定 Tailwind / Theme」。
+> 3 個專案都在用了，重點是穩固 API、確保不出事。
 
-### 被動觸發做
+### 必做
 
-- [ ] Storybook 部署到公開 URL（GitLab Pages 或 Vercel，CI 已有 job）
-- [ ] README 的 Quick Start 確保 copy-paste 就能跑（自己新專案開局時驗證）
-- [ ] 有第 2 個外部使用者問同樣的問題 → 補 FAQ section
+- [ ] Chromatic 視覺回歸常態化 — 每個 MR 跑 snapshot，有差異就擋 merge
+- [ ] Dark mode 全元件走查 — 確認所有元件在 dark mode 下正確顯示
+- [ ] 元件 API 一致性審查 — prop naming convention 統一（onChange vs onValueChange 等）
+- [ ] React 19 驗證 — peer deps 已支援 `^19.0.0`，需實際驗證
 
-### 有空再做
+### 值得做但不急
 
-- [ ] StackBlitz 一鍵範本 — 其實就是一個 `package.json` + `App.tsx`，花 30 分鐘
-- [ ] Storybook 每個元件頁加上 code snippet 可複製
+- [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
+- [ ] Storybook 部署到公開 URL（GitLab Pages 或 Vercel）
+- [ ] README 的 Quick Start 確保 copy-paste 就能跑（新專案開局時驗證）
 
 ### 不做
 
 - Starter template repo（`create-arkite-app`）— 維護成本 > 收益
 - TypeDoc API reference 站台 — Storybook autodocs + JSDoc 已經夠用
-- 獨立文件站 — Storybook 就是文件站
+- 獨立文件站 — Storybook 就是文件站（docs/ 有 Fumadocs 骨架，需求驅動再啟用）
 
 ---
 
-## Phase 3：內部品質持續提升（跟版本走）
+## Phase 3：v1.0.0 準備
 
-> 這些不是為了開源做的，是自己專案需要所以做。做了順便受益開源。
+> 前提條件已達成：3 個專案穩定使用。剩餘條件：API 穩定半年無 breaking change。
 
-### 隨專案需求自然發生
+### 發版前必須完成
 
-- [ ] 新元件收錄 — 第 2 個專案用到就收（gatekeeper 標準不變）
-- [ ] a11y 改善 — 被自己 QA 或用戶回報時修
-- [ ] React 19 驗證 — 等自己專案要升級時一起處理
-- [ ] SSR / Next.js 驗證 — 等自己專案用 Next.js 時驗證
-
-### 值得做但不急
-
-- [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
-- [ ] Dark mode 全元件走查一次
-- [ ] 元件 API 一致性審查（prop naming convention 統一）
+- [ ] API 穩定宣告 — 標記哪些元件 API 已凍結、哪些仍 experimental
+- [ ] Breaking change 一次性清理 — props 命名、event handler 風格統一
+- [ ] MIGRATION.md 完善 — v0.x → v1.0 升級指南
+- [ ] 所有消費端升級驗證 — ark-crm、ark-harvest、ark-rendoc-web 全部跑通
 
 ### v1.0.0 什麼時候發？
 
-**等自己至少 3 個專案穩定使用、API 半年沒有 breaking change 的時候。**
-不為了「看起來成熟」而提前發 1.0，0.x 反而給自己更多彈性。
+**3 個專案已穩定使用 ✅，等 API 半年沒有 breaking change 即可。**
+
+預估時間線：
+- v0.4.0 發布後開始計算 API 穩定期
+- 最快 2026 Q4，不趕
 
 ---
 
@@ -125,14 +140,27 @@
 
 ---
 
-## 佛系版本規劃
+## 版本規劃
 
 | 版本 | 觸發條件 | 內容 |
 |------|---------|------|
-| **v0.4.0** | 現在 | metadata 修正 + motion 拆分 + npm publish |
-| **v0.5.0** | 下一個內部專案開局 | Quick Start 驗證 + 新專案需要的元件 |
+| **v0.4.0** | 現在 | metadata 修正 + npm publish + Chromatic CI |
+| **v0.5.0** | v0.4.0 後 | Dark mode 走查 + API 一致性 + React 19 驗證 |
 | **v0.x.x** | 內部專案需求驅動 | 持續迭代，不設時間表 |
-| **v1.0.0** | 3+ 專案穩定用、API 穩定半年 | API 凍結、semver 承諾 |
+| **v1.0.0** | API 穩定半年 + 3 專案驗證 ✅ | API 凍結、semver 承諾 |
+
+---
+
+## 不需要做的事（已驗證）
+
+基於 3 個消費端的實際採用審查（2026-03-24），以下確認不需要：
+
+- **不需要加新元件** — 78 個匯出全被使用，覆蓋所有 SaaS admin 場景
+- **不需要加新 Badge variant** — 7 種 variant 足夠覆蓋所有狀態
+- **不需要 i18n 方案** — 文字由消費端 props/children 傳入
+- **不需要 form state 管理** — layout-only 設計已驗證正確
+- **不需要 page-level template** — ListPageTemplate/FormPageTemplate 屬於專案層
+- **不需要 formatDate/formatCurrency** — locale 格式是專案層設定
 
 ---
 

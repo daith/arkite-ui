@@ -507,6 +507,55 @@ npm install @radix-ui/react-dropdown-menu @radix-ui/react-popover @radix-ui/reac
 
 ---
 
+---
+
+## 2026-03-24 — 消費端採用審查
+
+### 全面審查 3 個 React 消費端的 @arkite/ui 採用情況
+
+對 ark-crm、ark-harvest、ark-rendoc-web 進行 4 輪迭代審查，
+同時從元件庫角度評估是否需要新增/修改元件。
+
+### 審查結果
+
+| 專案 | 頁面數 | 採用檔案 | 元件數 | 原生 select | Emoji | 健康度 |
+|---|---|---|---|---|---|---|
+| ark-harvest | 17 | 21 | 22 | 0 | 0 | ✅ 完美 |
+| ark-rendoc-web | 14 | 18 | 20 | 0 | 0 | ✅ 完美 |
+| ark-crm | 253 | 196 | 78 | 45 | ~8 | ⚠️ 持續改善 |
+
+### ark-crm 改善追蹤（4 輪審查）
+
+| 指標 | 第一輪 | 第四輪 | 變化 |
+|---|---|---|---|
+| 原生 `<select>` | 247 處 | 45 檔 | -82% |
+| Emoji icon | 29 檔 | ~8 檔 | -72% |
+| Badge className 繞過 | 8 處 | 0 | ✅ 歸零 |
+| useDeleteConfirm | 0 | 16 頁 | +16 |
+| 重複元件 | 3 個 | 0 | ✅ 清除 |
+| 共用 formatters | 無 | 4 個 | ✅ 建立 |
+
+### 元件庫側的行動
+
+**新增 Storybook Stories（補齊最後 3 個缺漏）：**
+- `SegmentedControl.stories.tsx` — 8 個 stories
+- `InlineCode.stories.tsx` — 5 個 stories
+- `Badge.stories.tsx` — 新增 StatusBadgePattern story（教消費端用 Badge + status map）
+
+**更新文件：**
+- `FormPatterns.mdx` — 新增 Dynamic Form Pattern 段落
+- `docs/ADOPTION_REPORT.md` — 建立採用報告
+- `ROADMAP.md` — 根據實際採用情況全面更新
+
+### 元件庫結論
+
+- **不需要新增元件** — 78 個匯出全被使用
+- **不需要修改 API** — 3 個專案都順利接入
+- **不需要加新 variant** — Badge 7 種 variant 足夠
+- **v1.0.0 前提條件「3 個專案穩定使用」已達成**，等 API 穩定半年即可發版
+
+---
+
 ### 待辦 / 後續
 
 **v0.4.0 發布前（必做）：**

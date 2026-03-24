@@ -94,6 +94,102 @@ function MyForm() {
 }
 ```
 
+## Dynamic Form Pattern
+
+When your form fields come from a database or API (e.g. custom fields, CRM field definitions),
+use `Form` + `FormField` with a field config array. **Do not build a separate `DynamicForm` component** —
+compose with existing primitives.
+
+```tsx
+import { Form, FormField, FormLabel, FormControl, FormSection } from '@arkite/ui'
+import { Input, Select, Textarea } from '@arkite/ui'
+
+// Field definition from your API / database
+interface FieldDefinition {
+  key: string
+  label: string
+  type: 'text' | 'email' | 'number' | 'date' | 'select' | 'textarea'
+  required?: boolean
+  options?: { value: string; label: string }[]  // for select type
+}
+
+// Generic renderer — put this in your project's shared/ folder
+function DynamicFields({
+  fields,
+  data,
+  onChange,
+  disabled,
+}: {
+  fields: FieldDefinition[]
+  data: Record<string, any>
+  onChange: (key: string, value: any) => void
+  disabled?: boolean
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {fields.map((field) => (
+        <FormField key={field.key} name={field.key}>
+          <FormLabel required={field.required}>{field.label}</FormLabel>
+          <FormControl>
+            {field.type === 'select' ? (
+              <Select
+                options={field.options ?? []}
+                value={data[field.key] ?? ''}
+                onChange={(e) => onChange(field.key, e.target.value)}
+                disabled={disabled}
+                placeholder={`Select ${field.label}...`}
+              />
+            ) : field.type === 'textarea' ? (
+              <Textarea
+                value={data[field.key] ?? ''}
+                onChange={(e) => onChange(field.key, e.target.value)}
+                disabled={disabled}
+              />
+            ) : (
+              <Input
+                type={field.type}
+                value={data[field.key] ?? ''}
+                onChange={(e) => onChange(field.key, e.target.value)}
+                disabled={disabled}
+              />
+            )}
+          </FormControl>
+        </FormField>
+      ))}
+    </div>
+  )
+}
+```
+
+Usage:
+
+```tsx
+<Form onSubmit={handleSubmit}>
+  <FormSection title="Basic Info">
+    {/* Static fields */}
+    <FormField name="name">...</FormField>
+  </FormSection>
+
+  <FormSection title="Custom Fields">
+    {/* Dynamic fields from API */}
+    <DynamicFields
+      fields={fieldDefinitions}
+      data={formData}
+      onChange={(key, value) => setFormData(prev => ({ ...prev, [key]: value }))}
+    />
+  </FormSection>
+
+  <FormActions>
+    <Button type="submit">Save</Button>
+  </FormActions>
+</Form>
+```
+
+Key points:
+- Use `Select` from `@arkite/ui` instead of native `<select>` — it supports `options` array, placeholder, error state, and theming.
+- The renderer lives in **your project**, not in `@arkite/ui`.
+- Extend field types as needed (e.g. `multi_select` → `Combobox`, `color` → `ColorPicker`).
+
 ## Key Principles
 
 1. **Arkite UI owns layout, you own state.** The library never calls `useState` or manages form values.
