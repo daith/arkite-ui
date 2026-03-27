@@ -54,6 +54,8 @@
     "test:watch": "vitest --project unit",
     "test:coverage": "vitest run --project unit --coverage",
     "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "storybook": "storybook dev -p 6006",
@@ -65,7 +67,8 @@
     "release": "changeset publish",
     "verify-changesets": "./scripts/verify-changesets.sh",
     "publish-package": "./scripts/publish.sh",
-    "chromatic": "chromatic --exit-zero-on-changes"
+    "chromatic": "chromatic --exit-zero-on-changes",
+    "prepare": "husky"
   },
   "size-limit": [
     {
@@ -140,10 +143,14 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "framer-motion": "^12.35.1",
     "globals": "^17.4.0",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
+    "lint-staged": "^16.4.0",
     "lucide-react": "^0.460.0",
     "playwright": "^1.58.2",
     "postcss": "^8.5.8",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remark-gfm": "^4.0.1",
@@ -183,6 +190,15 @@
     "url": "https://gitlab.com/foson.co/arkite-ui/-/issues"
   },
   "homepage": "https://gitlab.com/foson.co/arkite-ui#readme",
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "src/**/*.css": [
+      "prettier --write"
+    ]
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.5.0"
