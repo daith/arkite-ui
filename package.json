@@ -28,6 +28,8 @@
         "default": "./dist/motion.cjs"
       }
     },
+    "./eslint-config": "./src/configs/eslint.js",
+    "./prettier-config": "./src/configs/prettier.json",
     "./tailwind": {
       "import": {
         "types": "./dist/tailwind-preset.d.ts",
@@ -45,6 +47,7 @@
   "files": [
     "dist",
     "src/styles",
+    "src/configs",
     "cli"
   ],
   "scripts": {
