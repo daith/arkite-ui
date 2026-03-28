@@ -32,13 +32,13 @@ printf "========================================\n"
 # 0. Check node_modules
 if [ ! -d "node_modules" ]; then
     printf "${RED}Error: node_modules not found${NC}\n"
-    printf "Please run: npm install\n"
+    printf "Please run: pnpm install\n"
     exit 1
 fi
 
 # 1. Lint
 print_header "ESLint"
-LINT_OUTPUT=$(npm run lint 2>&1)
+LINT_OUTPUT=$(pnpm run lint 2>&1)
 LINT_EXIT=$?
 LINT_ERRORS=$(echo "$LINT_OUTPUT" | grep -c " error " || true)
 LINT_WARNINGS=$(echo "$LINT_OUTPUT" | grep -c " warning " || true)
@@ -51,7 +51,7 @@ fi
 
 # 2. TypeScript
 print_header "TypeScript"
-TSC_OUTPUT=$(npm run typecheck 2>&1)
+TSC_OUTPUT=$(pnpm run typecheck 2>&1)
 TSC_EXIT=$?
 if [ "$TSC_EXIT" -eq 0 ]; then
     print_status 0 "TypeScript: No type errors"
@@ -63,7 +63,7 @@ fi
 
 # 3. Unit Tests
 print_header "Unit Tests"
-TEST_OUTPUT=$(npm run test 2>&1)
+TEST_OUTPUT=$(pnpm run test 2>&1)
 TEST_EXIT=$?
 CLEAN_TEST=$(echo "$TEST_OUTPUT" | sed 's/\x1b\[[0-9;]*m//g')
 TEST_PASS=$(echo "$CLEAN_TEST" | grep -o '[0-9]* passed' | tail -1)
@@ -77,7 +77,7 @@ fi
 
 # 4. Build
 print_header "Build"
-BUILD_OUTPUT=$(npm run build 2>&1)
+BUILD_OUTPUT=$(pnpm run build 2>&1)
 BUILD_EXIT=$?
 if [ "$BUILD_EXIT" -eq 0 ]; then
     # Show output sizes
@@ -90,7 +90,7 @@ fi
 
 # 5. Bundle Size
 print_header "Bundle Size"
-SIZE_OUTPUT=$(npm run size 2>&1)
+SIZE_OUTPUT=$(pnpm run size 2>&1)
 SIZE_EXIT=$?
 if [ "$SIZE_EXIT" -eq 0 ]; then
     print_status 0 "Size limit: Within budget"
@@ -101,7 +101,7 @@ fi
 
 # 6. Storybook Build
 print_header "Storybook"
-SB_OUTPUT=$(npm run build-storybook 2>&1)
+SB_OUTPUT=$(pnpm run build-storybook 2>&1)
 SB_EXIT=$?
 if [ "$SB_EXIT" -eq 0 ]; then
     SB_SIZE=$(du -sh storybook-static 2>/dev/null | cut -f1 || echo "?")
@@ -113,7 +113,7 @@ fi
 
 # 7. Storybook A11y Tests
 print_header "Storybook A11y Tests"
-A11Y_OUTPUT=$(npx vitest run --project storybook 2>&1)
+A11Y_OUTPUT=$(pnpm vitest run --project storybook 2>&1)
 A11Y_EXIT=$?
 CLEAN_A11Y=$(echo "$A11Y_OUTPUT" | sed 's/\x1b\[[0-9;]*m//g')
 A11Y_PASS=$(echo "$CLEAN_A11Y" | grep -o '[0-9]* passed' | tail -1)

@@ -11,25 +11,25 @@ Arkite UI is a **pure UI component library**. We do not include business logic, 
 ```bash
 git clone git@gitlab.com:foson.co/arkite-ui.git
 cd arkite-ui
-npm install
-npm run storybook    # Preview components at http://localhost:6006
+pnpm install
+pnpm storybook       # Preview components at http://localhost:6006
 ```
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Watch mode (rebuild on change) |
-| `npm run build` | Production build (tsup) |
-| `npm run storybook` | Launch Storybook |
-| `npm run test` | Run unit tests (412 tests) |
-| `npm run test:watch` | Tests in watch mode |
-| `npm run test:coverage` | Tests with coverage report |
-| `npm run lint` | Lint source code (ESLint 9) |
-| `npm run typecheck` | TypeScript type check |
-| `npm run size` | Check bundle size budget |
-| `npm run chromatic` | Visual regression testing |
-| `npm run changeset` | Add a changeset for your MR |
+| `pnpm dev` | Watch mode (rebuild on change) |
+| `pnpm build` | Production build (tsup) |
+| `pnpm storybook` | Launch Storybook |
+| `pnpm test` | Run unit tests (412 tests) |
+| `pnpm test:watch` | Tests in watch mode |
+| `pnpm test:coverage` | Tests with coverage report |
+| `pnpm lint` | Lint source code (ESLint 9) |
+| `pnpm typecheck` | TypeScript type check |
+| `pnpm size` | Check bundle size budget |
+| `pnpm chromatic` | Visual regression testing |
+| `pnpm changeset` | Add a changeset for your MR |
 
 ## Adding a New Component
 
@@ -39,7 +39,7 @@ npm run storybook    # Preview components at http://localhost:6006
 4. Export from `src/index.ts`
 5. Add a Storybook story under `src/stories/<category>/`
 6. Add unit tests (`MyComponent.test.tsx`)
-7. Add a changeset: `npx changeset`
+7. Add a changeset: `pnpm changeset`
 
 ### Component Checklist
 
@@ -83,7 +83,7 @@ src/components/button/
 └── index.ts
 ```
 
-Run tests: `npm run test`
+Run tests: `pnpm test`
 
 ### What to Test
 
@@ -99,7 +99,7 @@ We use [changesets](https://github.com/changesets/changesets) for versioning. **
 
 ```bash
 # Add a changeset (interactive prompt)
-npx changeset
+pnpm changeset
 
 # This creates a file in .changeset/ describing the change
 # Commit it with your MR
@@ -128,8 +128,8 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 1. Create a feature branch from `main`
 2. Make your changes with tests
-3. Add a changeset: `npx changeset`
-4. Ensure `npm run lint && npm run typecheck && npm run test` pass
+3. Add a changeset: `pnpm changeset`
+4. Ensure `pnpm lint && pnpm typecheck && pnpm test` pass
 5. Open a merge request on GitLab
 6. CI runs lint, typecheck, test, size check, changeset check, and Chromatic
 

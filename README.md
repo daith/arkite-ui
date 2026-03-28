@@ -32,19 +32,19 @@ Arkite UI is not another generic component library. It focuses on the components
 ## Installation
 
 ```bash
-npm install @arkite/ui
+pnpm add @arkite/ui
 ```
 
 ### Peer Dependencies
 
 ```bash
-npm install react react-dom tailwindcss zustand lucide-react
+pnpm add react react-dom tailwindcss zustand lucide-react
 ```
 
 ### Optional
 
 ```bash
-npm install framer-motion    # For AnimatedModal, AnimatedDrawer, AnimatedToast
+pnpm add framer-motion    # For AnimatedModal, AnimatedDrawer, AnimatedToast
 ```
 
 ## Quick Start
@@ -345,18 +345,18 @@ src/
 ## Development
 
 ```bash
-npm install              # Install dependencies
-npm run build            # Build the package (tsup)
-npm run dev              # Watch mode
-npm run storybook        # Launch Storybook (http://localhost:6006)
-npm run test             # Run unit tests (412 tests)
-npm run test:watch       # Tests in watch mode
-npm run test:coverage    # Tests with coverage report
-npm run lint             # Lint source code
-npm run typecheck        # Type check
-npm run size             # Check bundle size budget
-npm run chromatic        # Visual regression testing
-npm run clean            # Clean dist/
+pnpm install             # Install dependencies
+pnpm build               # Build the package (tsup)
+pnpm dev                 # Watch mode
+pnpm storybook           # Launch Storybook (http://localhost:6006)
+pnpm test                # Run unit tests (412 tests)
+pnpm test:watch          # Tests in watch mode
+pnpm test:coverage       # Tests with coverage report
+pnpm lint                # Lint source code
+pnpm typecheck           # Type check
+pnpm size                # Check bundle size budget
+pnpm chromatic           # Visual regression testing
+pnpm clean               # Clean dist/
 ```
 
 ## CI/CD Pipeline
@@ -373,13 +373,13 @@ On git tags:
 
 ```bash
 # 1. Add a changeset for your changes
-npm run changeset
+pnpm changeset
 
 # 2. When ready to release, version and update CHANGELOG
-npm run version-packages
+pnpm version-packages
 
 # 3. Verify + build + publish (一鍵完成)
-npm run publish-package
+pnpm publish-package
 ```
 
 ### 本機發布前置需求

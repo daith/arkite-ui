@@ -24,7 +24,7 @@ fi
 
 # Step 2: build
 printf "\n${YELLOW}[2/4] Build...${NC}\n"
-npm run build
+pnpm run build
 BUILD_EXIT=$?
 
 if [ "$BUILD_EXIT" -ne 0 ]; then
@@ -47,7 +47,7 @@ fi
 
 # Step 4: publish
 printf "\n${YELLOW}[4/4] 發布到 GitLab Package Registry...${NC}\n"
-npm run release
+pnpm run release
 RELEASE_EXIT=$?
 
 if [ "$RELEASE_EXIT" -ne 0 ]; then

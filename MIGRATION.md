@@ -37,10 +37,10 @@ v0.4.0 新增以下 optional peer dependencies，請依照使用的元件安裝�
 
 ```bash
 # 安裝全部
-npm install cmdk @tanstack/react-virtual @radix-ui/react-dropdown-menu @radix-ui/react-popover @radix-ui/react-tooltip framer-motion
+pnpm add cmdk @tanstack/react-virtual @radix-ui/react-dropdown-menu @radix-ui/react-popover @radix-ui/react-tooltip framer-motion
 
 # 或只安裝需要的
-npm install cmdk framer-motion
+pnpm add cmdk framer-motion
 ```
 
 ---
@@ -50,7 +50,7 @@ npm install cmdk framer-motion
 `@arkite/ui` 現在要求 Tailwind CSS v4。若尚未升級：
 
 ```bash
-npm install tailwindcss@^4.0.0 @tailwindcss/vite
+pnpm add tailwindcss@^4.0.0 @tailwindcss/vite
 ```
 
 並在 `tailwind.config` 引入 preset：

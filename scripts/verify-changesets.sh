@@ -22,11 +22,11 @@ printf "========================================\n\n"
 
 # 1. changeset CLI 是否存在
 printf "=== CLI ===\n"
-if command -v changeset &>/dev/null || npx changeset --version &>/dev/null 2>&1; then
-    VERSION=$(npx changeset --version 2>/dev/null || echo "unknown")
+if command -v changeset &>/dev/null || pnpm changeset --version &>/dev/null 2>&1; then
+    VERSION=$(pnpm changeset --version 2>/dev/null || echo "unknown")
     pass "changeset CLI 可用 ($VERSION)"
 else
-    fail "changeset CLI 找不到 — 請執行 npm install"
+    fail "changeset CLI 找不到 — 請執行 pnpm install"
 fi
 
 # 2. .changeset/config.json 存在且格式正確
@@ -50,7 +50,7 @@ if [ -f "$CONFIG" ]; then
         warn "baseBranch 為 '$BASE'，確認是否正確"
     fi
 else
-    fail "$CONFIG 不存在 — 請執行 npx changeset init"
+    fail "$CONFIG 不存在 — 請執行 pnpm changeset init"
 fi
 
 # 3. package.json publishConfig
@@ -111,7 +111,7 @@ if [ -f "dist/index.js" ]; then
     BUILD_TIME=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M" dist/index.js 2>/dev/null || stat -c "%y" dist/index.js 2>/dev/null | cut -d. -f1)
     pass "dist/index.js 存在 (最後 build: $BUILD_TIME)"
 else
-    fail "dist/index.js 不存在 — 請先執行 npm run build"
+    fail "dist/index.js 不存在 — 請先執行 pnpm run build"
 fi
 
 # Summary
