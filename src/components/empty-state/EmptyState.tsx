@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { Button } from '../button/Button'
 import { Inbox, Search, FileX, AlertCircle, Plus } from 'lucide-react'
 
 export type EmptyStateVariant = 'default' | 'search' | 'error' | 'no-data'
@@ -50,16 +51,7 @@ const sizeStyles = {
 /** Placeholder display for empty views with an icon, message, and optional action. */
 export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
   (
-    {
-      className,
-      variant = 'default',
-      icon,
-      title,
-      description,
-      action,
-      size = 'md',
-      ...props
-    },
+    { className, variant = 'default', icon, title, description, action, size = 'md', ...props },
     ref
   ) => {
     const IconComponent = variantIcons[variant]
@@ -75,21 +67,12 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
         )}
         {...props}
       >
-        <div className="mb-4 text-muted-foreground">
+        <div className="text-muted-foreground mb-4">
           {icon || <IconComponent className={styles.icon} />}
         </div>
-        {title && (
-          <h3 className={cn('font-semibold text-foreground', styles.title)}>
-            {title}
-          </h3>
-        )}
+        {title && <h3 className={cn('text-foreground font-semibold', styles.title)}>{title}</h3>}
         {description && (
-          <p
-            className={cn(
-              'mt-1 max-w-sm text-muted-foreground',
-              styles.description
-            )}
-          >
+          <p className={cn('text-muted-foreground mt-1 max-w-sm', styles.description)}>
             {description}
           </p>
         )}
@@ -102,7 +85,10 @@ export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(
 EmptyState.displayName = 'EmptyState'
 
 // Pre-configured empty states
-export interface EmptyStatePresetProps extends Omit<EmptyStateProps, 'variant' | 'title' | 'description' | 'icon'> {
+export interface EmptyStatePresetProps extends Omit<
+  EmptyStateProps,
+  'variant' | 'title' | 'description' | 'icon'
+> {
   /** Custom title (overrides preset) */
   title?: ReactNode
   /** Custom description (overrides preset) */
@@ -111,22 +97,20 @@ export interface EmptyStatePresetProps extends Omit<EmptyStateProps, 'variant' |
 
 /** Preset empty state for search queries that returned no results. */
 export const NoResults = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
-  ({ title = 'No results found', description = 'Try adjusting your search or filters.', ...props }, ref) => (
-    <EmptyState
-      ref={ref}
-      variant="search"
-      title={title}
-      description={description}
-      {...props}
-    />
-  )
+  (
+    { title = 'No results found', description = 'Try adjusting your search or filters.', ...props },
+    ref
+  ) => <EmptyState ref={ref} variant="search" title={title} description={description} {...props} />
 )
 
 NoResults.displayName = 'NoResults'
 
 /** Preset empty state prompting the user to create their first item. */
 export const NoData = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
-  ({ title = 'No data yet', description = 'Get started by creating your first item.', ...props }, ref) => (
+  (
+    { title = 'No data yet', description = 'Get started by creating your first item.', ...props },
+    ref
+  ) => (
     <EmptyState
       ref={ref}
       variant="no-data"
@@ -140,14 +124,39 @@ export const NoData = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
 
 NoData.displayName = 'NoData'
 
+export interface ErrorStateProps extends EmptyStatePresetProps {
+  /** Callback fired when the retry button is clicked. When provided, a retry button is rendered automatically. */
+  onRetry?: () => void
+  /** Label for the retry button */
+  retryLabel?: string
+}
+
 /** Preset empty state indicating a data loading error occurred. */
-export const ErrorState = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
-  ({ title = 'Something went wrong', description = 'An error occurred while loading the data.', ...props }, ref) => (
+export const ErrorState = forwardRef<HTMLDivElement, ErrorStateProps>(
+  (
+    {
+      title = 'Something went wrong',
+      description = 'An error occurred while loading the data.',
+      onRetry,
+      retryLabel = 'Try again',
+      action,
+      ...props
+    },
+    ref
+  ) => (
     <EmptyState
       ref={ref}
       variant="error"
       title={title}
       description={description}
+      action={
+        action ??
+        (onRetry ? (
+          <Button variant="outline" size="sm" onClick={onRetry}>
+            {retryLabel}
+          </Button>
+        ) : undefined)
+      }
       {...props}
     />
   )

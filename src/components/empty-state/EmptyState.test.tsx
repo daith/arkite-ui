@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi } from 'vitest'
 import { EmptyState, NoResults, NoData, ErrorState } from './EmptyState'
 
 describe('EmptyState', () => {
@@ -15,10 +16,16 @@ describe('EmptyState', () => {
   })
 
   it('renders different icons for each variant', () => {
-    const { container: defaultContainer } = render(<EmptyState variant="default" data-testid="default" />)
-    const { container: searchContainer } = render(<EmptyState variant="search" data-testid="search" />)
+    const { container: defaultContainer } = render(
+      <EmptyState variant="default" data-testid="default" />
+    )
+    const { container: searchContainer } = render(
+      <EmptyState variant="search" data-testid="search" />
+    )
     const { container: errorContainer } = render(<EmptyState variant="error" data-testid="error" />)
-    const { container: noDataContainer } = render(<EmptyState variant="no-data" data-testid="no-data" />)
+    const { container: noDataContainer } = render(
+      <EmptyState variant="no-data" data-testid="no-data" />
+    )
 
     // Each variant should render an SVG icon (from lucide-react)
     expect(defaultContainer.querySelector('svg')).toBeInTheDocument()
@@ -87,5 +94,30 @@ describe('ErrorState', () => {
     render(<ErrorState title="Oops" description="Try again later." />)
     expect(screen.getByText('Oops')).toBeInTheDocument()
     expect(screen.getByText('Try again later.')).toBeInTheDocument()
+  })
+
+  it('renders retry button when onRetry is provided', async () => {
+    const onRetry = vi.fn()
+    render(<ErrorState onRetry={onRetry} />)
+    const button = screen.getByRole('button', { name: 'Try again' })
+    expect(button).toBeInTheDocument()
+    await userEvent.click(button)
+    expect(onRetry).toHaveBeenCalledOnce()
+  })
+
+  it('does not render retry button when onRetry is not provided', () => {
+    render(<ErrorState />)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('uses custom retryLabel', () => {
+    render(<ErrorState onRetry={() => {}} retryLabel="Reload" />)
+    expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument()
+  })
+
+  it('prefers action over onRetry when both are provided', () => {
+    render(<ErrorState onRetry={() => {}} action={<button>Custom</button>} />)
+    expect(screen.getByRole('button', { name: 'Custom' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
   })
 })
