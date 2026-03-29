@@ -1,6 +1,6 @@
 {
   "name": "@arkite/ui",
-  "version": "0.3.8",
+  "version": "0.3.9",
   "description": "Production-ready React components for SaaS admin panels. Tailwind CSS v4 + Radix UI + TypeScript.",
   "type": "module",
   "main": "./dist/index.cjs",
