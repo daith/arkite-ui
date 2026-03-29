@@ -31,12 +31,20 @@ lint:
   <<: *node-setup
   script:
     - pnpm run lint
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
 
 typecheck:
   stage: check
   <<: *node-setup
   script:
     - pnpm run typecheck
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
 
 test:
   stage: check
@@ -50,6 +58,10 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: coverage/cobertura-coverage.xml
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
 
 size:
   stage: check
@@ -58,6 +70,10 @@ size:
     - pnpm run build
     - pnpm run size
   dependencies: []
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: on_success
 
 changeset:check:
   stage: check
