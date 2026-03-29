@@ -125,6 +125,8 @@ publish:gitlab:
   image: node:20-alpine
   dependencies:
     - build
+  before_script:
+    - corepack enable && corepack prepare pnpm@latest --activate
   script:
     - |
       echo "@arkite:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
@@ -138,6 +140,8 @@ publish:npm:
   image: node:20-alpine
   dependencies:
     - build
+  before_script:
+    - corepack enable && corepack prepare pnpm@latest --activate
   script:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
     - pnpm publish --no-git-checks --access public
