@@ -32,9 +32,7 @@ const columns: Column<User>[] = [
     key: 'status',
     header: 'Status',
     cell: (row) => (
-      <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>
-        {row.status}
-      </Badge>
+      <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>{row.status}</Badge>
     ),
   },
 ]
@@ -63,9 +61,9 @@ const Template: StoryFn = (args) => (
   />
 )
 
-export const Default = Template.bind({})
+export const Default: StoryFn = Template.bind({})
 
-export const Loading = Template.bind({})
+export const Loading: StoryFn = Template.bind({})
 Loading.args = { loading: true }
 
 export const Empty: StoryFn = () => (
@@ -77,7 +75,7 @@ export const Empty: StoryFn = () => (
   />
 )
 
-export const NoPagination = Template.bind({})
+export const NoPagination: StoryFn = Template.bind({})
 NoPagination.args = { pagination: false }
 
 export const ErrorState: StoryFn = () => (
@@ -88,7 +86,9 @@ export const ErrorState: StoryFn = () => (
     emptyContent={
       <div className="flex flex-col items-center gap-2 py-4 text-center">
         <span className="text-destructive font-medium">Failed to load data</span>
-        <span className="text-sm text-muted-foreground">Please check your connection and try again.</span>
+        <span className="text-muted-foreground text-sm">
+          Please check your connection and try again.
+        </span>
       </div>
     }
   />
@@ -120,10 +120,7 @@ function SelectableDemo() {
         pagination
         defaultPageSize={5}
       />
-      <BulkActionBar
-        selectedCount={selected.size}
-        onClose={() => setSelected(new Set())}
-      >
+      <BulkActionBar selectedCount={selected.size} onClose={() => setSelected(new Set())}>
         <Button size="sm" variant="secondary">
           Export
         </Button>
@@ -147,7 +144,9 @@ export const ExpandableRows: StoryFn = () => (
     getRowKey={(row) => row.id}
     expandable={(row) => (
       <div className="space-y-2 text-sm">
-        <p><strong>Full details for {row.name}</strong></p>
+        <p>
+          <strong>Full details for {row.name}</strong>
+        </p>
         <p>Email: {row.email}</p>
         <p>Role: {row.role}</p>
         <p>Status: {row.status}</p>
@@ -194,7 +193,7 @@ export const ExpandableWithColumnToggle: StoryFn = () => (
     columns={columns}
     getRowKey={(row) => row.id}
     expandable={(row) => (
-      <div className="text-sm text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         Additional details for <strong>{row.name}</strong> — {row.email}
       </div>
     )}
@@ -213,9 +212,7 @@ const filterableColumns: Column<User>[] = [
     header: 'Status',
     filterable: true,
     cell: (row) => (
-      <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>
-        {row.status}
-      </Badge>
+      <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>{row.status}</Badge>
     ),
   },
 ]
