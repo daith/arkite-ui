@@ -141,6 +141,8 @@ publish:gitlab:
   image: node:20-alpine
   dependencies:
     - build
+  variables:
+    HUSKY: "0"
   before_script:
     - corepack enable && corepack prepare pnpm@latest --activate
   script:
@@ -156,6 +158,8 @@ publish:npm:
   image: node:20-alpine
   dependencies:
     - build
+  variables:
+    HUSKY: "0"
   before_script:
     - corepack enable && corepack prepare pnpm@latest --activate
   script:
