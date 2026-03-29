@@ -71,7 +71,7 @@
     "verify-changesets": "./scripts/verify-changesets.sh",
     "publish-package": "./scripts/publish.sh",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "size-limit": [
     {
