@@ -463,8 +463,13 @@ export function DataTable<T>({
 
       <div
         data-testid={stickyHeader ? 'sticky-scroll-container' : undefined}
-        className={cn(stickyHeader && 'overflow-auto', fillHeight && 'flex-1 min-h-0')}
-        style={stickyHeader && maxHeight ? { maxHeight } : undefined}
+        className={cn(
+          // 沒 fillHeight 時 sticky 自己提供 scroll container
+          stickyHeader && !fillHeight && 'overflow-auto',
+          // fillHeight 模式：middle 只當 flex 容器，scroll 交給 inner Table wrapper
+          fillHeight && 'flex-1 min-h-0',
+        )}
+        style={stickyHeader && !fillHeight && maxHeight ? { maxHeight } : undefined}
       >
       <Table stickyHeader={stickyHeader} fillHeight={fillHeight}>
         <TableHeader>

@@ -29,7 +29,9 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
       <table
         ref={ref}
         className={cn(
-          'w-full caption-bottom text-sm',
+          // border-separate + border-spacing-0 是 cross-browser sticky thead 必須
+          // 預設 border-collapse:collapse 在 Chrome 會讓 sticky 失效
+          'w-full caption-bottom text-sm border-separate border-spacing-0',
           bordered && 'border',
           className
         )}
