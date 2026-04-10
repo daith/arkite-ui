@@ -3,6 +3,7 @@
   "pages": [
     "getting-started",
     "theming",
+    "tokens",
     "---Components---",
     "components/..."
   ]

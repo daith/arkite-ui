@@ -1,0 +1,226 @@
+---
+title: Design Tokens
+description: Framework-agnostic design tokens for cross-platform use (web, React Native, design tools).
+---
+
+## What are tokens?
+
+`@arkite/ui/tokens` is a separate entry point that exports **plain JavaScript values** — no React, no DOM, no CSS. This means it works anywhere:
+
+- Web (Tailwind, CSS-in-JS, vanilla CSS)
+- React Native
+- Node scripts
+- Design tooling (Style Dictionary, Figma plugins)
+
+Use it to keep colors, spacing, and typography consistent across multiple projects and platforms.
+
+```ts
+import { colors, spacing, radius } from '@arkite/ui/tokens'
+```
+
+## Why a separate entry point?
+
+The main `@arkite/ui` package depends on React, Radix, and the DOM — it cannot run in React Native. The `/tokens` entry has zero runtime dependencies, so any environment can import it safely.
+
+| Entry | Runtime | Use case |
+|---|---|---|
+| `@arkite/ui` | React + DOM | Web component library |
+| `@arkite/ui/tokens` | None | Design values for any platform |
+| `@arkite/ui/tailwind` | Tailwind config | Tailwind preset |
+
+## Layered structure
+
+Tokens are organized in two layers, plus numeric scales for spacing/typography:
+
+```
+┌─ Layer 1: Primitives ─────────────────────────┐
+│  Raw color scales (gray.500, blue.600, …)      │
+│  Internal building blocks                      │
+└────────────────────────────────────────────────┘
+                    ↓ derives
+┌─ Layer 2: Semantic ───────────────────────────┐
+│  Meaningful tokens (success, danger, …)        │
+│  Public API — prefer this in product code      │
+└────────────────────────────────────────────────┘
+
+┌─ Scales ──────────────────────────────────────┐
+│  spacing, radius, fontSize, lineHeight, …      │
+└────────────────────────────────────────────────┘
+```
+
+**Always prefer the semantic layer.** Reach for primitives only when you need a specific shade with no semantic name (e.g. a chart color ramp).
+
+## Semantic colors
+
+Every semantic token has a `light` and `dark` variant:
+
+```ts
+import { colors } from '@arkite/ui/tokens'
+
+colors.light.success         // '#16a34a'
+colors.light.successForeground // '#ffffff'
+colors.dark.background       // '#030712'
+```
+
+| Token | Light | Dark | Purpose |
+|---|---|---|---|
+| `background` / `foreground` | white / gray-900 | gray-950 / gray-50 | Page surfaces |
+| `card` / `cardForeground` | white / gray-900 | gray-900 / gray-50 | Card surfaces |
+| `muted` / `mutedForeground` | gray-100 / gray-500 | gray-800 / gray-400 | De-emphasized content |
+| `primary` | purple-600 | purple-500 | Brand color |
+| `accent` | teal-500 | teal-400 | Secondary brand |
+| `success` | green-600 | green-500 | Positive states |
+| `warning` | amber-500 | amber-400 | Caution states |
+| `danger` | red-600 | red-500 | Destructive actions |
+| `info` | blue-600 | blue-500 | Informational |
+| `border` / `input` | gray-200 | gray-800 | Form & dividers |
+| `ring` | purple-600 | purple-500 | Focus rings |
+
+Each colored status token has a paired `*Foreground` for text on top of it.
+
+## Primitive scales
+
+Seven palettes, each with shades 50–950 (matches Tailwind's defaults):
+
+```ts
+import { primitives } from '@arkite/ui/tokens'
+
+primitives.gray[100]   // '#f3f4f6'
+primitives.purple[600] // '#9333ea'
+```
+
+| Palette | Used as |
+|---|---|
+| `gray` | Surfaces, text, borders |
+| `green` | Success |
+| `blue` | Info |
+| `red` | Danger |
+| `amber` | Warning |
+| `purple` | Primary brand |
+| `teal` | Accent |
+
+## Spacing, radius, typography
+
+All scales use **numbers, not strings** — so they work directly in React Native StyleSheet and any CSS-in-JS solution:
+
+```ts
+import { spacing, radius, fontSize, lineHeight, fontWeight } from '@arkite/ui/tokens'
+
+spacing[4]        // 16   (Tailwind's 4 = 1rem = 16px)
+radius.lg         // 8
+radius.full       // 9999 (for pills)
+fontSize.base     // 16
+lineHeight.normal // 1.5
+fontWeight.bold   // '700' (string, RN-compatible)
+```
+
+## Usage examples
+
+### React Native
+
+```tsx
+import { StyleSheet, useColorScheme, View, Text } from 'react-native'
+import { colors, spacing, radius, fontSize, fontWeight } from '@arkite/ui/tokens'
+
+function StatusBadge({ status, label }: { status: 'success' | 'danger'; label: string }) {
+  const scheme = useColorScheme() ?? 'light'
+  const c = colors[scheme]
+
+  return (
+    <View
+      style={{
+        backgroundColor: c[status],
+        paddingHorizontal: spacing[3],
+        paddingVertical: spacing[1],
+        borderRadius: radius.full,
+      }}
+    >
+      <Text
+        style={{
+          color: c[`${status}Foreground`],
+          fontSize: fontSize.sm,
+          fontWeight: fontWeight.semibold,
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  )
+}
+```
+
+### Web with CSS-in-JS
+
+```tsx
+import { colors, spacing } from '@arkite/ui/tokens'
+
+const styles = {
+  button: {
+    backgroundColor: colors.light.primary,
+    color: colors.light.primaryForeground,
+    padding: `${spacing[2]}px ${spacing[4]}px`,
+  },
+}
+```
+
+### Style Dictionary / Figma sync
+
+Because tokens are plain JS objects, you can transform them to any format:
+
+```ts
+import { colors, spacing } from '@arkite/ui/tokens'
+import { writeFileSync } from 'node:fs'
+
+const dtcg = {
+  color: Object.fromEntries(
+    Object.entries(colors.light).map(([k, v]) => [k, { $value: v, $type: 'color' }]),
+  ),
+  spacing: Object.fromEntries(
+    Object.entries(spacing).map(([k, v]) => [k, { $value: `${v}px`, $type: 'dimension' }]),
+  ),
+}
+
+writeFileSync('tokens.json', JSON.stringify(dtcg, null, 2))
+```
+
+## Migration tips
+
+### From hardcoded hex
+
+Before:
+```ts
+const STATUS_COLORS = {
+  success: '#22c55e',
+  danger: '#ef4444',
+}
+```
+
+After:
+```ts
+import { colors } from '@arkite/ui/tokens'
+
+const STATUS_COLORS = {
+  success: colors.light.success,
+  danger: colors.light.danger,
+}
+```
+
+### Pick a single source of truth
+
+If a project has both `@arkite/ui` (web) and a React Native app, install `@arkite/ui` in both — only the `/tokens` entry will be loaded on the RN side, with no React/DOM overhead.
+
+### Don't fight the layer
+
+If you find yourself reaching for `primitives.green[400]` in product code, ask whether you actually need a new semantic name (e.g. `successMuted`). The primitive layer is intentionally inconvenient — it's a smell that the semantic layer needs to grow.
+
+## Relationship to `createTheme()` and CSS variables
+
+The existing web theme system (`createTheme()`, CSS variables, Tailwind preset) is **unchanged**. Tokens are an additional, framework-agnostic surface — not a replacement.
+
+| If you're… | Use |
+|---|---|
+| Building a web component with Tailwind | CSS variables / `createTheme()` |
+| Building a React Native screen | `@arkite/ui/tokens` |
+| Writing a Node script that generates a Figma file | `@arkite/ui/tokens` |
+| Adding a new web color that should respect light/dark | CSS variables (so it auto-switches) |
+| Adding a new shared value used by both web and RN | `@arkite/ui/tokens` first, then mirror into the CSS variable layer |
