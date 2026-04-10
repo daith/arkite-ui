@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- 1554b4b: Add `@arkite/ui/tokens` entry point — framework-agnostic design tokens for cross-platform use.
+
+  The new entry exports plain JavaScript values (colors, spacing, radius, typography) with zero runtime dependencies, so it can be consumed from React Native, Node scripts, and design tooling — not just web.
+
+  **Layered structure:**
+
+  - `primitives` — 7 raw color scales (`gray`, `green`, `blue`, `red`, `amber`, `purple`, `teal` × shades 50–950) matching Tailwind's defaults
+  - `colors.{light,dark}` — 21 semantic tokens (`success`, `danger`, `info`, `warning`, `primary`, `accent`, surfaces, form) with paired `*Foreground` for contrast
+  - `spacing` / `radius` / `fontSize` / `lineHeight` / `fontWeight` — numeric scales sized for direct React Native StyleSheet use
+
+  ```ts
+  import { colors, spacing, radius } from '@arkite/ui/tokens'
+
+  // React Native
+  StyleSheet.create({
+    card: {
+      backgroundColor: colors.light.card,
+      padding: spacing[4],
+      borderRadius: radius.lg,
+    },
+  })
+  ```
+
+  The existing CSS-variable theme system (`createTheme`, `themePresets`, Tailwind preset) is unchanged — this is purely additive. See `docs/content/tokens.mdx` for the full guide.
+
+  A Storybook preview at `Foundation/Design Tokens` includes a WCAG 2.1 contrast audit for all semantic foreground/background pairs.
+
 ## 0.3.6
 
 ### Patch Changes
