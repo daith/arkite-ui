@@ -12,12 +12,20 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   hoverable?: boolean
   /** Sticky header — stays fixed while scrolling vertically */
   stickyHeader?: boolean
+  /**
+   * Make the scroll wrapper fill its parent's height (`h-full`).
+   * Use this when the table is inside a fixed-height flex container so the
+   * horizontal scrollbar pins to the bottom of the viewport even when there
+   * are few rows. The parent must provide a determinate height (e.g.
+   * `flex-1 min-h-0` inside a `flex flex-col` chain).
+   */
+  fillHeight?: boolean
 }
 
 /** Styled HTML table with support for striping, borders, and sticky headers. */
 export const Table = forwardRef<HTMLTableElement, TableProps>(
-  ({ className, variant = 'default', compact, bordered, hoverable, stickyHeader, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
+  ({ className, variant = 'default', compact, bordered, hoverable, stickyHeader, fillHeight, ...props }, ref) => (
+    <div className={cn('relative w-full overflow-auto', fillHeight && 'h-full')}>
       <table
         ref={ref}
         className={cn(

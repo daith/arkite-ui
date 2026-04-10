@@ -79,6 +79,13 @@ export interface DataTableProps<T> {
   stickyHeader?: boolean
   /** Max height for the scrollable table area (e.g. '400px', '60vh'). Required for stickyHeader to work. */
   maxHeight?: string | number
+  /**
+   * Make the table scroll wrapper fill its parent's height (`h-full`).
+   * Use when the DataTable is inside a fixed-height flex container so the
+   * horizontal scrollbar pins to the bottom of the viewport even when there
+   * are few rows. The parent must provide a determinate height.
+   */
+  fillHeight?: boolean
   /** Callback when filters change (for controlled usage) */
   onFilterChange?: (filters: Record<string, string[]>) => void
   /** Additional class name */
@@ -144,6 +151,7 @@ export function DataTable<T>({
   columnToggle = false,
   stickyHeader = false,
   maxHeight,
+  fillHeight = false,
   onFilterChange,
   className,
 }: DataTableProps<T>) {
@@ -412,7 +420,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className={cn('rounded-md border', className)}>
+    <div className={cn('rounded-md border', fillHeight && 'flex h-full flex-col', className)}>
       {columnToggle && (
         <div className="flex items-center justify-end border-b px-4 py-2">
           <div ref={columnToggleRef} className="relative">
@@ -455,10 +463,10 @@ export function DataTable<T>({
 
       <div
         data-testid={stickyHeader ? 'sticky-scroll-container' : undefined}
-        className={cn(stickyHeader && 'overflow-auto')}
+        className={cn(stickyHeader && 'overflow-auto', fillHeight && 'flex-1 min-h-0')}
         style={stickyHeader && maxHeight ? { maxHeight } : undefined}
       >
-      <Table stickyHeader={stickyHeader}>
+      <Table stickyHeader={stickyHeader} fillHeight={fillHeight}>
         <TableHeader>
           <TableRow>
             {expandable && (
