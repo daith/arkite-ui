@@ -37,8 +37,8 @@ const variantStyles: Record<BadgeVariant, string> = {
 }
 
 const sizeStyles: Record<BadgeSize, string> = {
-  sm: 'px-2 py-0.5 text-[10px] leading-none',
-  md: 'px-2.5 py-0.5 text-xs',
+  sm: 'px-2.5 py-0.5 text-xs leading-tight',
+  md: 'px-3 py-1 text-[13px] leading-snug',
 }
 
 /** Small inline label for status, categories, or counts with multiple color variants. */
