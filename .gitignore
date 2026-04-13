@@ -10,4 +10,4 @@ storybook-static
 .claude/
 .gitlab-ci.yml
 WORKLOG.md
-docs/ADOPTION_REPORT.md
+docs/
