@@ -2,8 +2,8 @@
 
 Production-ready React components for SaaS admin panels. Built with Tailwind CSS v4.
 
-[![pipeline](https://gitlab.com/foson.co/arkite-ui/badges/main/pipeline.svg)](https://gitlab.com/foson.co/arkite-ui/-/pipelines)
-[![coverage](https://gitlab.com/foson.co/arkite-ui/badges/main/coverage.svg)](https://gitlab.com/foson.co/arkite-ui/-/pipelines)
+[![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://daith.github.io/arkite-ui/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
 Arkite UI is not another generic component library. It focuses on the components you actually need to build multi-tenant SaaS admin panels — tenant switchers, data tables, stat dashboards, filter bars, and more.
 
@@ -11,9 +11,9 @@ Arkite UI is not another generic component library. It focuses on the components
 
 **Links:**
 
-- [Storybook (Component Docs)](https://foson.co.gitlab.io/arkite-ui/) — Live component preview
-- [GitLab Repository](https://gitlab.com/foson.co/arkite-ui) — Source code
-- [Issue Tracker](https://gitlab.com/foson.co/arkite-ui/-/issues) — Bug reports & feature requests
+- [Storybook (Component Docs)](https://daith.github.io/arkite-ui/) — Live component preview
+- [GitHub Repository](https://github.com/daith/arkite-ui) — Source code
+- [Issue Tracker](https://github.com/daith/arkite-ui/issues) — Bug reports & feature requests
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — Development guide
 - [CHANGELOG.md](./CHANGELOG.md) — Release history
 
