@@ -5,3 +5,9 @@ dist/
 
 *storybook.log
 storybook-static
+
+# Internal / local-only
+.claude/
+.gitlab-ci.yml
+WORKLOG.md
+docs/ADOPTION_REPORT.md
