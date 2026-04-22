@@ -165,4 +165,129 @@ describe('AdminLayout', () => {
     expect(screen.getByTestId('badge-count')).toBeInTheDocument()
     expect(screen.getByText('5')).toBeInTheDocument()
   })
+
+  it('renders subNav slot below navbar when provided', () => {
+    renderLayout({ subNav: <div data-testid="sub-nav">Sub Nav Content</div> })
+    expect(screen.getByTestId('sub-nav')).toBeInTheDocument()
+  })
+
+  it('does not render subNav container when slot is empty', () => {
+    const { container } = renderLayout()
+    expect(container.querySelector('[data-testid="sub-nav"]')).toBeNull()
+  })
+
+  describe('sidebarVariant="rail"', () => {
+    const railNavigation = [
+      {
+        label: 'Market',
+        path: '/market',
+        icon: <span data-testid="market-icon">M</span>,
+        items: [
+          { path: '/market/tw', label: 'TW Stocks' },
+          { path: '/market/us', label: 'US Stocks' },
+        ],
+      },
+      {
+        label: 'Research',
+        items: [
+          { path: '/research/reports', label: 'Reports' },
+        ],
+      },
+    ]
+
+    it('renders one rail button per visible group', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+      })
+      expect(screen.getByRole('button', { name: 'Market' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Research' })).toBeInTheDocument()
+    })
+
+    it('hides individual nav item labels from the rail', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+      })
+      expect(screen.queryByText('TW Stocks')).not.toBeInTheDocument()
+      expect(screen.queryByText('Reports')).not.toBeInTheDocument()
+    })
+
+    it('renders group icon when provided', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+      })
+      expect(screen.getByTestId('market-icon')).toBeInTheDocument()
+    })
+
+    it('marks group as active via aria-current when current path is within group.path', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+      })
+      expect(screen.getByRole('button', { name: 'Market' })).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('button', { name: 'Research' })).not.toHaveAttribute('aria-current')
+    })
+
+    it('marks group as active when a nested item path matches (no group.path)', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/research/reports',
+      })
+      expect(screen.getByRole('button', { name: 'Research' })).toHaveAttribute('aria-current', 'page')
+    })
+
+    it('navigates to group.path on rail click when provided', async () => {
+      const onNavigate = vi.fn()
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/research/reports',
+        onNavigate,
+      })
+      await userEvent.click(screen.getByRole('button', { name: 'Market' }))
+      expect(onNavigate).toHaveBeenCalledWith('/market')
+    })
+
+    it('falls back to first item path when group.path is absent', async () => {
+      const onNavigate = vi.fn()
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+        onNavigate,
+      })
+      await userEvent.click(screen.getByRole('button', { name: 'Research' }))
+      expect(onNavigate).toHaveBeenCalledWith('/research/reports')
+    })
+
+    it('prepends basePath when navigating from rail', async () => {
+      const onNavigate = vi.fn()
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/app/market',
+        basePath: '/app',
+        onNavigate,
+      })
+      await userEvent.click(screen.getByRole('button', { name: 'Research' }))
+      expect(onNavigate).toHaveBeenCalledWith('/app/research/reports')
+    })
+
+    it('renders subNav alongside rail', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+        subNav: <div data-testid="rail-sub-nav">Pills</div>,
+      })
+      expect(screen.getByTestId('rail-sub-nav')).toBeInTheDocument()
+    })
+  })
 })

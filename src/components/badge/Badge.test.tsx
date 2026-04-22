@@ -28,4 +28,38 @@ describe('Badge', () => {
     render(<Badge className="custom-class">Test</Badge>)
     expect(screen.getByText('Test').className).toContain('custom-class')
   })
+
+  describe('max prop', () => {
+    it('renders numeric child as-is when within max', () => {
+      render(<Badge max={99}>{50}</Badge>)
+      expect(screen.getByText('50')).toBeInTheDocument()
+    })
+
+    it('truncates numeric child exceeding max with "+" suffix', () => {
+      render(<Badge max={99}>{150}</Badge>)
+      expect(screen.getByText('99+')).toBeInTheDocument()
+      expect(screen.queryByText('150')).not.toBeInTheDocument()
+    })
+
+    it('renders boundary value (equal to max) unchanged', () => {
+      render(<Badge max={99}>{99}</Badge>)
+      expect(screen.getByText('99')).toBeInTheDocument()
+      expect(screen.queryByText('99+')).not.toBeInTheDocument()
+    })
+
+    it('truncates numeric string children', () => {
+      render(<Badge max={9}>15</Badge>)
+      expect(screen.getByText('9+')).toBeInTheDocument()
+    })
+
+    it('passes non-numeric children through unchanged', () => {
+      render(<Badge max={99}>New</Badge>)
+      expect(screen.getByText('New')).toBeInTheDocument()
+    })
+
+    it('is inert when max is not set', () => {
+      render(<Badge>{9999}</Badge>)
+      expect(screen.getByText('9999')).toBeInTheDocument()
+    })
+  })
 })

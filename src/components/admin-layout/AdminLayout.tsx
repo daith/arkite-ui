@@ -32,6 +32,8 @@ export interface AdminNavItem {
   external?: boolean
   /** Disabled state */
   disabled?: boolean
+  /** Additional path patterns that should highlight this item (supports /stores/:id/appointments style) */
+  activeMatch?: string[]
 }
 
 export interface AdminNavGroup {
@@ -41,6 +43,10 @@ export interface AdminNavGroup {
   items: AdminNavItem[]
   /** Only visible when `visibleWhen` returns true */
   visibleWhen?: (context: AdminLayoutContext) => boolean
+  /** Group icon (used by `sidebarVariant="rail"`; ignored in classic) */
+  icon?: ReactNode
+  /** Optional group-level route (used by `sidebarVariant="rail"` when the rail item is clicked; falls back to the first visible item's path) */
+  path?: string
 }
 
 export interface AdminBrandConfig {
@@ -101,6 +107,10 @@ export interface AdminLayoutProps {
   navbarRight?: ReactNode
   /** Sidebar footer content (replaces default logout button) */
   sidebarFooter?: ReactNode
+  /** Sidebar visual variant: `"classic"` (default, 240/64px collapsible with labels) or `"rail"` (72px fixed icon rail where each nav group becomes one item). */
+  sidebarVariant?: 'classic' | 'rail'
+  /** Optional sub-navigation slot rendered between the navbar and main content. Intended for the rail variant's "sub pill" row, but works with any variant. */
+  subNav?: ReactNode
   /** Toast position */
   toastPosition?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center'
   /** Hide toast container (if consumer manages their own) */
@@ -172,6 +182,8 @@ export function AdminLayout({
   navbarLeft,
   navbarRight,
   sidebarFooter,
+  sidebarVariant = 'classic',
+  subNav,
   toastPosition = 'top-right',
   hideToast = false,
   children,
@@ -206,14 +218,107 @@ export function AdminLayout({
     }
   }
 
-  const isActive = (path: string) => {
-    const resolved = resolvePath(path)
+  const isActive = (item: AdminNavItem) => {
+    // Check activeMatch first (more specific patterns take priority)
+    if (item.activeMatch) {
+      const matched = item.activeMatch.some((pattern) => {
+        const regex = new RegExp(`^${resolvePath(pattern).replace(/:[^/]+/g, '[^/]+')}(/|$)`)
+        return regex.test(currentPath)
+      })
+      if (matched) return true
+    }
+    // Check if any OTHER item's activeMatch claims this path (avoid double highlight)
+    const claimedByOther = visibleGroups.some((group) =>
+      group.items.some((other) =>
+        other.path !== item.path &&
+        other.activeMatch?.some((pattern) => {
+          const regex = new RegExp(`^${resolvePath(pattern).replace(/:[^/]+/g, '[^/]+')}(/|$)`)
+          return regex.test(currentPath)
+        })
+      )
+    )
+    if (claimedByOther) return false
+    // Default: exact match or startsWith
+    const resolved = resolvePath(item.path)
     return currentPath === resolved || currentPath.startsWith(`${resolved}/`)
+  }
+
+  const isGroupActive = (group: AdminNavGroup) => {
+    if (group.path) {
+      const resolved = resolvePath(group.path)
+      if (currentPath === resolved || currentPath.startsWith(`${resolved}/`)) return true
+    }
+    return group.items.some((item) => isActive(item))
+  }
+
+  const handleGroupClick = (group: AdminNavGroup) => {
+    const target = group.path ?? group.items[0]?.path
+    if (!target) return
+    onNavigate(resolvePath(target))
   }
 
   return (
     <div className={cn('flex h-screen bg-background', className)}>
       {/* Sidebar */}
+      {sidebarVariant === 'rail' ? (
+        <aside
+          className="flex w-[72px] min-w-[72px] flex-col border-r bg-card"
+          aria-label="Primary"
+        >
+          <div className="flex h-14 items-center justify-center border-b">
+            {brand.collapsedLogo || (
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm">
+                {brand.shortName || brand.name.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div className="flex-1 overflow-y-auto overflow-x-hidden py-2">
+            <div className="flex flex-col items-stretch gap-1 px-2">
+              {visibleGroups.map((group) => {
+                const active = isGroupActive(group)
+                return (
+                  <button
+                    key={group.label}
+                    type="button"
+                    onClick={() => handleGroupClick(group)}
+                    aria-label={group.label}
+                    aria-current={active ? 'page' : undefined}
+                    className={cn(
+                      'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-medium leading-tight transition-colors',
+                      'hover:bg-muted hover:text-foreground',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      active ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
+                    )}
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center">
+                      {group.icon || (
+                        <span className="text-sm font-semibold">{group.label.charAt(0)}</span>
+                      )}
+                    </span>
+                    <span className="w-full truncate text-center">{group.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+          {(sidebarFooter || onLogout) && (
+            <div className="border-t p-2">
+              {sidebarFooter || (
+                onLogout && (
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    aria-label="Logout"
+                    className="flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Logout
+                  </button>
+                )
+              )}
+            </div>
+          )}
+        </aside>
+      ) : (
       <Sidebar collapsible defaultCollapsed={false}>
         <SidebarBrand brand={brand} />
 
@@ -221,7 +326,7 @@ export function AdminLayout({
           {visibleGroups.map((group) => (
             <SidebarGroup key={group.label} label={group.label}>
               {group.items.map((item) => {
-                const active = isActive(item.path)
+                const active = isActive(item)
 
                 if (renderLink && !item.external) {
                   return (
@@ -280,6 +385,7 @@ export function AdminLayout({
           )}
         </SidebarFooter>
       </Sidebar>
+      )}
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -315,6 +421,13 @@ export function AdminLayout({
             )}
           </NavbarContent>
         </Navbar>
+
+        {/* Sub-navigation slot (e.g., rail variant's sub pill row) */}
+        {subNav && (
+          <div className="border-b bg-card/50 px-6 py-2">
+            {subNav}
+          </div>
+        )}
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto p-6">

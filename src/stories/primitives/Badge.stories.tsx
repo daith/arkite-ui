@@ -55,6 +55,51 @@ export const AllVariants: Story = {
   ),
 }
 
+export const MaxCount: Story = {
+  name: 'Numeric max (99+ truncation)',
+  render: () => (
+    <div className="space-y-4">
+      <div>
+        <p className="text-sm font-medium mb-2">With <code className="text-xs">max=99</code></p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="destructive" max={99}>{3}</Badge>
+          <Badge variant="destructive" max={99}>{50}</Badge>
+          <Badge variant="destructive" max={99}>{99}</Badge>
+          <Badge variant="destructive" max={99}>{100}</Badge>
+          <Badge variant="destructive" max={99}>{9999}</Badge>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-medium mb-2">With <code className="text-xs">max=9</code> (compact counters)</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="info" max={9}>{1}</Badge>
+          <Badge variant="info" max={9}>{9}</Badge>
+          <Badge variant="info" max={9}>{10}</Badge>
+          <Badge variant="info" max={9}>{42}</Badge>
+        </div>
+      </div>
+
+      <div>
+        <p className="text-sm font-medium mb-2">Non-numeric children pass through</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="success" max={99}>New</Badge>
+          <Badge variant="outline" max={99}>Beta</Badge>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-border p-4 text-xs text-muted-foreground">
+        <p className="font-medium text-foreground mb-2">Usage</p>
+        <pre className="bg-muted p-3 rounded overflow-x-auto">{`// Cap at 99; anything higher becomes "99+"
+<Badge variant="destructive" max={99}>{unreadCount}</Badge>
+
+// String children are unaffected
+<Badge max={99}>New</Badge>  // → "New"`}</pre>
+      </div>
+    </div>
+  ),
+}
+
 /* ------------------------------------------------------------------ */
 /*  Pattern: Status Badge                                              */
 /*  Use Badge + a status config map to display statuses consistently. */
