@@ -8,6 +8,5 @@ storybook-static
 
 # Internal / local-only
 .claude/
-.gitlab-ci.yml
 WORKLOG.md
 docs/
