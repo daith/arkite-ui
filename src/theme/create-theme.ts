@@ -79,7 +79,7 @@ export interface CreateThemeOptions {
  *
  * @example
  * ```ts
- * import { createTheme, applyTheme } from '@arkite/ui'
+ * import { createTheme, applyTheme } from '@arkite-ui/core'
  *
  * const myTheme = createTheme({
  *   primary: '#FF6B00',

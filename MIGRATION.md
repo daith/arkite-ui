@@ -8,12 +8,12 @@
 
 **Before (v0.3.x):**
 ```tsx
-import { AnimatedModal, AnimatedDrawer } from '@arkite/ui'
+import { AnimatedModal, AnimatedDrawer } from '@arkite-ui/core'
 ```
 
 **After (v0.4.0+):**
 ```tsx
-import { AnimatedModal, AnimatedDrawer, AnimatedToastContainer, useAnimatedToast } from '@arkite/ui/motion'
+import { AnimatedModal, AnimatedDrawer, AnimatedToastContainer, useAnimatedToast } from '@arkite-ui/core/motion'
 ```
 
 原因：將 framer-motion 設為 optional peer dependency，讓不需要動畫的專案不需要安裝此套件，減少 bundle size。
@@ -47,7 +47,7 @@ pnpm add cmdk framer-motion
 
 ### 3. Tailwind CSS v4 必要設定
 
-`@arkite/ui` 現在要求 Tailwind CSS v4。若尚未升級：
+`@arkite-ui/core` 現在要求 Tailwind CSS v4。若尚未升級：
 
 ```bash
 pnpm add tailwindcss@^4.0.0 @tailwindcss/vite
@@ -57,7 +57,7 @@ pnpm add tailwindcss@^4.0.0 @tailwindcss/vite
 
 ```ts
 // tailwind.config.ts
-import arkitePreset from '@arkite/ui/tailwind'
+import arkitePreset from '@arkite-ui/core/tailwind'
 
 export default {
   presets: [arkitePreset],
@@ -71,7 +71,7 @@ export default {
 確保在應用程式入口 import 樣式：
 
 ```ts
-import '@arkite/ui/styles.css'
+import '@arkite-ui/core/styles.css'
 ```
 
 ---

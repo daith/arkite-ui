@@ -12,7 +12,7 @@ export default meta
 // ── Default ──
 
 export const Default: StoryFn = () => (
-  <CopyButton value="npm install @arkite/ui" />
+  <CopyButton value="npm install @arkite-ui/core" />
 )
 
 // ── Icon Only ──

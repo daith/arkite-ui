@@ -11,7 +11,7 @@
  *
  * @example
  * ```ts
- * import { colors } from '@arkite/ui/tokens'
+ * import { colors } from '@arkite-ui/core/tokens'
  * import { useColorScheme } from 'react-native'
  *
  * const scheme = useColorScheme() ?? 'light'

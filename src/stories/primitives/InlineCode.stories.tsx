@@ -5,7 +5,7 @@ const meta = {
   title: 'Primitives/InlineCode',
   component: InlineCode,
   args: {
-    children: 'npm install @arkite/ui',
+    children: 'npm install @arkite-ui/core',
   },
 } satisfies Meta<typeof InlineCode>
 

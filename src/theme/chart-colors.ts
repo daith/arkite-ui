@@ -6,7 +6,7 @@
  *
  * @example
  * ```tsx
- * import { chartColors } from '@arkite/ui'
+ * import { chartColors } from '@arkite-ui/core'
  *
  * <BarChart data={data}>
  *   <Bar dataKey="revenue" fill={chartColors[1]} />

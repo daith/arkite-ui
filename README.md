@@ -32,7 +32,7 @@ Arkite UI is not another generic component library. It focuses on the components
 ## Installation
 
 ```bash
-pnpm add @arkite/ui
+pnpm add @arkite-ui/core
 ```
 
 ### Peer Dependencies
@@ -53,7 +53,7 @@ pnpm add framer-motion    # For AnimatedModal, AnimatedDrawer, AnimatedToast
 
 ```tsx
 // main.tsx or app.tsx
-import '@arkite/ui/styles.css'
+import '@arkite-ui/core/styles.css'
 ```
 
 ### 2. Tailwind Configuration (v4)
@@ -63,19 +63,19 @@ With Tailwind CSS v4, import the preset in your CSS:
 ```css
 /* app.css */
 @import "tailwindcss";
-@import "@arkite/ui/styles.css";
+@import "@arkite-ui/core/styles.css";
 ```
 
 Or use the JS preset for Tailwind v4 config:
 
 ```ts
-import arkitePreset from '@arkite/ui/tailwind'
+import arkitePreset from '@arkite-ui/core/tailwind'
 ```
 
 ### 3. Use Components
 
 ```tsx
-import { AdminLayout, DataTable, Button, Badge } from '@arkite/ui'
+import { AdminLayout, DataTable, Button, Badge } from '@arkite-ui/core'
 ```
 
 ## Components (55+)
@@ -189,7 +189,7 @@ Requires `framer-motion` peer dependency.
 ### Admin Layout
 
 ```tsx
-import { AdminLayout, type AdminNavGroup } from '@arkite/ui'
+import { AdminLayout, type AdminNavGroup } from '@arkite-ui/core'
 
 const navigation: AdminNavGroup[] = [
   {
@@ -224,7 +224,7 @@ function App() {
 ### Data Table
 
 ```tsx
-import { DataTable, Badge } from '@arkite/ui'
+import { DataTable, Badge } from '@arkite-ui/core'
 
 const columns = [
   { key: 'name', header: 'Name', sortable: true },
@@ -238,7 +238,7 @@ const columns = [
 ### Filter Bar + Bulk Actions
 
 ```tsx
-import { FilterBar, FilterBarSearch, FilterBarFilters, FilterBarActions, BulkActionBar, Button } from '@arkite/ui'
+import { FilterBar, FilterBarSearch, FilterBarFilters, FilterBarActions, BulkActionBar, Button } from '@arkite-ui/core'
 
 <FilterBar>
   <FilterBarSearch value={search} onChange={setSearch} placeholder="Search users..." />
@@ -261,7 +261,7 @@ import { FilterBar, FilterBarSearch, FilterBarFilters, FilterBarActions, BulkAct
 ### Toast Notifications
 
 ```tsx
-import { useToast, ToastContainer } from '@arkite/ui'
+import { useToast, ToastContainer } from '@arkite-ui/core'
 
 function App() {
   const toast = useToast()
@@ -278,7 +278,7 @@ function App() {
 ### Stats Dashboard
 
 ```tsx
-import { StatGroup, StatCard } from '@arkite/ui'
+import { StatGroup, StatCard } from '@arkite-ui/core'
 import { Database, Activity } from 'lucide-react'
 
 <StatGroup columns={4}>
@@ -294,14 +294,14 @@ import { Database, Activity } from 'lucide-react'
 4 theme presets: **Default** (Stripe-inspired), **Neutral** (Zinc), **Ocean** (Blue), **Forest** (Green).
 
 ```tsx
-import { applyTheme, themePresets } from '@arkite/ui'
+import { applyTheme, themePresets } from '@arkite-ui/core'
 applyTheme(themePresets.ocean)
 ```
 
 ### Custom Theme
 
 ```tsx
-import { createTheme, applyTheme } from '@arkite/ui'
+import { createTheme, applyTheme } from '@arkite-ui/core'
 
 const myTheme = createTheme({
   primary: '#FF6B00',

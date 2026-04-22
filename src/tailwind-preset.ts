@@ -4,12 +4,12 @@
  * Tailwind v4 uses CSS-first configuration. The recommended way to
  * consume Arkite UI is to import the CSS file:
  *
- *   @import "@arkite/ui/styles.css";
+ *   @import "@arkite-ui/core/styles.css";
  *
  * If you need a JS config (e.g. for tooling or legacy compat),
  * you can reference this preset via the @config directive:
  *
- *   @config "@arkite/ui/tailwind";
+ *   @config "@arkite-ui/core/tailwind";
  *
  * @deprecated Prefer importing the CSS file directly in Tailwind v4.
  */

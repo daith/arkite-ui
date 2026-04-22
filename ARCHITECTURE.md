@@ -12,7 +12,7 @@ This document describes the architecture and design decisions behind Arkite UI.
 │  ├── Routes, pages, business logic              │
 │  ├── @ark-crm/auth  (auth store, RBAC)          │
 │  ├── @ark-crm/api   (API clients, hooks)        │
-│  └── @arkite/ui     (pure UI components) ◀──────│── This library
+│  └── @arkite-ui/core     (pure UI components) ◀──────│── This library
 └─────────────────────────────────────────────────┘
 ```
 
@@ -135,7 +135,7 @@ Components are controlled or uncontrolled — they never manage global state. Th
 
 ### Optional Peer Dependencies
 
-`framer-motion` is an optional peer dependency. Motion components (`AnimatedModal`, `AnimatedDrawer`, `AnimatedToastContainer`) are exported from a separate entry point `@arkite/ui/motion` to avoid polluting the main bundle. Non-animated equivalents exist for all motion components.
+`framer-motion` is an optional peer dependency. Motion components (`AnimatedModal`, `AnimatedDrawer`, `AnimatedToastContainer`) are exported from a separate entry point `@arkite-ui/core/motion` to avoid polluting the main bundle. Non-animated equivalents exist for all motion components.
 
 ## Build & Bundle
 
@@ -172,4 +172,4 @@ Tag     → build → build-storybook → pages (deploy) → publish:gitlab → 
 - `@radix-ui/react-dropdown-menu`, `@radix-ui/react-popover`, `@radix-ui/react-tooltip` (optional)
 - `@tanstack/react-virtual` (optional)
 - `cmdk` (optional)
-- `framer-motion` (^10 || ^11 || ^12, optional — used by `@arkite/ui/motion`)
+- `framer-motion` (^10 || ^11 || ^12, optional — used by `@arkite-ui/core/motion`)

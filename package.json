@@ -1,5 +1,5 @@
 {
-  "name": "@arkite/ui",
+  "name": "@arkite-ui/core",
   "version": "0.5.0",
   "description": "Production-ready React components for SaaS admin panels. Tailwind CSS v4 + Radix UI + TypeScript.",
   "type": "module",

@@ -1,5 +1,5 @@
 /**
- * `@arkite/ui/tokens` — framework-agnostic design tokens.
+ * `@arkite-ui/core/tokens` — framework-agnostic design tokens.
  *
  * This entry point exports pure JavaScript values (no React, no DOM, no CSS)
  * so it can be consumed from any environment: web, React Native, Node scripts,
@@ -15,7 +15,7 @@
  *
  * @example Web (TypeScript)
  * ```ts
- * import { colors, spacing } from '@arkite/ui/tokens'
+ * import { colors, spacing } from '@arkite-ui/core/tokens'
  *
  * const buttonStyle = {
  *   backgroundColor: colors.light.primary,
@@ -25,7 +25,7 @@
  *
  * @example React Native
  * ```tsx
- * import { colors, spacing, radius } from '@arkite/ui/tokens'
+ * import { colors, spacing, radius } from '@arkite-ui/core/tokens'
  * import { StyleSheet, useColorScheme } from 'react-native'
  *
  * function useThemedStyles() {

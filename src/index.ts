@@ -89,7 +89,7 @@ export * from './components/divider'
 export * from './components/admin-layout'
 export * from './components/collapsible-section'
 
-// Motion — use '@arkite/ui/motion' entry point (requires framer-motion)
+// Motion — use '@arkite-ui/core/motion' entry point (requires framer-motion)
 
 // Theme
 export * from './theme'

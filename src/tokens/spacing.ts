@@ -8,7 +8,7 @@
  *
  * @example
  * ```ts
- * import { spacing } from '@arkite/ui/tokens'
+ * import { spacing } from '@arkite-ui/core/tokens'
  *
  * StyleSheet.create({
  *   card: { padding: spacing[4], gap: spacing[2] },

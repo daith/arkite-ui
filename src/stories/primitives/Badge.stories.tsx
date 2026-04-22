@@ -103,7 +103,7 @@ export const MaxCount: Story = {
 /* ------------------------------------------------------------------ */
 /*  Pattern: Status Badge                                              */
 /*  Use Badge + a status config map to display statuses consistently. */
-/*  Keep the mapping in your project, not in @arkite/ui.              */
+/*  Keep the mapping in your project, not in @arkite-ui/core.              */
 /* ------------------------------------------------------------------ */
 
 type BadgeVariant = 'success' | 'warning' | 'destructive' | 'info' | 'outline' | 'secondary'

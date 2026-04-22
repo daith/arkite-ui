@@ -18,7 +18,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          'Visual review surface for `@arkite/ui/tokens`. Use this page to validate color choices, contrast ratios, and scale values before approving the token system.',
+          'Visual review surface for `@arkite-ui/core/tokens`. Use this page to validate color choices, contrast ratios, and scale values before approving the token system.',
       },
     },
   },

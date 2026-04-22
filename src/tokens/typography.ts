@@ -6,7 +6,7 @@
  *
  * @example
  * ```ts
- * import { fontSize, lineHeight, fontWeight } from '@arkite/ui/tokens'
+ * import { fontSize, lineHeight, fontWeight } from '@arkite-ui/core/tokens'
  *
  * StyleSheet.create({
  *   title: {

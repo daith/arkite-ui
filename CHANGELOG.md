@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 1554b4b: Add `@arkite/ui/tokens` entry point — framework-agnostic design tokens for cross-platform use.
+- 1554b4b: Add `@arkite-ui/core/tokens` entry point — framework-agnostic design tokens for cross-platform use.
 
   The new entry exports plain JavaScript values (colors, spacing, radius, typography) with zero runtime dependencies, so it can be consumed from React Native, Node scripts, and design tooling — not just web.
 
@@ -15,7 +15,7 @@
   - `spacing` / `radius` / `fontSize` / `lineHeight` / `fontWeight` — numeric scales sized for direct React Native StyleSheet use
 
   ```ts
-  import { colors, spacing, radius } from '@arkite/ui/tokens'
+  import { colors, spacing, radius } from '@arkite-ui/core/tokens'
 
   // React Native
   StyleSheet.create({

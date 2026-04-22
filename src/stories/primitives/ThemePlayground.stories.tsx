@@ -322,7 +322,7 @@ function Playground() {
               <span className="text-sm">Offline</span>
             </div>
             <Kbd>Ctrl+K</Kbd>
-            <InlineCode>npm install @arkite/ui</InlineCode>
+            <InlineCode>npm install @arkite-ui/core</InlineCode>
           </div>
         </Section>
 
