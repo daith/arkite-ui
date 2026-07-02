@@ -1,5 +1,5 @@
 #!/bin/bash
-# publish.sh - Verify and publish @arkite/ui to GitLab Package Registry
+# publish.sh - Verify and publish @arkite-ui/core
 # Usage: ./scripts/publish.sh
 
 RED='\033[0;31m'
@@ -46,7 +46,7 @@ if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
 fi
 
 # Step 4: publish
-printf "\n${YELLOW}[4/4] 發布到 GitLab Package Registry...${NC}\n"
+printf "\n${YELLOW}[4/4] 發布（changeset publish）...${NC}\n"
 pnpm run release
 RELEASE_EXIT=$?
 
@@ -56,6 +56,7 @@ if [ "$RELEASE_EXIT" -ne 0 ]; then
 fi
 
 printf "\n${GREEN}========================================${NC}\n"
-printf "${GREEN}  @arkite/ui@%s 發布成功！${NC}\n" "$PKG_VERSION"
+printf "${GREEN}  @arkite-ui/core@%s 發布成功！${NC}\n" "$PKG_VERSION"
 printf "${GREEN}========================================${NC}\n"
+printf "npm: https://www.npmjs.com/package/@arkite-ui/core\n"
 printf "GitLab Package Registry: https://gitlab.com/foson.co/arkite-ui/-/packages\n\n"

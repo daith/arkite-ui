@@ -1,7 +1,6 @@
 stages:
   - check
   - build
-  - deploy
   - publish
 
 default:
@@ -109,35 +108,9 @@ chromatic:
   allow_failure: true
 
 # -------------------------------------------------------------------
-# Deploy & Publish: only on tags on main branch
+# Publish: only on tags on main branch
+# (Storybook is deployed to GitHub Pages via .github/workflows/deploy-storybook.yml)
 # -------------------------------------------------------------------
-
-build-storybook:
-  stage: build
-  <<: *node-setup
-  variables:
-    NODE_OPTIONS: "--max-old-space-size=4096"
-  script:
-    - pnpm run build-storybook
-  artifacts:
-    paths:
-      - storybook-static/
-    expire_in: 1 hour
-  allow_failure: true
-  rules:
-    - if: $CI_COMMIT_TAG
-
-pages:
-  stage: deploy
-  dependencies:
-    - build-storybook
-  script:
-    - mv storybook-static public
-  artifacts:
-    paths:
-      - public
-  rules:
-    - if: $CI_COMMIT_TAG
 
 publish:gitlab:
   stage: publish
@@ -170,5 +143,3 @@ publish:npm:
     - pnpm publish --no-git-checks --access public
   rules:
     - if: $CI_COMMIT_TAG && $NPM_TOKEN
-      when: manual
-      allow_failure: true
