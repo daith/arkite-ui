@@ -7,19 +7,19 @@
 
 ---
 
-## 現況快照（2026-03-24）
+## 現況快照（2026-07-02）
 
 | 指標 | 數據 |
 |------|------|
-| 版本 | v0.3.5 |
-| 元件數 | 67 個目錄、78 個匯出 |
-| 測試 | 73 檔、797 cases、100% 通過 |
-| Stories | 72 個、100% 元件覆蓋 |
-| a11y | 317/317 stories 零 violation（WCAG AA） |
+| 版本 | v0.5.0（2026-04-22 以 `@arkite-ui/core` 發布 npm，0.6.0 changeset 待發） |
+| 元件數 | 67 個目錄 |
+| 測試 | 74 檔、834 cases、100% 通過 |
+| Stories | 75 檔、100% 元件覆蓋 |
+| a11y | 零 violation（WCAG AA，2026-03-24 審查） |
 | Bundle | < 300 KB（size-limit 監控） |
-| 消費端 | 3 個 React 專案採用（ark-crm、ark-harvest、ark-rendoc-web） |
+| 消費端 | 9 個專案安裝（ark-crm、ark-harvest、ark-rendoc-web、ark-shield、ark-crew、ark-connect、ark-finance、chronoark-one 等） |
 
-> 完整採用數據見 [docs/ADOPTION_REPORT.md](docs/ADOPTION_REPORT.md)
+> 完整採用數據見 [docs/ADOPTION_REPORT.md](docs/ADOPTION_REPORT.md)（2026-03-24 時點）
 
 ---
 
@@ -53,23 +53,23 @@
 
 ---
 
-## Phase 1：放上去（v0.4.0） — 進行中
+## Phase 1：放上去（v0.4.0） — ✅ 完成（2026-07-02 對齊）
 
 > 花最少力氣，讓套件在 npm 上能被找到、裝起來能跑。
 
 ### 必做（直接受益自己專案）
 
-- [ ] 修正 `package.json` metadata（author、description 移除 shadcn/ui）
-- [ ] 補 `MIGRATION.md` — motion import 路徑 + Radix peer deps 變更
-- [ ] Chromatic token 設好，CI 視覺回歸跑通
-- [ ] Changesets 首次發布驗證，確認 npm publish 流程正確
-- [ ] bump v0.4.0，npm publish public
+- [x] 修正 `package.json` metadata（author、description 移除 shadcn/ui）
+- [x] 補 `MIGRATION.md` — motion import 路徑 + Radix peer deps 變更
+- [x] Chromatic token 設好，CI 視覺回歸跑通（`.gitlab-ci.yml` chromatic job，MR + main 觸發）
+- [x] Changesets 首次發布驗證，確認 npm publish 流程正確
+- [x] bump v0.4.0 → 後續以 `@arkite-ui/core@0.5.0` 發布 npm public（2026-04-22）
 
 ### 順手做（10 分鐘內搞定的事）
 
-- [ ] `LICENSE` 確認 copyright 年份 + 組織名稱正確
-- [ ] `package.json` keywords 補 `radix-ui`、`design-system`
-- [ ] README 頂部加一行 npm badge（`npm version`、`bundle size`）
+- [x] `LICENSE` 確認 copyright 年份 + 組織名稱正確（2026-07-02 修正年份 2024 → 2026）
+- [x] `package.json` keywords 補 `radix-ui`、`design-system`（2026-07-02）
+- [x] README 頂部加一行 npm badge（`npm version`、`bundle size`）（2026-07-02）
 
 ### 不急（有人問再說）
 
@@ -78,21 +78,22 @@
 
 ---
 
-## Phase 2：內部品質鞏固（v0.5.0）
+## Phase 2：內部品質鞏固（v0.5.x — 進行中）
 
-> 3 個專案都在用了，重點是穩固 API、確保不出事。
+> 多個專案都在用了，重點是穩固 API、確保不出事。
 
 ### 必做
 
-- [ ] Chromatic 視覺回歸常態化 — 每個 MR 跑 snapshot，有差異就擋 merge
+- [x] Chromatic 視覺回歸常態化 — 每個 MR 跑 snapshot（⚠️ 目前 `--exit-zero-on-changes`，有差異不會擋 merge，要擋需移除該 flag）
 - [ ] Dark mode 全元件走查 — 確認所有元件在 dark mode 下正確顯示
-- [ ] 元件 API 一致性審查 — prop naming convention 統一（onChange vs onValueChange 等）
+- [x] 元件 API 一致性審查 — 審查報告見 [docs/API_CONSISTENCY.md](docs/API_CONSISTENCY.md)（2026-07-02）；rename 執行歸入 Phase 3 breaking 清理
 - [ ] React 19 驗證 — peer deps 已支援 `^19.0.0`，需實際驗證
+- [x] 移除業務邏輯滲入 — 刪除 authStore/tenantStore/usePermission/useDataFetch/breadcrumb config（2026-07-02，0.6.0 changeset）
 
 ### 值得做但不急
 
 - [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
-- [ ] Storybook 部署到公開 URL（GitLab Pages 或 Vercel）
+- [x] Storybook 部署到公開 URL（GitHub Pages：daith.github.io/arkite-ui）
 - [ ] README 的 Quick Start 確保 copy-paste 就能跑（新專案開局時驗證）
 
 ### 不做
@@ -144,10 +145,12 @@
 
 | 版本 | 觸發條件 | 內容 |
 |------|---------|------|
-| **v0.4.0** | 現在 | metadata 修正 + npm publish + Chromatic CI |
-| **v0.5.0** | v0.4.0 後 | Dark mode 走查 + API 一致性 + React 19 驗證 |
+| **v0.4.0** ✅ | — | metadata 修正 + Chromatic CI + tokens entry point |
+| **v0.5.0** ✅ | 2026-04-22 | 改名 `@arkite-ui/core` 發布 npm、rail sidebar、subNav slot |
+| **v0.6.0** | changeset 已備 | 移除業務邏輯（breadcrumb config、stores、hooks）— breaking |
+| **v0.7.0** | API 審查後 | prop naming 統一（依 docs/API_CONSISTENCY.md）— breaking 一次清完 |
 | **v0.x.x** | 內部專案需求驅動 | 持續迭代，不設時間表 |
-| **v1.0.0** | API 穩定半年 + 3 專案驗證 ✅ | API 凍結、semver 承諾 |
+| **v1.0.0** | API 穩定半年 + 消費端驗證 | API 凍結、semver 承諾（最快 2026 Q4） |
 
 ---
 

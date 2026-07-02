@@ -2,6 +2,8 @@
 
 Production-ready React components for SaaS admin panels. Built with Tailwind CSS v4.
 
+[![npm version](https://img.shields.io/npm/v/%40arkite-ui%2Fcore)](https://www.npmjs.com/package/@arkite-ui/core)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/%40arkite-ui%2Fcore)](https://bundlephobia.com/package/@arkite-ui/core)
 [![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://daith.github.io/arkite-ui/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 

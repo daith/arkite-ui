@@ -200,7 +200,9 @@
     "admin",
     "dashboard",
     "tailwindcss",
-    "multi-tenant"
+    "multi-tenant",
+    "radix-ui",
+    "design-system"
   ],
   "author": "Wilson Hsieh <rin397@gmail.com>",
   "bugs": {
