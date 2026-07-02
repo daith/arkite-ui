@@ -2,7 +2,6 @@
  * TenantSwitcher - Tenant switching dropdown
  *
  * Props-driven: works with any state management solution.
- * Optionally use `useTenantStore` for a batteries-included experience.
  */
 
 import { useState, useRef, useEffect, type ReactNode } from 'react'

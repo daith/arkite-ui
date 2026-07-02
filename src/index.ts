@@ -1,7 +1,5 @@
 // Utils
 export { cn } from './utils/cn'
-export { getBreadcrumbItems, getSimpleBreadcrumbItems } from './utils/breadcrumb'
-export type { BreadcrumbItem as BreadcrumbConfigItem } from './utils/breadcrumb'
 
 // UI Primitives
 export * from './components/view-toggle'
