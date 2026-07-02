@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.6.0
+
+### Minor Changes
+
+- 019aa01: Remove app-specific business logic from the shared library:
+
+  - **BREAKING**: `getBreadcrumbItems`, `getSimpleBreadcrumbItems`, and `BreadcrumbConfigItem` are no longer exported. They hardcoded app-specific routes (`/sources`, `/companies`, `/webhooks`, ...). Copy the old `src/utils/breadcrumb.ts` into your app if needed — the `Breadcrumb` component itself is unchanged.
+  - Remove unexported dead code: `stores/authStore` (mock users), `stores/tenantStore`, `hooks/usePermission` (placeholder checks that always returned `true`), `hooks/useDataFetch` (use TanStack Query / SWR instead).
+
+## 0.5.0
+
+### Minor Changes
+
+- cd9da8e: AdminLayout: add `sidebarVariant: 'classic' | 'rail'`, `subNav` slot, `AdminNavGroup.icon`/`path`, and `AdminNavItem.activeMatch` for nested-route highlighting. Badge: add `max` prop (numeric children greater than max render as `{max}+`). Package renamed to `@arkite-ui/core`.
+
 ## 0.4.0
 
 ### Minor Changes

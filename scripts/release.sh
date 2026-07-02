@@ -54,6 +54,12 @@ printf "\n${YELLOW}[4/5] 消化 changesets、bump 版本...${NC}\n"
 pnpm changeset version || exit 1
 NEW_VERSION=$(node -p "require('./package.json').version" 2>/dev/null)
 
+if ! grep -q "^## ${NEW_VERSION}" CHANGELOG.md; then
+    printf "${RED}✗ CHANGELOG.md 沒有 ${NEW_VERSION} 的條目 — changeset version 可能失敗了，中止並還原。${NC}\n"
+    git checkout -- .
+    exit 1
+fi
+
 printf "\n即將發布：${GREEN}v%s${NC}\n" "$NEW_VERSION"
 printf "CHANGELOG 摘要：\n"
 awk "/^## ${NEW_VERSION//./\\.}/{flag=1; next} /^## /{flag=0} flag" CHANGELOG.md | head -20
@@ -71,7 +77,8 @@ printf "\n${YELLOW}[5/5] commit + tag + push...${NC}\n"
 git add -A
 git commit -m "chore: release v${NEW_VERSION}" || exit 1
 git tag "v${NEW_VERSION}" || exit 1
-git push origin main --tags || exit 1
+# 只推新 tag，避免 --tags 把本地殘留的舊 tag 一起推上去觸發舊 pipeline
+git push origin main "refs/tags/v${NEW_VERSION}" || exit 1
 
 printf "\n${GREEN}========================================${NC}\n"
 printf "${GREEN}  v%s 已推送，GitLab CI 接手發布${NC}\n" "$NEW_VERSION"
