@@ -1,6 +1,6 @@
 {
   "name": "@arkite-ui/core",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "packageManager": "pnpm@10.28.2",
   "description": "Production-ready React components for SaaS admin panels. Tailwind CSS v4 + Radix UI + TypeScript.",
   "type": "module",
