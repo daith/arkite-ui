@@ -106,4 +106,18 @@ describe('ColorPicker', () => {
     await userEvent.click(presetBtn)
     expect(onChange).not.toHaveBeenCalled()
   })
+
+  it('renders errorMessage text', () => {
+    render(
+      <ColorPicker
+        value="#ff0000"
+        onChange={vi.fn()}
+        error
+        errorMessage="Invalid color"
+      />
+    )
+    const message = screen.getByText('Invalid color')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })

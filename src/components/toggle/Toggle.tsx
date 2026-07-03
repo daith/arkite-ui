@@ -11,6 +11,10 @@ export interface ToggleProps
   label?: string
   /** Description text */
   description?: string
+  /** Error state */
+  error?: boolean
+  /** Error message */
+  errorMessage?: string
 }
 
 const sizeStyles: Record<ToggleSize, { track: string; thumb: string; checkedTranslate: string }> = {
@@ -39,6 +43,8 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       size = 'md',
       label,
       description,
+      error = false,
+      errorMessage,
       disabled,
       id,
       ...props
@@ -58,6 +64,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
             'has-[:checked]:bg-primary',
             'has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring/40 has-[:focus-visible]:ring-offset-0',
             'has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50',
+            error && 'ring-1 ring-destructive',
             styles.track
           )}
         >
@@ -83,7 +90,7 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
       </div>
     )
 
-    if (!label && !description) {
+    if (!label && !description && !errorMessage) {
       return <div className={className}>{toggle}</div>
     }
 
@@ -104,6 +111,9 @@ export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(
           )}
           {description && (
             <p className="text-xs text-muted-foreground">{description}</p>
+          )}
+          {errorMessage && (
+            <p className="text-xs text-destructive">{errorMessage}</p>
           )}
         </div>
       </div>

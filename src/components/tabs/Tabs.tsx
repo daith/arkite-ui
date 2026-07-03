@@ -7,13 +7,14 @@ import {
   type ReactNode,
 } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 
 export type TabsVariant = 'default' | 'pills' | 'underline'
 export type TabsSize = 'sm' | 'md' | 'lg'
 
 interface TabsContextValue {
   value: string
-  onValueChange: (value: string) => void
+  onChange: (value: string) => void
   variant: TabsVariant
   size: TabsSize
 }
@@ -28,12 +29,14 @@ function useTabsContext() {
   return context
 }
 
-export interface TabsProps extends HTMLAttributes<HTMLDivElement> {
+export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   /** Currently active tab value */
   value?: string
   /** Default active tab (uncontrolled) */
   defaultValue?: string
   /** Callback when tab changes */
+  onChange?: (value: string) => void
+  /** @deprecated use `onChange` instead — removed in v1.0 */
   onValueChange?: (value: string) => void
   /** Tab style variant */
   variant?: TabsVariant
@@ -48,6 +51,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
       className,
       value: controlledValue,
       defaultValue,
+      onChange,
       onValueChange,
       variant = 'default',
       size = 'md',
@@ -59,14 +63,19 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue || '')
 
     const value = controlledValue ?? uncontrolledValue
-    const handleValueChange = (newValue: string) => {
+    const handleChange = (newValue: string) => {
       setUncontrolledValue(newValue)
-      onValueChange?.(newValue)
+      if (onChange) {
+        onChange(newValue)
+      } else if (onValueChange) {
+        warnDeprecated('Tabs', 'onValueChange', 'onChange')
+        onValueChange(newValue)
+      }
     }
 
     return (
       <TabsContext.Provider
-        value={{ value, onValueChange: handleValueChange, variant, size }}
+        value={{ value, onChange: handleChange, variant, size }}
       >
         <div ref={ref} className={cn('w-full', className)} {...props}>
           {children}
@@ -141,7 +150,7 @@ const triggerVariantStyles: Record<TabsVariant, { base: string; active: string }
 /** Clickable tab button that activates its associated content panel. */
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className, value, disabled, icon, children, ...props }, ref) => {
-    const { value: selectedValue, onValueChange, variant, size } = useTabsContext()
+    const { value: selectedValue, onChange, variant, size } = useTabsContext()
     const isActive = selectedValue === value
     const styles = triggerVariantStyles[variant]
 
@@ -153,7 +162,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
         aria-selected={isActive}
         aria-controls={`tabpanel-${value}`}
         disabled={disabled}
-        onClick={() => onValueChange(value)}
+        onClick={() => onChange(value)}
         className={cn(
           'inline-flex items-center justify-center gap-2 font-medium transition-all',
           'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40 focus-visible:ring-offset-0',

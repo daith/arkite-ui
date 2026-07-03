@@ -3,12 +3,17 @@ import { describe, it, expect } from 'vitest'
 import { LoadingOverlay } from './LoadingOverlay'
 
 describe('LoadingOverlay', () => {
-  it('renders when visible is true (default)', () => {
+  it('renders when open is true (default)', () => {
     const { container } = render(<LoadingOverlay />)
     expect(container.firstChild).toBeInTheDocument()
   })
 
-  it('does not render when visible=false', () => {
+  it('does not render when open=false', () => {
+    const { container } = render(<LoadingOverlay open={false} />)
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('still supports the deprecated visible alias', () => {
     const { container } = render(<LoadingOverlay visible={false} />)
     expect(container.firstChild).toBeNull()
   })

@@ -33,7 +33,9 @@ export interface TreeProps {
   onExpandChange?: (keys: string[]) => void
   /** Enable checkboxes */
   checkable?: boolean
-  /** Checked keys */
+  /** Default checked keys (uncontrolled) */
+  defaultCheckedKeys?: string[]
+  /** Checked keys (controlled) */
   checkedKeys?: string[]
   /** On check change */
   onCheckChange?: (keys: string[]) => void
@@ -249,6 +251,7 @@ export function Tree({
   expandedKeys: controlledExpandedKeys,
   onExpandChange,
   checkable = false,
+  defaultCheckedKeys = [],
   checkedKeys: controlledCheckedKeys,
   onCheckChange,
   onSelect,
@@ -282,9 +285,14 @@ export function Tree({
   )
 
   /* ── Check state ── */
+  const isCheckControlled = controlledCheckedKeys !== undefined
+  const [uncontrolledChecked, setUncontrolledChecked] = useState<Set<string>>(
+    () => new Set(defaultCheckedKeys)
+  )
   const checkedSet = useMemo(
-    () => new Set(controlledCheckedKeys ?? []),
-    [controlledCheckedKeys]
+    () =>
+      isCheckControlled ? new Set(controlledCheckedKeys) : uncontrolledChecked,
+    [isCheckControlled, controlledCheckedKeys, uncontrolledChecked]
   )
 
   const parentMap = useMemo(() => buildParentMap(data), [data])
@@ -337,9 +345,10 @@ export function Tree({
         parentKey = parentMap.get(parentKey)
       }
 
+      if (!isCheckControlled) setUncontrolledChecked(next)
       onCheckChange?.(Array.from(next))
     },
-    [checkedSet, getCheckState, nodeMap, parentMap, onCheckChange]
+    [checkedSet, getCheckState, isCheckControlled, nodeMap, parentMap, onCheckChange]
   )
 
   /* ── Render ── */

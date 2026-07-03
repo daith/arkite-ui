@@ -70,4 +70,11 @@ describe('DatePicker', () => {
     render(<DatePicker value={new Date(2025, 0, 5)} format="yyyy-MM-dd" />)
     expect(screen.getByPlaceholderText('Select date')).toHaveValue('2025-01-05')
   })
+
+  it('renders errorMessage text', () => {
+    render(<DatePicker error errorMessage="Invalid date" />)
+    const message = screen.getByText('Invalid date')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })

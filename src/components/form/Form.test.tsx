@@ -24,9 +24,9 @@ describe('Form', () => {
 })
 
 describe('FormField with FormMessage', () => {
-  it('shows error message when error is provided', () => {
+  it('shows error message when errorMessage is provided', () => {
     render(
-      <FormField error="This field is required">
+      <FormField errorMessage="This field is required">
         <FormLabel>Name</FormLabel>
         <FormMessage />
       </FormField>
@@ -47,14 +47,42 @@ describe('FormField with FormMessage', () => {
     expect(destructiveTexts).toHaveLength(0)
   })
 
-  it('FormMessage error prop overrides context', () => {
+  it('FormMessage errorMessage prop overrides context', () => {
     render(
-      <FormField error="Context error">
-        <FormMessage error="Override error" />
+      <FormField errorMessage="Context error">
+        <FormMessage errorMessage="Override error" />
       </FormField>
     )
     expect(screen.getByText('Override error')).toBeInTheDocument()
     expect(screen.queryByText('Context error')).not.toBeInTheDocument()
+  })
+
+  it('FormField deprecated `error` alias still works', () => {
+    render(
+      <FormField error="Legacy field error">
+        <FormMessage />
+      </FormField>
+    )
+    expect(screen.getByText('Legacy field error')).toBeInTheDocument()
+  })
+
+  it('FormMessage deprecated `error` alias still works', () => {
+    render(
+      <FormField>
+        <FormMessage error="Legacy message error" />
+      </FormField>
+    )
+    expect(screen.getByText('Legacy message error')).toBeInTheDocument()
+  })
+
+  it('errorMessage wins when both errorMessage and error are provided', () => {
+    render(
+      <FormField errorMessage="New error" error="Old error">
+        <FormMessage />
+      </FormField>
+    )
+    expect(screen.getByText('New error')).toBeInTheDocument()
+    expect(screen.queryByText('Old error')).not.toBeInTheDocument()
   })
 })
 

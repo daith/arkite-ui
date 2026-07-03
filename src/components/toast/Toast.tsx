@@ -1,9 +1,19 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react'
 import { create } from 'zustand'
 
-export type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info'
+export type ToastVariant =
+  | 'default'
+  | 'success'
+  | 'warning'
+  | 'info'
+  | 'destructive'
+  /** @deprecated use `'destructive'` instead — removed in v1.0 */
+  | 'error'
+
+type ResolvedToastVariant = Exclude<ToastVariant, 'error'>
 export type ToastPosition =
   | 'top-right'
   | 'top-left'
@@ -47,26 +57,26 @@ export const useToastStore = create<ToastStore>((set) => ({
   clearToasts: () => set({ toasts: [] }),
 }))
 
-const variantStyles: Record<ToastVariant, string> = {
+const variantStyles: Record<ResolvedToastVariant, string> = {
   default: 'bg-card border-border',
   success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-900',
-  error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
+  destructive: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
   warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-900',
   info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-900',
 }
 
-const variantTextStyles: Record<ToastVariant, string> = {
+const variantTextStyles: Record<ResolvedToastVariant, string> = {
   default: 'text-foreground',
   success: 'text-green-800 dark:text-green-200',
-  error: 'text-red-800 dark:text-red-200',
+  destructive: 'text-red-800 dark:text-red-200',
   warning: 'text-yellow-800 dark:text-yellow-200',
   info: 'text-blue-800 dark:text-blue-200',
 }
 
-const iconMap: Record<ToastVariant, typeof Info | null> = {
+const iconMap: Record<ResolvedToastVariant, typeof Info | null> = {
   default: null,
   success: CheckCircle2,
-  error: AlertCircle,
+  destructive: AlertCircle,
   warning: AlertTriangle,
   info: Info,
 }
@@ -95,7 +105,12 @@ export function Toast({
   onClose,
 }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false)
-  const IconComponent = iconMap[variant]
+  if (variant === 'error') {
+    warnDeprecated('Toast', 'variant="error"', 'variant="destructive"')
+  }
+  const resolvedVariant: ResolvedToastVariant =
+    variant === 'error' ? 'destructive' : variant
+  const IconComponent = iconMap[resolvedVariant]
 
   useEffect(() => {
     if (duration > 0) {
@@ -117,8 +132,8 @@ export function Toast({
       role="alert"
       className={cn(
         'pointer-events-auto flex w-full max-w-sm gap-3 rounded-lg border p-4 shadow-lg transition-all duration-200',
-        variantStyles[variant],
-        variantTextStyles[variant],
+        variantStyles[resolvedVariant],
+        variantTextStyles[resolvedVariant],
         isExiting ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0'
       )}
     >
@@ -194,7 +209,7 @@ export function useToast() {
         success: (title: ReactNode, description?: ReactNode) =>
           addToast({ title, description, variant: 'success' as const }),
         error: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'error' as const }),
+          addToast({ title, description, variant: 'destructive' as const }),
         warning: (title: ReactNode, description?: ReactNode) =>
           addToast({ title, description, variant: 'warning' as const }),
         info: (title: ReactNode, description?: ReactNode) =>

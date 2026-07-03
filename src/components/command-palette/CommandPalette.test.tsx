@@ -138,7 +138,7 @@ describe('CommandShortcut', () => {
 describe('CommandDialog', () => {
   it('renders children when open=true', () => {
     render(
-      <CommandDialog open={true} onOpenChange={() => {}}>
+      <CommandDialog open={true} onClose={() => {}}>
         <CommandInput placeholder="Type a command..." />
       </CommandDialog>
     )
@@ -147,14 +147,41 @@ describe('CommandDialog', () => {
 
   it('does not render when open=false', () => {
     render(
-      <CommandDialog open={false} onOpenChange={() => {}}>
+      <CommandDialog open={false} onClose={() => {}}>
         <CommandInput placeholder="Type a command..." />
       </CommandDialog>
     )
     expect(screen.queryByPlaceholderText('Type a command...')).not.toBeInTheDocument()
   })
 
-  it('calls onOpenChange(false) when Escape is pressed', async () => {
+  it('calls onClose when Escape is pressed', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    render(
+      <CommandDialog open={true} onClose={onClose}>
+        <CommandInput placeholder="Search..." />
+      </CommandDialog>
+    )
+    await user.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onClose when backdrop is clicked', async () => {
+    const user = userEvent.setup()
+    const onClose = vi.fn()
+    const { container } = render(
+      <CommandDialog open={true} onClose={onClose}>
+        <CommandInput placeholder="Search..." />
+      </CommandDialog>
+    )
+    // The backdrop is the first child div with bg-black/50
+    const backdrop = container.querySelector('.fixed.inset-0.bg-black\\/50')
+    expect(backdrop).not.toBeNull()
+    await user.click(backdrop!)
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('still supports the deprecated onOpenChange alias, called with false on close', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     render(
@@ -166,18 +193,26 @@ describe('CommandDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('calls onOpenChange(false) when backdrop is clicked', async () => {
+  it('prefers onClose over the deprecated onOpenChange when both are provided', async () => {
     const user = userEvent.setup()
+    const onClose = vi.fn()
     const onOpenChange = vi.fn()
-    const { container } = render(
-      <CommandDialog open={true} onOpenChange={onOpenChange}>
+    render(
+      <CommandDialog open={true} onClose={onClose} onOpenChange={onOpenChange}>
         <CommandInput placeholder="Search..." />
       </CommandDialog>
     )
-    // The backdrop is the first child div with bg-black/50
-    const backdrop = container.querySelector('.fixed.inset-0.bg-black\\/50')
-    expect(backdrop).not.toBeNull()
-    await user.click(backdrop!)
-    expect(onOpenChange).toHaveBeenCalledWith(false)
+    await user.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onOpenChange).not.toHaveBeenCalled()
+  })
+
+  it('applies custom className to the dialog content element', () => {
+    render(
+      <CommandDialog open={true} onClose={() => {}} className="my-dialog">
+        <CommandInput placeholder="Search..." />
+      </CommandDialog>
+    )
+    expect(screen.getByRole('dialog')).toHaveClass('my-dialog')
   })
 })

@@ -288,7 +288,7 @@ function Playground() {
             <Alert variant="info">Informational message</Alert>
             <Alert variant="success">Success message</Alert>
             <Alert variant="warning">Warning message</Alert>
-            <Alert variant="error">Error message</Alert>
+            <Alert variant="destructive">Error message</Alert>
           </div>
           <div className="flex items-center gap-6">
             <div className="w-48">

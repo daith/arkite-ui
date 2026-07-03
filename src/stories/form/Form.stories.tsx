@@ -65,7 +65,7 @@ export const Default: StoryFn = () => (
 
 export const WithErrors: StoryFn = () => (
   <Form className="w-96">
-    <FormField name="email" error="Invalid email address">
+    <FormField name="email" errorMessage="Invalid email address">
       <FormLabel required>Email</FormLabel>
       <FormControl>
         <Input type="email" placeholder="john@example.com" error />
@@ -73,7 +73,7 @@ export const WithErrors: StoryFn = () => (
       <FormMessage />
     </FormField>
 
-    <FormField name="password" error="Password must be at least 8 characters">
+    <FormField name="password" errorMessage="Password must be at least 8 characters">
       <FormLabel required>Password</FormLabel>
       <FormControl>
         <Input type="password" error />
@@ -167,7 +167,7 @@ const ValidationDemo = () => {
   return (
     <Form className="w-96" onSubmit={handleSubmit}>
       <FormSection title="Registration" description="Create your account">
-        <FormField name="name" error={errors.name}>
+        <FormField name="name" errorMessage={errors.name}>
           <FormLabel required>Name</FormLabel>
           <FormControl>
             <Input
@@ -180,7 +180,7 @@ const ValidationDemo = () => {
           <FormMessage />
         </FormField>
 
-        <FormField name="email" error={errors.email}>
+        <FormField name="email" errorMessage={errors.email}>
           <FormLabel required>Email</FormLabel>
           <FormControl>
             <Input
@@ -195,7 +195,7 @@ const ValidationDemo = () => {
           <FormMessage />
         </FormField>
 
-        <FormField name="agree" error={errors.agree}>
+        <FormField name="agree" errorMessage={errors.agree}>
           <div className="flex items-center gap-2">
             <FormControl>
               <Checkbox

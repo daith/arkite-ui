@@ -114,4 +114,13 @@ describe('TagInput', () => {
     await userEvent.type(input, '   {Enter}')
     expect(onChange).not.toHaveBeenCalled()
   })
+
+  it('renders errorMessage text', () => {
+    render(
+      <TagInput value={[]} onChange={vi.fn()} error errorMessage="Too many tags" />
+    )
+    const message = screen.getByText('Too many tags')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })

@@ -196,6 +196,66 @@ describe('Tree', () => {
     )
   })
 
+  it('defaultCheckedKeys sets initial uncontrolled checked state', () => {
+    render(
+      <Tree
+        data={sampleData}
+        defaultExpandedKeys={['root', 'child-1']}
+        checkable
+        defaultCheckedKeys={['grandchild-1']}
+      />
+    )
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    // Checkbox order: Root, Child 1, Grandchild 1, Grandchild 2, Child 2, Sibling
+    expect(checkboxes[2]).toHaveAttribute('aria-checked', 'true')
+    // Parents are indeterminate
+    expect(checkboxes[0]).toHaveAttribute('aria-checked', 'mixed')
+    expect(checkboxes[1]).toHaveAttribute('aria-checked', 'mixed')
+  })
+
+  it('updates uncontrolled checked state on click and fires onCheckChange', async () => {
+    const onCheckChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <Tree
+        data={sampleData}
+        defaultExpandedKeys={['root', 'child-1']}
+        checkable
+        defaultCheckedKeys={[]}
+        onCheckChange={onCheckChange}
+      />
+    )
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    // Check grandchild-1 (3rd checkbox)
+    await user.click(checkboxes[2])
+
+    // Internal state updated without a controlled checkedKeys prop
+    expect(checkboxes[2]).toHaveAttribute('aria-checked', 'true')
+    expect(checkboxes[0]).toHaveAttribute('aria-checked', 'mixed')
+    expect(onCheckChange).toHaveBeenCalledWith(
+      expect.arrayContaining(['grandchild-1'])
+    )
+  })
+
+  it('controlled checkedKeys overrides defaultCheckedKeys', () => {
+    render(
+      <Tree
+        data={sampleData}
+        defaultExpandedKeys={['root', 'child-1']}
+        checkable
+        defaultCheckedKeys={['grandchild-1']}
+        checkedKeys={[]}
+      />
+    )
+
+    const checkboxes = screen.getAllByRole('checkbox')
+    for (const checkbox of checkboxes) {
+      expect(checkbox).toHaveAttribute('aria-checked', 'false')
+    }
+  })
+
   it('default expanded keys work', () => {
     render(
       <Tree

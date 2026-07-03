@@ -14,6 +14,8 @@ export interface CheckboxProps
   description?: string
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
 }
 
 const sizeStyles: Record<CheckboxSize, { box: string; icon: string; text: string }> = {
@@ -43,6 +45,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       label,
       description,
       error = false,
+      errorMessage,
       disabled,
       id,
       ...props
@@ -84,7 +87,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             />
           </div>
         </div>
-        {(label || description) && (
+        {(label || description || errorMessage) && (
           <div className="space-y-1">
             {label && (
               <label
@@ -100,6 +103,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             )}
             {description && (
               <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+            {errorMessage && (
+              <p className="text-xs text-destructive">{errorMessage}</p>
             )}
           </div>
         )}

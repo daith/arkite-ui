@@ -13,6 +13,7 @@ import {
 const variantStyles: Record<ToastVariant, string> = {
   default: 'bg-card border-border',
   success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-900',
+  destructive: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
   error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
   warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-900',
   info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-900',
@@ -21,6 +22,7 @@ const variantStyles: Record<ToastVariant, string> = {
 const variantTextStyles: Record<ToastVariant, string> = {
   default: 'text-foreground',
   success: 'text-green-800 dark:text-green-200',
+  destructive: 'text-red-800 dark:text-red-200',
   error: 'text-red-800 dark:text-red-200',
   warning: 'text-yellow-800 dark:text-yellow-200',
   info: 'text-blue-800 dark:text-blue-200',
@@ -29,6 +31,7 @@ const variantTextStyles: Record<ToastVariant, string> = {
 const iconMap: Record<ToastVariant, typeof Info | null> = {
   default: null,
   success: CheckCircle2,
+  destructive: AlertCircle,
   error: AlertCircle,
   warning: AlertTriangle,
   info: Info,
@@ -165,7 +168,7 @@ export function useAnimatedToast() {
         success: (title: ReactNode, description?: ReactNode) =>
           addToast({ title, description, variant: 'success' as const }),
         error: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'error' as const }),
+          addToast({ title, description, variant: 'destructive' as const }),
         warning: (title: ReactNode, description?: ReactNode) =>
           addToast({ title, description, variant: 'warning' as const }),
         info: (title: ReactNode, description?: ReactNode) =>

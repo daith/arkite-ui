@@ -1,5 +1,6 @@
 import { forwardRef, useRef, useState, type DragEvent } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { Plus, X, ImageIcon } from 'lucide-react'
 
 export interface ImageUploadProps {
@@ -19,8 +20,13 @@ export interface ImageUploadProps {
   disabled?: boolean
   /** Show uploading overlay on specific URLs */
   loadingUrls?: string[]
+  /**
+   * Error state. Passing a string (the message itself) is deprecated —
+   * use `errorMessage` instead; string support is removed in v1.0.
+   */
+  error?: boolean | string
   /** Error message */
-  error?: string
+  errorMessage?: string
   /** Container class name */
   className?: string
   /** Placeholder text */
@@ -48,6 +54,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
       disabled = false,
       loadingUrls = [],
       error,
+      errorMessage,
       className,
       placeholder,
     },
@@ -55,6 +62,13 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
   ) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [isDragging, setIsDragging] = useState(false)
+
+    if (typeof error === 'string' && errorMessage === undefined) {
+      warnDeprecated('ImageUpload', 'error', 'errorMessage')
+    }
+    const resolvedErrorMessage =
+      errorMessage ?? (typeof error === 'string' ? error : undefined)
+    const hasError = Boolean(error)
 
     const isSingle = max === 1
     const isFull = max != null && value.length >= max
@@ -175,7 +189,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                 'flex h-32 w-32 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors',
                 isDragging
                   ? 'border-primary bg-primary/5'
-                  : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+                  : hasError
+                    ? 'border-destructive'
+                    : 'border-muted-foreground/25 hover:border-muted-foreground/50',
                 disabled && 'pointer-events-none opacity-50'
               )}
             >
@@ -190,7 +206,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
               )}
             </button>
           )}
-          {error && <p className="text-xs text-destructive">{error}</p>}
+          {resolvedErrorMessage && (
+          <p className="text-xs text-destructive">{resolvedErrorMessage}</p>
+        )}
         </div>
       )
     }
@@ -240,7 +258,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                 'flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed transition-colors',
                 isDragging
                   ? 'border-primary bg-primary/5'
-                  : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+                  : hasError
+                    ? 'border-destructive'
+                    : 'border-muted-foreground/25 hover:border-muted-foreground/50',
                 disabled && 'pointer-events-none opacity-50'
               )}
             >
@@ -256,7 +276,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
             {value.length} / {max}
           </p>
         )}
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        {resolvedErrorMessage && (
+          <p className="text-xs text-destructive">{resolvedErrorMessage}</p>
+        )}
       </div>
     )
   }

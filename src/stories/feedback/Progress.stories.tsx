@@ -7,7 +7,7 @@ const meta = {
   argTypes: {
     value: { control: { type: 'range', min: 0, max: 100 } },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
-    variant: { control: 'select', options: ['default', 'success', 'warning', 'error'] },
+    variant: { control: 'select', options: ['default', 'success', 'warning', 'destructive'] },
     showLabel: { control: 'boolean' },
     indeterminate: { control: 'boolean' },
     striped: { control: 'boolean' },
@@ -49,7 +49,7 @@ export const AllVariants: Story = {
       <Progress value={80} variant="default" showLabel aria-label="Default progress" />
       <Progress value={60} variant="success" showLabel aria-label="Success progress" />
       <Progress value={40} variant="warning" showLabel aria-label="Warning progress" />
-      <Progress value={20} variant="error" showLabel aria-label="Error progress" />
+      <Progress value={20} variant="destructive" showLabel aria-label="Destructive progress" />
     </div>
   ),
 }

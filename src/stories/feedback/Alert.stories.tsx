@@ -7,7 +7,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['info', 'success', 'warning', 'error'],
+      options: ['info', 'success', 'warning', 'destructive'],
     },
     dismissible: { control: 'boolean' },
   },
@@ -39,9 +39,9 @@ export const Warning: Story = {
   },
 }
 
-export const Error: Story = {
+export const Destructive: Story = {
   args: {
-    variant: 'error',
+    variant: 'destructive',
     title: 'Error',
     children: 'Something went wrong. Please try again.',
   },
@@ -57,7 +57,7 @@ export const AllVariants: Story = {
       <Alert variant="info" title="Info">Informational message.</Alert>
       <Alert variant="success" title="Success">Operation completed.</Alert>
       <Alert variant="warning" title="Warning">Please review carefully.</Alert>
-      <Alert variant="error" title="Error">Something went wrong.</Alert>
+      <Alert variant="destructive" title="Error">Something went wrong.</Alert>
     </div>
   ),
 }

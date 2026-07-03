@@ -13,6 +13,8 @@ export interface RadioProps
   description?: string
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
 }
 
 const sizeStyles: Record<RadioSize, { outer: string; inner: string; text: string }> = {
@@ -42,6 +44,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
       label,
       description,
       error = false,
+      errorMessage,
       disabled,
       id,
       ...props
@@ -83,7 +86,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
             />
           </div>
         </div>
-        {(label || description) && (
+        {(label || description || errorMessage) && (
           <div className="space-y-1">
             {label && (
               <label
@@ -99,6 +102,9 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
             )}
             {description && (
               <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+            {errorMessage && (
+              <p className="text-xs text-destructive">{errorMessage}</p>
             )}
           </div>
         )}
@@ -132,6 +138,8 @@ export interface RadioGroupProps {
   orientation?: 'vertical' | 'horizontal'
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Disabled state */
   disabled?: boolean
   /** Class name */
@@ -148,10 +156,11 @@ export const RadioGroup = ({
   size = 'md',
   orientation = 'vertical',
   error = false,
+  errorMessage,
   disabled = false,
   className,
 }: RadioGroupProps) => {
-  return (
+  const group = (
     <div
       role="radiogroup"
       className={cn(
@@ -175,6 +184,17 @@ export const RadioGroup = ({
           onChange={(e) => onChange?.(e.target.value)}
         />
       ))}
+    </div>
+  )
+
+  if (!errorMessage) {
+    return group
+  }
+
+  return (
+    <div>
+      {group}
+      <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
     </div>
   )
 }

@@ -1,9 +1,12 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { Spinner } from '../spinner/Spinner'
+import { warnDeprecated } from '../../utils/deprecate'
 
 export interface LoadingOverlayProps extends HTMLAttributes<HTMLDivElement> {
   /** Show the overlay */
+  open?: boolean
+  /** @deprecated use `open` instead — removed in v1.0 */
   visible?: boolean
   /** Custom spinner or content */
   children?: ReactNode
@@ -17,8 +20,12 @@ export interface LoadingOverlayProps extends HTMLAttributes<HTMLDivElement> {
 
 /** Semi-transparent overlay with a centered spinner. Wrap around any element to indicate loading. */
 export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
-  ({ className, visible = true, blur = false, size = 'md', label, children, ...props }, ref) => {
-    if (!visible) return null
+  ({ className, open, visible, blur = false, size = 'md', label, children, ...props }, ref) => {
+    if (open === undefined && visible !== undefined) {
+      warnDeprecated('LoadingOverlay', 'visible', 'open')
+    }
+    const isOpen = open ?? visible ?? true
+    if (!isOpen) return null
 
     return (
       <div

@@ -48,11 +48,11 @@ export const Sizes: StoryFn = () => (
 
 export const Hidden: StoryFn = () => (
   <Box>
-    <LoadingOverlay visible={false} />
+    <LoadingOverlay open={false} />
   </Box>
 )
 Hidden.parameters = {
-  docs: { description: { story: 'When `visible={false}`, nothing is rendered.' } },
+  docs: { description: { story: 'When `open={false}`, nothing is rendered.' } },
 }
 
 export const CustomContent: StoryFn = () => (

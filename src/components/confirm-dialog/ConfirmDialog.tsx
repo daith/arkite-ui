@@ -26,6 +26,8 @@ export interface ConfirmDialogProps {
   size?: ModalSize
   /** Custom icon */
   icon?: ReactNode
+  /** Additional class name applied to the dialog content */
+  className?: string
 }
 
 function WarningIcon({ className }: { className?: string }) {
@@ -53,6 +55,7 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
       loading = false,
       size = 'sm',
       icon,
+      className,
     },
     ref
   ) => {
@@ -66,6 +69,7 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
         ref={ref}
         open={open}
         onClose={onClose}
+        className={className}
         size={size}
         showCloseButton={false}
         closeOnBackdropClick={!loading}

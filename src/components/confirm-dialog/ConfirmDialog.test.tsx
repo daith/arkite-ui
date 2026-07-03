@@ -109,6 +109,21 @@ describe('ConfirmDialog', () => {
     )
     expect(screen.getByText('Warning!')).toBeInTheDocument()
   })
+
+  it('applies custom className to the dialog content', () => {
+    render(
+      <ConfirmDialog
+        open
+        onClose={vi.fn()}
+        title="Confirm?"
+        onConfirm={vi.fn()}
+        className="my-dialog"
+      />
+    )
+    const content = document.querySelector('.my-dialog')
+    expect(content).not.toBeNull()
+    expect(content).toContainElement(screen.getByText('Confirm?'))
+  })
 })
 
 describe('DeleteConfirmDialog', () => {

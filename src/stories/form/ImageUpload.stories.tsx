@@ -102,7 +102,8 @@ export const WithLoading: StoryFn = () => (
 export const WithError: StoryFn = () => (
   <ImageUpload
     max={1}
-    error="Upload failed: file too large"
+    error
+    errorMessage="Upload failed: file too large"
   />
 )
 

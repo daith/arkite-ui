@@ -92,7 +92,19 @@ describe('Tabs', () => {
     )
   })
 
-  it('calls onValueChange when a tab is clicked', async () => {
+  it('calls onChange when a tab is clicked', async () => {
+    const handleChange = vi.fn()
+    const user = userEvent.setup()
+
+    renderTabs({ onChange: handleChange })
+
+    await user.click(screen.getByRole('tab', { name: 'Tab 2' }))
+
+    expect(handleChange).toHaveBeenCalledTimes(1)
+    expect(handleChange).toHaveBeenCalledWith('tab2')
+  })
+
+  it('still supports the deprecated onValueChange alias', async () => {
     const handleChange = vi.fn()
     const user = userEvent.setup()
 

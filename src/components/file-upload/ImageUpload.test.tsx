@@ -124,8 +124,25 @@ describe('ImageUpload', () => {
   // ── Error display ──
 
   it('shows error message', () => {
-    render(<ImageUpload max={1} error="Upload failed" />)
+    render(<ImageUpload max={1} errorMessage="Upload failed" />)
     expect(screen.getByText('Upload failed')).toBeInTheDocument()
+  })
+
+  it('deprecated `error` string alias still shows the message', () => {
+    render(<ImageUpload max={1} error="Legacy upload error" />)
+    expect(screen.getByText('Legacy upload error')).toBeInTheDocument()
+  })
+
+  it('errorMessage wins when both errorMessage and string error are provided', () => {
+    render(<ImageUpload max={1} errorMessage="New error" error="Old error" />)
+    expect(screen.getByText('New error')).toBeInTheDocument()
+    expect(screen.queryByText('Old error')).not.toBeInTheDocument()
+  })
+
+  it('boolean error applies destructive border to the upload button', () => {
+    render(<ImageUpload max={1} error />)
+    const button = screen.getByText('Upload image').closest('button')!
+    expect(button.className).toContain('border-destructive')
   })
 
   // ── Loading state ──

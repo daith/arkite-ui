@@ -19,8 +19,13 @@ describe('toast imperative API', () => {
     expect(toasts[0].variant).toBe('success')
   })
 
-  it('toast.error() sets error variant', () => {
+  it('toast.error() sets destructive variant', () => {
     toast.error('Failed')
+    expect(getToasts()[0].variant).toBe('destructive')
+  })
+
+  it('accepts deprecated error variant via options', () => {
+    toast.show('Legacy', { variant: 'error' })
     expect(getToasts()[0].variant).toBe('error')
   })
 

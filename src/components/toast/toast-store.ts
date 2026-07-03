@@ -2,7 +2,14 @@ import { create } from 'zustand'
 
 export interface ToastItem {
   id: string
-  variant: 'default' | 'success' | 'error' | 'warning' | 'info'
+  variant:
+    | 'default'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'destructive'
+    /** @deprecated use `'destructive'` instead — removed in v1.0 */
+    | 'error'
   title: string
   description?: string
   duration?: number

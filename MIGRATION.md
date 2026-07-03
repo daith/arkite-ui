@@ -1,5 +1,40 @@
 # Migration Guide
 
+## v0.6.x → v0.7.0
+
+### Prop 命名統一（漸進式，非破壞性）
+
+v0.7.0 統一了 prop 命名慣例（完整審查見 `docs/API_CONSISTENCY.md`）。**所有舊名稱仍可用**，但會在 dev mode 印出 deprecation 警告，並於 **v1.0 移除** —— 請在升級 v1.0 前完成以下取代：
+
+| 元件 | 舊 | 新 |
+|------|----|----|
+| `Alert` / `Progress` / `CircularProgress` / `Toast` | `variant="error"` | `variant="destructive"` |
+| `Alert` | `onDismiss` | `onClose` |
+| `Tabs` | `onValueChange` | `onChange` |
+| `LoadingOverlay` | `visible` | `open` |
+| `CommandDialog` | `onOpenChange` | `onClose` |
+| `CircularProgress` | `size`（number） | `diameter` |
+| `FormField` / `FormMessage` | `error`（string） | `errorMessage` |
+| `ImageUpload` | `error`（string） | `errorMessage`（`error` 改為 boolean 狀態旗標） |
+| `Toggle`（元件名） | `Toggle` | `Switch` |
+
+機械式取代範例（各專案可直接跑）：
+
+```bash
+# Alert variant（最大宗）
+grep -rl 'variant="error"' src | xargs sed -i '' 's/<Alert variant="error"/<Alert variant="destructive"/g'
+```
+
+`toast.error(...)` 便捷方法**保留不變**（內部改為產生 destructive variant，外觀不變）。
+
+### 新增（無需遷移）
+
+- `errorMessage?: string`：Checkbox、Radio/RadioGroup、Combobox、DatePicker、DateRangePicker、ColorPicker、TagInput、Switch —— 對齊 Input 家族的 `error` + `errorMessage` 慣例
+- `Tree.defaultCheckedKeys`（非受控勾選狀態）
+- `ConfirmDialog` / `CommandDialog` 支援 `className`
+
+---
+
 ## v0.3.x → v0.4.0
 
 ### 1. Motion 元件 import 路徑變更

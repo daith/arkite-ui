@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { Label } from '../label/Label'
 
 // Form Context
@@ -46,7 +47,9 @@ Form.displayName = 'Form'
 interface FormFieldContextValue {
   id: string
   name?: string
+  /** @deprecated use `errorMessage` instead — removed in v1.0 */
   error?: string
+  errorMessage?: string
   disabled?: boolean
 }
 
@@ -65,6 +68,8 @@ export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
   /** Field name */
   name?: string
   /** Error message */
+  errorMessage?: string
+  /** @deprecated use `errorMessage` instead — removed in v1.0 */
   error?: string
   /** Disable field */
   disabled?: boolean
@@ -72,13 +77,20 @@ export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
 
 /** Form field container that provides id, name, and error context to its children. */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ className, name, error, disabled, children, ...props }, ref) => {
+  ({ className, name, errorMessage, error, disabled, children, ...props }, ref) => {
     const id = useId()
     const formContext = useFormContext()
     const isDisabled = disabled || formContext.disabled
 
+    if (error !== undefined && errorMessage === undefined) {
+      warnDeprecated('FormField', 'error', 'errorMessage')
+    }
+    const resolvedError = errorMessage ?? error
+
     return (
-      <FormFieldContext.Provider value={{ id, name, error, disabled: isDisabled }}>
+      <FormFieldContext.Provider
+        value={{ id, name, error: resolvedError, errorMessage: resolvedError, disabled: isDisabled }}
+      >
         <div ref={ref} className={cn('space-y-2', className)} {...props}>
           {children}
         </div>
@@ -167,14 +179,20 @@ FormDescription.displayName = 'FormDescription'
 // FormMessage component - for error messages
 export interface FormMessageProps extends HTMLAttributes<HTMLParagraphElement> {
   /** Error message (overrides context) */
+  errorMessage?: string
+  /** @deprecated use `errorMessage` instead — removed in v1.0 */
   error?: string
 }
 
 /** Validation error message displayed below a form field. */
 export const FormMessage = forwardRef<HTMLParagraphElement, FormMessageProps>(
-  ({ className, error: errorProp, children, ...props }, ref) => {
+  ({ className, errorMessage, error: errorProp, children, ...props }, ref) => {
     const context = useContext(FormFieldContext)
-    const error = errorProp || context?.error
+
+    if (errorProp !== undefined && errorMessage === undefined) {
+      warnDeprecated('FormMessage', 'error', 'errorMessage')
+    }
+    const error = errorMessage ?? errorProp ?? context?.errorMessage
 
     if (!error && !children) return null
 

@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useState,
   type ComponentPropsWithoutRef,
@@ -7,6 +8,7 @@ import {
 } from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 
 // --- Command (root) ---
 
@@ -174,24 +176,43 @@ export function CommandShortcut({
 export interface CommandDialogProps {
   /** Controlled open state */
   open: boolean
-  /** Close callback */
-  onOpenChange: (open: boolean) => void
+  /** Called when the dialog requests to close (Escape, backdrop click) */
+  onClose?: () => void
+  /** @deprecated use `onClose` instead — removed in v1.0 */
+  onOpenChange?: (open: boolean) => void
+  /** Additional class name applied to the dialog content element */
+  className?: string
   children: ReactNode
 }
 
 /** Modal overlay that wraps a Command component for use as a Cmd+K palette. */
-export function CommandDialog({ open, onOpenChange, children }: CommandDialogProps) {
+export function CommandDialog({
+  open,
+  onClose,
+  onOpenChange,
+  className,
+  children,
+}: CommandDialogProps) {
+  const requestClose = useCallback(() => {
+    if (onClose) {
+      onClose()
+    } else if (onOpenChange) {
+      warnDeprecated('CommandDialog', 'onOpenChange', 'onClose')
+      onOpenChange(false)
+    }
+  }, [onClose, onOpenChange])
+
   // Close on escape
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onOpenChange(false)
+        requestClose()
       }
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [open, onOpenChange])
+  }, [open, requestClose])
 
   if (!open) return null
 
@@ -201,10 +222,17 @@ export function CommandDialog({ open, onOpenChange, children }: CommandDialogPro
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- backdrop dismiss handled by Escape key listener */}
       <div
         className="fixed inset-0 bg-black/50 animate-in fade-in-0"
-        onClick={() => onOpenChange(false)}
+        onClick={requestClose}
       />
       {/* Dialog */}
-      <div role="dialog" aria-label="Command palette" className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95">
+      <div
+        role="dialog"
+        aria-label="Command palette"
+        className={cn(
+          'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95',
+          className
+        )}
+      >
         <Command className="rounded-lg border shadow-2xl">
           {children}
         </Command>

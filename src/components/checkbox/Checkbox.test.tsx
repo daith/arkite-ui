@@ -106,4 +106,11 @@ describe('Checkbox', () => {
     const { container } = render(<Checkbox className="my-custom-class" />)
     expect(container.firstChild).toHaveClass('my-custom-class')
   })
+
+  it('renders errorMessage text', () => {
+    render(<Checkbox label="Terms" error errorMessage="You must accept" />)
+    const message = screen.getByText('You must accept')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })

@@ -69,6 +69,8 @@ export interface DatePickerProps
   clearable?: boolean
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Size variant */
   size?: DatePickerSize
 }
@@ -98,6 +100,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       disabledDates = [],
       clearable: _clearable = true,
       error,
+      errorMessage,
       disabled,
       size = 'md',
       placeholder = 'Select date',
@@ -312,6 +315,10 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           <div className="absolute z-50 mt-1 rounded-md border bg-card shadow-lg">
             {renderCalendar()}
           </div>
+        )}
+
+        {errorMessage && (
+          <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
         )}
       </div>
     )

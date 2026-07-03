@@ -71,6 +71,13 @@ describe('Radio', () => {
     render(<Radio name="test" value="a" />)
     expect(screen.getByRole('radio')).toBeInTheDocument()
   })
+
+  it('renders errorMessage text', () => {
+    render(<Radio label="Option A" error errorMessage="Required choice" />)
+    const message = screen.getByText('Required choice')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })
 
 describe('RadioGroup', () => {
@@ -162,5 +169,14 @@ describe('RadioGroup', () => {
   it('applies custom className', () => {
     render(<RadioGroup name="group" options={options} className="custom-group" />)
     expect(screen.getByRole('radiogroup')).toHaveClass('custom-group')
+  })
+
+  it('renders errorMessage text once below the group', () => {
+    render(
+      <RadioGroup name="group" options={options} error errorMessage="Pick an option" />
+    )
+    const messages = screen.getAllByText('Pick an option')
+    expect(messages).toHaveLength(1)
+    expect(messages[0].className).toContain('text-destructive')
   })
 })

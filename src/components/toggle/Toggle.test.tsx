@@ -35,4 +35,21 @@ describe('Toggle', () => {
     render(<Toggle label="Dark mode" id="dark-toggle" />)
     expect(screen.getByText('Dark mode')).toHaveAttribute('for', 'dark-toggle')
   })
+
+  it('applies error styling when error prop is true', () => {
+    const { container } = render(<Toggle error />)
+    expect(container.querySelector('.ring-destructive')).toBeInTheDocument()
+  })
+
+  it('renders errorMessage text', () => {
+    render(<Toggle label="Notifications" error errorMessage="Must be enabled" />)
+    const message = screen.getByText('Must be enabled')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
+
+  it('renders errorMessage without label or description', () => {
+    render(<Toggle error errorMessage="Required" />)
+    expect(screen.getByText('Required')).toBeInTheDocument()
+  })
 })

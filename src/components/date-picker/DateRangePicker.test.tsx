@@ -326,4 +326,20 @@ describe('DateRangePicker variant="calendar"', () => {
     expect(screen.getByText('January 2024')).toBeInTheDocument()
     expect(screen.getByText('February 2024')).toBeInTheDocument()
   })
+
+  it('renders errorMessage text (input variant)', () => {
+    render(<DateRangePicker error errorMessage="Invalid range" />)
+    const message = screen.getByText('Invalid range')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
+
+  it('renders errorMessage text (calendar variant)', () => {
+    render(
+      <DateRangePicker variant="calendar" error errorMessage="Invalid range" />
+    )
+    const message = screen.getByText('Invalid range')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })

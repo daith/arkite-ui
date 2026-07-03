@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import {
   AlertCircle,
   CheckCircle2,
@@ -8,7 +9,15 @@ import {
   X,
 } from 'lucide-react'
 
-export type AlertVariant = 'info' | 'success' | 'warning' | 'error'
+export type AlertVariant =
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'destructive'
+  /** @deprecated use `'destructive'` instead — removed in v1.0 */
+  | 'error'
+
+type ResolvedAlertVariant = Exclude<AlertVariant, 'error'>
 
 export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Alert variant */
@@ -21,25 +30,27 @@ export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   customIcon?: ReactNode
   /** Dismissible alert */
   dismissible?: boolean
-  /** On dismiss callback */
+  /** On close callback */
+  onClose?: () => void
+  /** @deprecated use `onClose` instead — removed in v1.0 */
   onDismiss?: () => void
 }
 
-const variantStyles: Record<AlertVariant, string> = {
+const variantStyles: Record<ResolvedAlertVariant, string> = {
   info: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:border-blue-900 dark:text-blue-200',
   success:
     'bg-green-50 border-green-200 text-green-800 dark:bg-green-950 dark:border-green-900 dark:text-green-200',
   warning:
     'bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-900 dark:text-yellow-200',
-  error:
+  destructive:
     'bg-red-50 border-red-200 text-red-800 dark:bg-red-950 dark:border-red-900 dark:text-red-200',
 }
 
-const iconMap: Record<AlertVariant, typeof Info> = {
+const iconMap: Record<ResolvedAlertVariant, typeof Info> = {
   info: Info,
   success: CheckCircle2,
   warning: AlertTriangle,
-  error: AlertCircle,
+  destructive: AlertCircle,
 }
 
 /** Contextual feedback message with variant-based styling, optional icon, and dismissible support. */
@@ -52,13 +63,23 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
       icon = true,
       customIcon,
       dismissible = false,
+      onClose,
       onDismiss,
       children,
       ...props
     },
     ref
   ) => {
-    const IconComponent = iconMap[variant]
+    if (variant === 'error') {
+      warnDeprecated('Alert', 'variant="error"', 'variant="destructive"')
+    }
+    if (onDismiss) {
+      warnDeprecated('Alert', 'onDismiss', 'onClose')
+    }
+    const resolvedVariant: ResolvedAlertVariant =
+      variant === 'error' ? 'destructive' : variant
+    const handleClose = onClose ?? onDismiss
+    const IconComponent = iconMap[resolvedVariant]
 
     return (
       <div
@@ -66,7 +87,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         role="alert"
         className={cn(
           'relative flex gap-3 rounded-lg border p-4',
-          variantStyles[variant],
+          variantStyles[resolvedVariant],
           className
         )}
         {...props}
@@ -85,7 +106,7 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(
         {dismissible && (
           <button
             type="button"
-            onClick={onDismiss}
+            onClick={handleClose}
             className="shrink-0 rounded-md p-1 opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             <X className="h-4 w-4" />

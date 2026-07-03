@@ -1,29 +1,32 @@
 import { useEffect, useState } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info, Loader2 } from 'lucide-react'
 import { useImperativeToastStore, type ToastItem } from './toast-store'
 import type { ToastPosition } from './Toast'
 
-const variantStyles: Record<ToastItem['variant'], string> = {
+type ResolvedToastItemVariant = Exclude<ToastItem['variant'], 'error'>
+
+const variantStyles: Record<ResolvedToastItemVariant, string> = {
   default: 'bg-card border-border',
   success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-900',
-  error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
+  destructive: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
   warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-900',
   info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-900',
 }
 
-const variantTextStyles: Record<ToastItem['variant'], string> = {
+const variantTextStyles: Record<ResolvedToastItemVariant, string> = {
   default: 'text-foreground',
   success: 'text-green-800 dark:text-green-200',
-  error: 'text-red-800 dark:text-red-200',
+  destructive: 'text-red-800 dark:text-red-200',
   warning: 'text-yellow-800 dark:text-yellow-200',
   info: 'text-blue-800 dark:text-blue-200',
 }
 
-const iconMap: Record<ToastItem['variant'], typeof Info | null> = {
+const iconMap: Record<ResolvedToastItemVariant, typeof Info | null> = {
   default: null,
   success: CheckCircle2,
-  error: AlertCircle,
+  destructive: AlertCircle,
   warning: AlertTriangle,
   info: Info,
 }
@@ -46,7 +49,12 @@ interface ImperativeToastProps {
 function ImperativeToast({ item, onClose, isLoading }: ImperativeToastProps) {
   const [isExiting, setIsExiting] = useState(false)
   const duration = item.duration ?? 5000
-  const IconComponent = isLoading ? null : iconMap[item.variant]
+  if (item.variant === 'error') {
+    warnDeprecated('Toast', 'variant="error"', 'variant="destructive"')
+  }
+  const resolvedVariant: ResolvedToastItemVariant =
+    item.variant === 'error' ? 'destructive' : item.variant
+  const IconComponent = isLoading ? null : iconMap[resolvedVariant]
 
   useEffect(() => {
     if (duration > 0) {
@@ -68,8 +76,8 @@ function ImperativeToast({ item, onClose, isLoading }: ImperativeToastProps) {
       role="alert"
       className={cn(
         'pointer-events-auto flex w-full max-w-sm gap-3 rounded-lg border p-4 shadow-lg transition-all duration-200',
-        variantStyles[item.variant],
-        variantTextStyles[item.variant],
+        variantStyles[resolvedVariant],
+        variantTextStyles[resolvedVariant],
         isExiting ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0'
       )}
     >

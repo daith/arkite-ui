@@ -88,6 +88,8 @@ export interface DateRangePickerProps
   disabled?: boolean
   /** Error state for both inputs */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Size variant */
   size?: DateRangePickerSize
   /** Display variant. 'input' shows two text inputs (default). 'calendar' shows a single trigger button with a dual-month calendar popover. */
@@ -146,6 +148,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       maxDate,
       disabled,
       error,
+      errorMessage,
       size = 'md',
       variant = 'input',
       ...props
@@ -693,13 +696,17 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           </button>
 
           {calendarOpen && renderDualMonthCalendar()}
+
+          {errorMessage && (
+            <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
+          )}
         </div>
       )
     }
 
     // --- Input variant render (original behavior) ---
 
-    return (
+    const inputVariant = (
       <div
         ref={(node) => {
           // Merge forwarded ref with internal ref
@@ -832,6 +839,17 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             {renderCalendar()}
           </div>
         )}
+      </div>
+    )
+
+    if (!errorMessage) {
+      return inputVariant
+    }
+
+    return (
+      <div className="inline-block">
+        {inputVariant}
+        <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
       </div>
     )
   }

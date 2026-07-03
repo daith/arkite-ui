@@ -29,6 +29,8 @@ export interface ComboboxProps {
   disabled?: boolean
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Empty state message */
   emptyMessage?: string
   /** Async search callback */
@@ -68,6 +70,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       multiple = false,
       disabled = false,
       error = false,
+      errorMessage,
       emptyMessage = 'No results found.',
       onSearch,
       loading = false,
@@ -131,7 +134,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       return selected ? [selected.label] : null
     }, [selectedValues, options, multiple])
 
-    return (
+    const combobox = (
       <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
         <PopoverPrimitive.Trigger asChild>
           <button
@@ -278,6 +281,17 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
           </PopoverPrimitive.Content>
         </PopoverPrimitive.Portal>
       </PopoverPrimitive.Root>
+    )
+
+    if (!errorMessage) {
+      return combobox
+    }
+
+    return (
+      <div className={fullWidth ? 'w-full' : 'w-fit'}>
+        {combobox}
+        <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
+      </div>
     )
   }
 )

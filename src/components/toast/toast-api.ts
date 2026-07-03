@@ -19,7 +19,7 @@ function success(title: string, options?: ToastOptions): string {
 }
 
 function error(title: string, options?: ToastOptions): string {
-  return show(title, { ...options, variant: 'error' })
+  return show(title, { ...options, variant: 'destructive' })
 }
 
 function warning(title: string, options?: ToastOptions): string {

@@ -65,7 +65,7 @@ const DialogDemo = () => {
           or press <Kbd>⌘</Kbd> <Kbd>K</Kbd>
         </p>
       </div>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={open} onClose={() => setOpen(false)}>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>

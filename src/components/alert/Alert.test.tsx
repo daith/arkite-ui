@@ -38,11 +38,23 @@ describe('Alert', () => {
       expect(alert.className).toContain('border-yellow-200')
     })
 
-    it('applies error variant styles', () => {
-      render(<Alert variant="error">Error</Alert>)
+    it('applies destructive variant styles', () => {
+      render(<Alert variant="destructive">Destructive</Alert>)
       const alert = screen.getByRole('alert')
       expect(alert.className).toContain('bg-red-50')
       expect(alert.className).toContain('border-red-200')
+    })
+
+    it('supports deprecated error variant as alias for destructive', () => {
+      render(
+        <>
+          <Alert data-testid="old" variant="error">Old</Alert>
+          <Alert data-testid="new" variant="destructive">New</Alert>
+        </>
+      )
+      expect(screen.getByTestId('old').className).toBe(
+        screen.getByTestId('new').className
+      )
     })
   })
 
@@ -93,7 +105,20 @@ describe('Alert', () => {
       expect(screen.getByRole('button', { name: /dismiss/i })).toBeInTheDocument()
     })
 
-    it('calls onDismiss when dismiss button is clicked', async () => {
+    it('calls onClose when dismiss button is clicked', async () => {
+      const user = userEvent.setup()
+      const handleClose = vi.fn()
+      render(
+        <Alert dismissible onClose={handleClose}>
+          Dismissible
+        </Alert>
+      )
+
+      await user.click(screen.getByRole('button', { name: /dismiss/i }))
+      expect(handleClose).toHaveBeenCalledTimes(1)
+    })
+
+    it('supports deprecated onDismiss as alias for onClose', async () => {
       const user = userEvent.setup()
       const handleDismiss = vi.fn()
       render(
@@ -104,6 +129,21 @@ describe('Alert', () => {
 
       await user.click(screen.getByRole('button', { name: /dismiss/i }))
       expect(handleDismiss).toHaveBeenCalledTimes(1)
+    })
+
+    it('prefers onClose over deprecated onDismiss when both provided', async () => {
+      const user = userEvent.setup()
+      const handleClose = vi.fn()
+      const handleDismiss = vi.fn()
+      render(
+        <Alert dismissible onClose={handleClose} onDismiss={handleDismiss}>
+          Dismissible
+        </Alert>
+      )
+
+      await user.click(screen.getByRole('button', { name: /dismiss/i }))
+      expect(handleClose).toHaveBeenCalledTimes(1)
+      expect(handleDismiss).not.toHaveBeenCalled()
     })
   })
 

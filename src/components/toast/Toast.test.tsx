@@ -1,6 +1,8 @@
-import { renderHook, act } from '@testing-library/react'
+import { render, renderHook, act, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useToast, useToastStore } from './Toast'
+import { Toast, useToast, useToastStore } from './Toast'
+import { ImperativeToastContainer } from './ToastContainer'
+import { useImperativeToastStore } from './toast-store'
 
 describe('useToast', () => {
   beforeEach(() => {
@@ -29,12 +31,12 @@ describe('useToast', () => {
     expect(toasts[0].description).toBe('Completed')
   })
 
-  it('adds error toast', () => {
+  it('adds destructive toast via error() convenience method', () => {
     const { result } = renderHook(() => useToast())
     act(() => {
       result.current.error('Failed')
     })
-    expect(useToastStore.getState().toasts[0].variant).toBe('error')
+    expect(useToastStore.getState().toasts[0].variant).toBe('destructive')
   })
 
   it('adds warning toast', () => {
@@ -78,5 +80,47 @@ describe('useToast', () => {
       result.current.clear()
     })
     expect(useToastStore.getState().toasts).toHaveLength(0)
+  })
+})
+
+describe('Toast component variants', () => {
+  it('renders destructive variant with red styles', () => {
+    render(
+      <Toast id="t1" title="Boom" variant="destructive" onClose={() => {}} />
+    )
+    const alert = screen.getByRole('alert')
+    expect(alert.className).toContain('bg-red-50')
+    expect(alert.className).toContain('text-red-800')
+  })
+
+  it('supports deprecated error variant as alias for destructive', () => {
+    render(
+      <>
+        <Toast id="t-old" title="Old" variant="error" onClose={() => {}} />
+        <Toast id="t-new" title="New" variant="destructive" onClose={() => {}} />
+      </>
+    )
+    const [oldToast, newToast] = screen.getAllByRole('alert')
+    expect(oldToast.className).toBe(newToast.className)
+    expect(oldToast.className).toContain('bg-red-50')
+  })
+})
+
+describe('ImperativeToastContainer variants', () => {
+  beforeEach(() => {
+    useImperativeToastStore.getState().dismissAllToasts()
+  })
+
+  it('renders deprecated error variant with destructive styles', () => {
+    act(() => {
+      useImperativeToastStore.getState().addToast({
+        variant: 'error',
+        title: 'Legacy failure',
+      })
+    })
+    render(<ImperativeToastContainer />)
+    const alert = screen.getByRole('alert')
+    expect(alert.className).toContain('bg-red-50')
+    expect(alert.className).toContain('text-red-800')
   })
 })

@@ -151,6 +151,8 @@
 
 ## 優先級修復建議（v0.7.0 breaking 清理）
 
+> **✅ 2026-07-03 已全數實作**（P0 1–3、P1 4–6、P2 7–10）：新名為正式 API，舊名保留為 deprecated 別名（dev 警告、v1.0 移除），故 v0.7.0 實際為非破壞性升級。遷移對照表見 `MIGRATION.md`。
+
 ### P0 —— 破壞性、影響面最大，務必定版
 
 1. **統一「危險/負面」variant 值 → 定為 `destructive`**（與 Button/shadcn 生態一致；反向選 `error` 要改 Button/Badge/Timeline/ConfirmDialog，改動面更大）

@@ -20,6 +20,8 @@ export interface ColorPickerProps {
   size?: ColorPickerSize
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Additional class name for the root element */
   className?: string
   /** Optional preset color swatches */
@@ -83,6 +85,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
       disabled = false,
       size = 'md',
       error = false,
+      errorMessage,
       className,
       presets,
     },
@@ -247,6 +250,10 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
               )
             })}
           </div>
+        )}
+
+        {errorMessage && (
+          <p className="text-xs text-destructive">{errorMessage}</p>
         )}
       </div>
     )

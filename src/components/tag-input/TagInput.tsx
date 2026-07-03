@@ -30,6 +30,8 @@ export interface TagInputProps
   disabled?: boolean
   /** Error state */
   error?: boolean
+  /** Error message */
+  errorMessage?: string
   /** Input size variant */
   size?: TagInputSize
   /** Additional class name for the container */
@@ -67,6 +69,7 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
       maxLength,
       disabled = false,
       error = false,
+      errorMessage,
       size = 'md',
       className,
       allowDuplicates = false,
@@ -140,7 +143,7 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
       [addTag]
     )
 
-    return (
+    const container = (
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
       <div
         className={cn(
@@ -197,6 +200,17 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
           )}
           {...props}
         />
+      </div>
+    )
+
+    if (!errorMessage) {
+      return container
+    }
+
+    return (
+      <div>
+        {container}
+        <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
       </div>
     )
   }

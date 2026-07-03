@@ -1,8 +1,17 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 
 export type ProgressSize = 'sm' | 'md' | 'lg'
-export type ProgressVariant = 'default' | 'success' | 'warning' | 'error'
+export type ProgressVariant =
+  | 'default'
+  | 'success'
+  | 'warning'
+  | 'destructive'
+  /** @deprecated use `'destructive'` instead — removed in v1.0 */
+  | 'error'
+
+type ResolvedProgressVariant = Exclude<ProgressVariant, 'error'>
 
 export interface ProgressProps extends HTMLAttributes<HTMLDivElement> {
   /** Progress value (0-100) */
@@ -31,11 +40,11 @@ const sizeStyles: Record<ProgressSize, string> = {
   lg: 'h-3',
 }
 
-const variantStyles: Record<ProgressVariant, string> = {
+const variantStyles: Record<ResolvedProgressVariant, string> = {
   default: 'bg-primary',
   success: 'bg-success',
   warning: 'bg-warning',
-  error: 'bg-destructive',
+  destructive: 'bg-destructive',
 }
 
 /** Horizontal progress bar with determinate, indeterminate, and striped modes. */
@@ -56,6 +65,11 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     },
     ref
   ) => {
+    if (variant === 'error') {
+      warnDeprecated('Progress', 'variant="error"', 'variant="destructive"')
+    }
+    const resolvedVariant: ResolvedProgressVariant =
+      variant === 'error' ? 'destructive' : variant
     const percentage = Math.min(100, Math.max(0, (value / max) * 100))
 
     return (
@@ -82,7 +96,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           <div
             className={cn(
               'h-full rounded-full transition-all duration-300',
-              variantStyles[variant],
+              variantStyles[resolvedVariant],
               indeterminate && 'animate-progress-indeterminate',
               striped && 'bg-stripes',
               animated && striped && 'animate-stripes'
@@ -105,7 +119,9 @@ export interface CircularProgressProps extends HTMLAttributes<HTMLDivElement> {
   value?: number
   /** Maximum value */
   max?: number
-  /** Size in pixels */
+  /** Diameter in pixels */
+  diameter?: number
+  /** @deprecated use `diameter` instead — removed in v1.0 */
   size?: number
   /** Stroke width */
   strokeWidth?: number
@@ -126,7 +142,8 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
       className,
       value = 0,
       max = 100,
-      size = 48,
+      diameter,
+      size,
       strokeWidth = 4,
       variant = 'default',
       showLabel = false,
@@ -136,8 +153,17 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
     },
     ref
   ) => {
+    if (variant === 'error') {
+      warnDeprecated('CircularProgress', 'variant="error"', 'variant="destructive"')
+    }
+    if (size !== undefined) {
+      warnDeprecated('CircularProgress', 'size', 'diameter')
+    }
+    const resolvedVariant: ResolvedProgressVariant =
+      variant === 'error' ? 'destructive' : variant
+    const resolvedDiameter = diameter ?? size ?? 48
     const percentage = Math.min(100, Math.max(0, (value / max) * 100))
-    const radius = (size - strokeWidth) / 2
+    const radius = (resolvedDiameter - strokeWidth) / 2
     const circumference = radius * 2 * Math.PI
     const offset = circumference - (percentage / 100) * circumference
 
@@ -145,8 +171,8 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
       default: 'stroke-primary',
       success: 'stroke-success',
       warning: 'stroke-warning',
-      error: 'stroke-destructive',
-    }[variant]
+      destructive: 'stroke-destructive',
+    }[resolvedVariant]
 
     return (
       <div
@@ -157,7 +183,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
         aria-valuemax={max}
         aria-label={ariaLabel}
         className={cn('relative inline-flex items-center justify-center', className)}
-        style={{ width: size, height: size }}
+        style={{ width: resolvedDiameter, height: resolvedDiameter }}
         {...props}
       >
         <svg
@@ -165,8 +191,8 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
             'transform -rotate-90',
             indeterminate && 'animate-spin'
           )}
-          width={size}
-          height={size}
+          width={resolvedDiameter}
+          height={resolvedDiameter}
         >
           {/* Background circle */}
           <circle
@@ -174,8 +200,8 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
             fill="none"
             strokeWidth={strokeWidth}
             r={radius}
-            cx={size / 2}
-            cy={size / 2}
+            cx={resolvedDiameter / 2}
+            cy={resolvedDiameter / 2}
           />
           {/* Progress circle */}
           <circle
@@ -184,8 +210,8 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             r={radius}
-            cx={size / 2}
-            cy={size / 2}
+            cx={resolvedDiameter / 2}
+            cy={resolvedDiameter / 2}
             style={{
               strokeDasharray: circumference,
               strokeDashoffset: indeterminate ? circumference * 0.75 : offset,

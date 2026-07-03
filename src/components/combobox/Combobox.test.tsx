@@ -251,4 +251,11 @@ describe('Combobox', () => {
     expect(onSearch).toHaveBeenCalledWith('ab')
     expect(onSearch).toHaveBeenCalledWith('abc')
   })
+
+  it('renders errorMessage text', () => {
+    render(<Combobox options={options} error errorMessage="Selection required" />)
+    const message = screen.getByText('Selection required')
+    expect(message).toBeInTheDocument()
+    expect(message.className).toContain('text-destructive')
+  })
 })
