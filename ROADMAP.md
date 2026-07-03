@@ -92,6 +92,8 @@
 
 ### 值得做但不急
 
+- [ ] Sparkline 補 nullable data / `emptyFallback`（無資料時的 placeholder 線）— ark-finance 因此仍留一層薄 wrapper（2026-07-03 消費端對齊時發現）
+
 - [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
 - [x] Storybook 部署到公開 URL（GitHub Pages：daith.github.io/arkite-ui）
 - [ ] README 的 Quick Start 確保 copy-paste 就能跑（新專案開局時驗證）
