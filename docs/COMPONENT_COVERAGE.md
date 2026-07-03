@@ -75,6 +75,8 @@ Breadcrumb 子件 ×7、DropdownMenu 子件 ×10、Popover 子件 ×2（Anchor/C
 
 ## 守門人裁決（Prioritized）
 
+> **✅ 2026-07-03 已實作**：下方「收編」與「補強」全部項目已進 core（Sparkline、SheetSelect、Badge `count` variant、PageHeader `size`、Card `density`+`CardHeader.actions`、LoadingOverlay `fullscreen`）。後續動作：通知 finance/museum 改用 core 版並刪除本地自建。
+
 ### ✅ 收編（進 core）
 
 1. **Sparkline**（finance）— 純 SVG ~20 行、零依賴、props 完備；SaaS admin dashboard 是本庫定位核心，與 Stat/StatCard 天然互補。成本極低。

@@ -1,9 +1,13 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 
+export type PageHeaderSize = 'sm' | 'md' | 'lg'
+
 export interface PageHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Page title */
   title: ReactNode
+  /** Typography scale — `md` (default) matches the original rendering; `sm` for sub-pages, `lg` for dashboards / detail pages */
+  size?: PageHeaderSize
   /** Optional description below the title */
   description?: ReactNode
   /** Actions slot (right side) */
@@ -26,9 +30,15 @@ function ArrowLeftIcon() {
   )
 }
 
+const sizeStyles: Record<PageHeaderSize, { title: string; description: string }> = {
+  sm: { title: 'text-xl', description: 'text-sm' },
+  md: { title: 'text-2xl', description: 'text-sm' },
+  lg: { title: 'text-3xl', description: 'text-base' },
+}
+
 /** Page header with title, description, breadcrumb, and action slots. */
 export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
-  ({ title, description, actions, breadcrumb, badge, onBack, backLabel = 'Go back', className, children, ...props }, ref) => {
+  ({ title, size = 'md', description, actions, breadcrumb, badge, onBack, backLabel = 'Go back', className, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -49,11 +59,11 @@ export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
                   <ArrowLeftIcon />
                 </button>
               )}
-              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+              <h1 className={cn(sizeStyles[size].title, 'font-bold tracking-tight')}>{title}</h1>
               {badge}
             </div>
             {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <p className={cn(sizeStyles[size].description, 'text-muted-foreground')}>{description}</p>
             )}
           </div>
           {actions && (

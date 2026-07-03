@@ -24,6 +24,20 @@ describe('Badge', () => {
     expect(screen.getByText('Warn').className).toContain('bg-warning')
   })
 
+  it('applies count variant as neutral pill with tabular numerals', () => {
+    render(<Badge variant="count">{42}</Badge>)
+    const el = screen.getByText('42')
+    expect(el.className).toContain('bg-muted')
+    expect(el.className).toContain('text-muted-foreground')
+    expect(el.className).toContain('tabular-nums')
+  })
+
+  it('count variant composes with max truncation', () => {
+    render(<Badge variant="count" max={99}>{150}</Badge>)
+    const el = screen.getByText('99+')
+    expect(el.className).toContain('bg-muted')
+  })
+
   it('applies custom className', () => {
     render(<Badge className="custom-class">Test</Badge>)
     expect(screen.getByText('Test').className).toContain('custom-class')

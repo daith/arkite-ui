@@ -43,4 +43,31 @@ describe('LoadingOverlay', () => {
     const { container } = render(<LoadingOverlay className="my-custom-class" />)
     expect(container.firstChild).toHaveClass('my-custom-class')
   })
+
+  describe('fullscreen', () => {
+    it('is container-relative by default (absolute, z-10, no blur)', () => {
+      const { container } = render(<LoadingOverlay />)
+      expect(container.firstChild).toHaveClass('absolute', 'inset-0', 'z-10')
+      expect(container.firstChild).not.toHaveClass('fixed')
+      expect(container.firstChild).not.toHaveClass('backdrop-blur-sm')
+    })
+
+    it('renders fixed inset-0 with high z-index and backdrop blur when fullscreen', () => {
+      const { container } = render(<LoadingOverlay fullscreen />)
+      expect(container.firstChild).toHaveClass('fixed', 'inset-0', 'z-50', 'backdrop-blur-sm')
+      expect(container.firstChild).not.toHaveClass('absolute')
+    })
+
+    it('shows spinner and label inside a centered panel when fullscreen', () => {
+      render(<LoadingOverlay fullscreen label="Syncing..." />)
+      const label = screen.getByText('Syncing...')
+      expect(label).toBeInTheDocument()
+      expect(label.parentElement).toHaveClass('rounded-lg', 'bg-background', 'shadow-lg')
+    })
+
+    it('composes with open — renders nothing when open=false', () => {
+      const { container } = render(<LoadingOverlay fullscreen open={false} />)
+      expect(container.firstChild).toBeNull()
+    })
+  })
 })

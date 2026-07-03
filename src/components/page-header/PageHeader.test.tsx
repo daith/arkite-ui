@@ -57,6 +57,21 @@ describe('PageHeader', () => {
     expect(screen.getByTestId('crumbs')).toBeInTheDocument()
   })
 
+  it('defaults to md size (text-2xl title, unchanged from before)', () => {
+    render(<PageHeader title="Users" description="Manage users." />)
+    expect(screen.getByRole('heading', { name: 'Users' }).className).toContain('text-2xl')
+    expect(screen.getByText('Manage users.').className).toContain('text-sm')
+  })
+
+  it('scales title and description with size', () => {
+    const { rerender } = render(<PageHeader title="Users" description="Desc" size="sm" />)
+    expect(screen.getByRole('heading', { name: 'Users' }).className).toContain('text-xl')
+
+    rerender(<PageHeader title="Users" description="Desc" size="lg" />)
+    expect(screen.getByRole('heading', { name: 'Users' }).className).toContain('text-3xl')
+    expect(screen.getByText('Desc').className).toContain('text-base')
+  })
+
   it('renders children', () => {
     render(
       <PageHeader title="Users">

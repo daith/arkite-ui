@@ -51,6 +51,20 @@ export const WithBackButton: StoryFn = () => (
   />
 )
 
+export const Sizes: StoryFn = () => (
+  <div className="space-y-8">
+    {(['sm', 'md', 'lg'] as const).map((size) => (
+      <PageHeader
+        key={size}
+        size={size}
+        title={`Dashboard (size="${size}")`}
+        description="Overview of your workspace activity."
+        badge={<Badge variant="info">Live</Badge>}
+      />
+    ))}
+  </div>
+)
+
 export const WithBreadcrumb: StoryFn = () => (
   <PageHeader
     breadcrumb={

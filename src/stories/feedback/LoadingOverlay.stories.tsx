@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { Meta, StoryFn } from '@storybook/react-vite'
 import { LoadingOverlay } from '../../components/loading-overlay'
 
@@ -45,6 +46,33 @@ export const Sizes: StoryFn = () => (
     ))}
   </div>
 )
+
+export const Fullscreen: StoryFn = () => {
+  const [open, setOpen] = useState(false)
+  return (
+    <div>
+      <button
+        type="button"
+        className="rounded-md border px-3 py-1.5 text-sm"
+        onClick={() => {
+          setOpen(true)
+          setTimeout(() => setOpen(false), 2000)
+        }}
+      >
+        Show fullscreen overlay (2s)
+      </button>
+      <LoadingOverlay fullscreen open={open} label="Syncing data..." />
+    </div>
+  )
+}
+Fullscreen.parameters = {
+  docs: {
+    description: {
+      story:
+        'With `fullscreen`, the overlay covers the entire viewport (fixed, z-50, backdrop blur) with a centered panel — for app-level busy states like sync or upload.',
+    },
+  },
+}
 
 export const Hidden: StoryFn = () => (
   <Box>

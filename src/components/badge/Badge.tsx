@@ -9,6 +9,7 @@ export type BadgeVariant =
   | 'destructive'
   | 'outline'
   | 'info'
+  | 'count'
 
 export type BadgeSize = 'sm' | 'md'
 
@@ -36,6 +37,8 @@ const variantStyles: Record<BadgeVariant, string> = {
     'border border-border text-foreground bg-transparent',
   info:
     'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  count:
+    'bg-muted text-muted-foreground tabular-nums',
 }
 
 const sizeStyles: Record<BadgeSize, string> = {

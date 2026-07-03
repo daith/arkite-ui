@@ -12,6 +12,8 @@ export interface LoadingOverlayProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode
   /** Overlay background blur */
   blur?: boolean
+  /** Cover the whole viewport (fixed inset-0, high z-index, backdrop blur) instead of the nearest positioned container */
+  fullscreen?: boolean
   /** Spinner size */
   size?: 'sm' | 'md' | 'lg'
   /** Loading text below spinner */
@@ -20,31 +22,42 @@ export interface LoadingOverlayProps extends HTMLAttributes<HTMLDivElement> {
 
 /** Semi-transparent overlay with a centered spinner. Wrap around any element to indicate loading. */
 export const LoadingOverlay = forwardRef<HTMLDivElement, LoadingOverlayProps>(
-  ({ className, open, visible, blur = false, size = 'md', label, children, ...props }, ref) => {
+  ({ className, open, visible, blur = false, fullscreen = false, size = 'md', label, children, ...props }, ref) => {
     if (open === undefined && visible !== undefined) {
       warnDeprecated('LoadingOverlay', 'visible', 'open')
     }
     const isOpen = open ?? visible ?? true
     if (!isOpen) return null
 
+    const content = children || (
+      <>
+        <Spinner size={size} />
+        {label && (
+          <p className={cn('text-sm text-muted-foreground', !fullscreen && 'mt-2')}>
+            {label}
+          </p>
+        )}
+      </>
+    )
+
     return (
       <div
         ref={ref}
         className={cn(
-          'absolute inset-0 z-10 flex flex-col items-center justify-center',
+          'flex flex-col items-center justify-center',
+          fullscreen ? 'fixed inset-0 z-50' : 'absolute inset-0 z-10',
           'bg-background/60',
-          blur && 'backdrop-blur-sm',
+          (blur || fullscreen) && 'backdrop-blur-sm',
           className
         )}
         {...props}
       >
-        {children || (
-          <>
-            <Spinner size={size} />
-            {label && (
-              <p className="mt-2 text-sm text-muted-foreground">{label}</p>
-            )}
-          </>
+        {fullscreen ? (
+          <div className="flex flex-col items-center gap-3 rounded-lg border bg-background px-6 py-5 shadow-lg">
+            {content}
+          </div>
+        ) : (
+          content
         )}
       </div>
     )

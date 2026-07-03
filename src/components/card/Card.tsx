@@ -1,5 +1,7 @@
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { createContext, forwardRef, useContext, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+
+export type CardDensity = 'default' | 'compact'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   /** Card padding */
@@ -10,6 +12,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean
   /** Card border */
   bordered?: boolean
+  /** Content density — `compact` tightens header/content/footer padding and typography for dashboard widgets. Inherited by CardHeader/CardContent/CardFooter. */
+  density?: CardDensity
 }
 
 export interface CardHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -19,11 +23,23 @@ export interface CardHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>, 't
   description?: ReactNode
   /** Header action (button, etc.) */
   action?: ReactNode
+  /** Right-aligned row of actions (e.g. multiple icon buttons) */
+  actions?: ReactNode
+  /** Density override — defaults to the parent Card's `density` */
+  density?: CardDensity
 }
 
-export type CardContentProps = HTMLAttributes<HTMLDivElement>
+export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  /** Density override — defaults to the parent Card's `density` */
+  density?: CardDensity
+}
 
-export type CardFooterProps = HTMLAttributes<HTMLDivElement>
+export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
+  /** Density override — defaults to the parent Card's `density` */
+  density?: CardDensity
+}
+
+const CardDensityContext = createContext<CardDensity>('default')
 
 const paddingStyles = {
   none: '',
@@ -48,53 +64,72 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       shadow = 'sm',
       hoverable = false,
       bordered = true,
+      density = 'default',
       children,
       ...props
     },
     ref
   ) => {
     return (
-      <div
-        ref={ref}
-        className={cn(
-          'rounded-lg bg-card text-card-foreground',
-          bordered && 'border',
-          paddingStyles[padding],
-          shadowStyles[shadow],
-          hoverable && 'transition-shadow hover:shadow-md cursor-pointer',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <CardDensityContext.Provider value={density}>
+        <div
+          ref={ref}
+          className={cn(
+            'rounded-lg bg-card text-card-foreground',
+            bordered && 'border',
+            paddingStyles[padding],
+            shadowStyles[shadow],
+            hoverable && 'transition-shadow hover:shadow-md cursor-pointer',
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </CardDensityContext.Provider>
     )
   }
 )
 
 Card.displayName = 'Card'
 
-/** Card header section with title, description, and an optional action slot. */
+/** Card header section with title, description, and optional action slots. */
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, title, description, action, children, ...props }, ref) => {
+  ({ className, title, description, action, actions, density, children, ...props }, ref) => {
+    const contextDensity = useContext(CardDensityContext)
+    const compact = (density ?? contextDensity) === 'compact'
     return (
       <div
         ref={ref}
-        className={cn('flex items-start justify-between gap-4 p-4', className)}
+        className={cn(
+          'flex items-start justify-between gap-4',
+          compact ? 'px-4 py-3' : 'p-4',
+          className
+        )}
         {...props}
       >
-        <div className="space-y-1.5">
+        <div className={compact ? 'min-w-0 space-y-1' : 'space-y-1.5'}>
           {title && (
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
+            <h3
+              className={cn(
+                'font-semibold leading-none tracking-tight',
+                compact ? 'text-sm' : 'text-lg'
+              )}
+            >
               {title}
             </h3>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>
+              {description}
+            </p>
           )}
           {children}
         </div>
         {action && <div className="shrink-0">{action}</div>}
+        {actions && (
+          <div className="flex shrink-0 items-center gap-1">{actions}</div>
+        )}
       </div>
     )
   }
@@ -104,9 +139,15 @@ CardHeader.displayName = 'CardHeader'
 
 /** Main body section of a Card. */
 export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, density, ...props }, ref) => {
+    const contextDensity = useContext(CardDensityContext)
+    const compact = (density ?? contextDensity) === 'compact'
     return (
-      <div ref={ref} className={cn('p-4 pt-0', className)} {...props} />
+      <div
+        ref={ref}
+        className={cn(compact ? 'px-4 pb-3 pt-0' : 'p-4 pt-0', className)}
+        {...props}
+      />
     )
   }
 )
@@ -115,11 +156,17 @@ CardContent.displayName = 'CardContent'
 
 /** Bottom section of a Card, typically used for actions or metadata. */
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, density, ...props }, ref) => {
+    const contextDensity = useContext(CardDensityContext)
+    const compact = (density ?? contextDensity) === 'compact'
     return (
       <div
         ref={ref}
-        className={cn('flex items-center p-4 pt-0', className)}
+        className={cn(
+          'flex items-center',
+          compact ? 'px-4 pb-3 pt-0' : 'p-4 pt-0',
+          className
+        )}
         {...props}
       />
     )

@@ -16,6 +16,10 @@ const meta = {
     },
     hoverable: { control: 'boolean' },
     bordered: { control: 'boolean' },
+    density: {
+      control: 'select',
+      options: ['default', 'compact'],
+    },
   },
   args: {
     padding: 'md',
@@ -53,6 +57,52 @@ export const WithAction: Story = {
         <Button variant="primary" size="sm">Save</Button>
       </CardFooter>
     </Card>
+  ),
+}
+
+export const DashboardWidget: Story = {
+  name: 'Dashboard widget (compact + actions)',
+  render: () => (
+    <div className="flex gap-4">
+      <Card density="compact" className="w-80">
+        <CardHeader
+          title="Watchlist"
+          description="12 symbols tracked"
+          actions={
+            <>
+              <button
+                type="button"
+                aria-label="Refresh"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                ↻
+              </button>
+              <button
+                type="button"
+                aria-label="Settings"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+              >
+                ⚙
+              </button>
+            </>
+          }
+        />
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Compact density: tighter padding and smaller header typography for dense
+            dashboard grids.
+          </p>
+        </CardContent>
+      </Card>
+      <Card className="w-80">
+        <CardHeader title="Watchlist" description="12 symbols tracked" />
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Default density for comparison — unchanged from before.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   ),
 }
 

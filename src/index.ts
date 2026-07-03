@@ -42,6 +42,7 @@ export * from './components/filter-bar'
 export * from './components/data-table'
 export * from './components/virtual-list'
 export * from './components/stat'
+export * from './components/sparkline'
 export * from './components/empty-state'
 export * from './components/table'
 
@@ -54,6 +55,7 @@ export * from './components/tag-input'
 export * from './components/file-upload'
 export * from './components/date-picker'
 export * from './components/color-picker'
+export * from './components/sheet-select'
 
 // Feedback
 export * from './components/toast'

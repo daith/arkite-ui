@@ -7,7 +7,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'secondary', 'success', 'warning', 'destructive', 'outline', 'info'],
+      options: ['default', 'secondary', 'success', 'warning', 'destructive', 'outline', 'info', 'count'],
     },
   },
   args: {
@@ -51,6 +51,34 @@ export const AllVariants: Story = {
       <Badge variant="destructive">Destructive</Badge>
       <Badge variant="info">Info</Badge>
       <Badge variant="outline">Outline</Badge>
+      <Badge variant="count">{42}</Badge>
+    </div>
+  ),
+}
+
+export const Count: Story = {
+  name: 'Count (tab counters)',
+  render: () => (
+    <div className="space-y-4">
+      <div>
+        <p className="text-sm font-medium mb-2">Neutral count pills — e.g. after tab labels</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="inline-flex items-center text-sm">
+            Items <Badge variant="count" size="sm" className="ml-1.5">{12}</Badge>
+          </span>
+          <span className="inline-flex items-center text-sm">
+            Photos <Badge variant="count" size="sm" className="ml-1.5">{7}</Badge>
+          </span>
+          <span className="inline-flex items-center text-sm">
+            Logs <Badge variant="count" size="sm" className="ml-1.5" max={99}>{150}</Badge>
+          </span>
+        </div>
+      </div>
+      <div className="rounded-md border border-border p-4 text-xs text-muted-foreground">
+        <p className="font-medium text-foreground mb-2">Usage</p>
+        <pre className="bg-muted p-3 rounded overflow-x-auto">{`// Composes with max
+<Badge variant="count" max={99}>{itemCount}</Badge>  // 150 → "99+"`}</pre>
+      </div>
     </div>
   ),
 }
