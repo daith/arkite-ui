@@ -147,8 +147,8 @@
 |------|---------|------|
 | **v0.4.0** ✅ | — | metadata 修正 + Chromatic CI + tokens entry point |
 | **v0.5.0** ✅ | 2026-04-22 | 改名 `@arkite-ui/core` 發布 npm、rail sidebar、subNav slot |
-| **v0.6.0** | changeset 已備 | 移除業務邏輯（breadcrumb config、stores、hooks）— breaking |
-| **v0.7.0** | API 審查後 | prop naming 統一（依 docs/API_CONSISTENCY.md）— breaking 一次清完 |
+| **v0.6.1** ✅ | 2026-07-03 | 移除業務邏輯（breadcrumb config、stores、hooks）— breaking（0.6.0 tag 因 CI 故障未發成，由 0.6.1 補發） |
+| **v0.7.0** ✅ | 2026-07-03 | prop naming 統一（依 docs/API_CONSISTENCY.md）— 舊名保留為 deprecated 別名，v1.0 移除 |
 | **v0.x.x** | 內部專案需求驅動 | 持續迭代，不設時間表 |
 | **v1.0.0** | API 穩定半年 + 消費端驗證 | API 凍結、semver 承諾（最快 2026 Q4） |
 
