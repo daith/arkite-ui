@@ -92,7 +92,7 @@
 
 ### 值得做但不急
 
-- [ ] Sparkline 補 nullable data / `emptyFallback`（無資料時的 placeholder 線）— ark-finance 因此仍留一層薄 wrapper（2026-07-03 消費端對齊時發現）
+- [x] Sparkline 補 nullable data / `placeholder`（無資料時的虛線 placeholder）— 2026-07-03 完成，ark-finance 可移除 wrapper
 
 - [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
 - [x] Storybook 部署到公開 URL（GitHub Pages：daith.github.io/arkite-ui）

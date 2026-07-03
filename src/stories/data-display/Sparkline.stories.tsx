@@ -56,3 +56,26 @@ export const InContext: Story = {
   ),
   parameters: { layout: 'padded' },
 }
+
+export const Placeholder: Story = {
+  name: 'Placeholder (no data)',
+  render: () => (
+    <div className="flex items-center gap-6">
+      <div className="space-y-1 text-center">
+        <Sparkline data={null} placeholder width={80} height={24} />
+        <p className="text-2xs text-muted-foreground">placeholder</p>
+      </div>
+      <div className="space-y-1 text-center">
+        <Sparkline data={[42]} placeholder width={80} height={24} />
+        <p className="text-2xs text-muted-foreground">single point + placeholder</p>
+      </div>
+      <div className="space-y-1 text-center">
+        <Sparkline
+          data={[]}
+          placeholder={<span className="text-xs text-muted-foreground">N/A</span>}
+        />
+        <p className="text-2xs text-muted-foreground">custom node</p>
+      </div>
+    </div>
+  ),
+}

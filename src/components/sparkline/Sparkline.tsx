@@ -1,12 +1,12 @@
-import { forwardRef, type SVGAttributes } from 'react'
+import { forwardRef, type ReactNode, type SVGAttributes } from 'react'
 import { cn } from '../../utils/cn'
 
 export type SparklineTrend = 'auto' | 'up' | 'down' | 'neutral'
 
 export interface SparklineProps
   extends Omit<SVGAttributes<SVGSVGElement>, 'width' | 'height' | 'color'> {
-  /** Data points to plot, left to right */
-  data: number[]
+  /** Data points to plot, left to right (null/undefined treated as no data) */
+  data: number[] | null | undefined
   /** SVG width in pixels */
   width?: number
   /** SVG height in pixels */
@@ -17,6 +17,12 @@ export interface SparklineProps
   color?: string
   /** Trend coloring — 'auto' compares last vs first value */
   trend?: SparklineTrend
+  /**
+   * Rendered when there are fewer than 2 data points.
+   * `true` draws a dashed neutral line; a ReactNode replaces the output entirely.
+   * Without it, empty data renders nothing and a single point renders a dot.
+   */
+  placeholder?: boolean | ReactNode
 }
 
 const trendStyles: Record<Exclude<SparklineTrend, 'auto'>, string> = {
@@ -45,30 +51,59 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(
       strokeWidth = 1.5,
       color,
       trend = 'auto',
+      placeholder,
       className,
       'aria-label': ariaLabel,
       ...props
     },
     ref
   ) => {
-    if (data.length === 0) return null
+    const values = data ?? []
+
+    if (values.length < 2 && placeholder != null && placeholder !== false) {
+      if (placeholder !== true) return <>{placeholder}</>
+      const pad = strokeWidth
+      return (
+        <svg
+          ref={ref}
+          width={width}
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          aria-hidden
+          className={cn('shrink-0 text-border', className)}
+          {...props}
+        >
+          <line
+            x1={pad}
+            y1={height / 2}
+            x2={width - pad}
+            y2={height / 2}
+            stroke="currentColor"
+            strokeWidth={1}
+            strokeDasharray="2 2"
+          />
+        </svg>
+      )
+    }
+
+    if (values.length === 0) return null
 
     // Inset so the stroke never clips at the edges
     const pad = strokeWidth
     const innerWidth = width - pad * 2
     const innerHeight = height - pad * 2
 
-    const min = Math.min(...data)
-    const max = Math.max(...data)
+    const min = Math.min(...values)
+    const max = Math.max(...values)
     const span = max - min
 
-    const points = data
+    const points = values
       .map((value, index) => {
         // Single point renders as a flat line; equal values center vertically
         const x =
-          data.length === 1
+          values.length === 1
             ? pad + innerWidth / 2
-            : pad + (innerWidth * index) / (data.length - 1)
+            : pad + (innerWidth * index) / (values.length - 1)
         const y =
           span === 0
             ? height / 2
@@ -86,10 +121,10 @@ export const Sparkline = forwardRef<SVGSVGElement, SparklineProps>(
         role="img"
         aria-label={ariaLabel}
         aria-hidden={ariaLabel ? undefined : true}
-        className={cn('shrink-0', !color && trendStyles[resolveTrend(data, trend)], className)}
+        className={cn('shrink-0', !color && trendStyles[resolveTrend(values, trend)], className)}
         {...props}
       >
-        {data.length === 1 ? (
+        {values.length === 1 ? (
           <circle
             cx={width / 2}
             cy={height / 2}

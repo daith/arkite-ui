@@ -96,4 +96,39 @@ describe('Sparkline', () => {
     )
     expect(container.querySelector('svg')).toHaveClass('custom-class')
   })
+
+  it('accepts null data and renders nothing without placeholder', () => {
+    const { container } = render(<Sparkline data={null} />)
+    expect(container.querySelector('svg')).not.toBeInTheDocument()
+  })
+
+  it('renders built-in dashed placeholder for null data when placeholder is true', () => {
+    const { container } = render(
+      <Sparkline data={null} placeholder width={60} height={18} />
+    )
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveClass('text-border')
+    expect(svg).toHaveAttribute('aria-hidden', 'true')
+    const line = container.querySelector('line')
+    expect(line).toHaveAttribute('stroke-dasharray', '2 2')
+  })
+
+  it('renders placeholder for single-point data when placeholder is set', () => {
+    const { container } = render(<Sparkline data={[5]} placeholder />)
+    expect(container.querySelector('line')).toBeInTheDocument()
+    expect(container.querySelector('circle')).not.toBeInTheDocument()
+  })
+
+  it('renders a custom placeholder node', () => {
+    render(
+      <Sparkline data={[]} placeholder={<span data-testid="empty">–</span>} />
+    )
+    expect(screen.getByTestId('empty')).toBeInTheDocument()
+  })
+
+  it('ignores placeholder when data has 2+ points', () => {
+    const { container } = render(<Sparkline data={[1, 2, 3]} placeholder />)
+    expect(container.querySelector('polyline')).toBeInTheDocument()
+    expect(container.querySelector('line')).not.toBeInTheDocument()
+  })
 })
