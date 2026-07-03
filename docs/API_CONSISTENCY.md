@@ -3,6 +3,7 @@
 > 審查日期：2026-07-02
 > 審查範圍：`dist/index.d.ts`（公開 API）+ `dist/Drawer-*.d.ts`（Modal / Drawer / Toast）+ 原始碼抽查。所有 prop / 元件名以 .d.ts 實際宣告為準。
 > 對應 ROADMAP Phase 2「元件 API 一致性審查」；rename 執行歸入 v0.7.0 breaking 清理。
+> **消費端實測影響面見 [API_CONSISTENCY_IMPACT.md](API_CONSISTENCY_IMPACT.md)**（2026-07-03，7 專案 384 檔）：P0-1 Alert variant 175 筆為最大宗；LoadingOverlay/CircularProgress/Tree 等項全數 0 用例可直接定版。
 
 ## 總體結論
 
