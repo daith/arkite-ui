@@ -12,20 +12,20 @@ import {
 
 const variantStyles: Record<ToastVariant, string> = {
   default: 'bg-card border-border',
-  success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-900',
-  destructive: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
-  error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-900',
-  warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-900',
-  info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-900',
+  success: 'bg-success-soft border-success-border',
+  destructive: 'bg-destructive-soft border-destructive-border',
+  error: 'bg-destructive-soft border-destructive-border',
+  warning: 'bg-warning-soft border-warning-border',
+  info: 'bg-info-soft border-info-border',
 }
 
 const variantTextStyles: Record<ToastVariant, string> = {
   default: 'text-foreground',
-  success: 'text-green-800 dark:text-green-200',
-  destructive: 'text-red-800 dark:text-red-200',
-  error: 'text-red-800 dark:text-red-200',
-  warning: 'text-yellow-800 dark:text-yellow-200',
-  info: 'text-blue-800 dark:text-blue-200',
+  success: 'text-success-soft-foreground',
+  destructive: 'text-destructive-soft-foreground',
+  error: 'text-destructive-soft-foreground',
+  warning: 'text-warning-soft-foreground',
+  info: 'text-info-soft-foreground',
 }
 
 const iconMap: Record<ToastVariant, typeof Info | null> = {

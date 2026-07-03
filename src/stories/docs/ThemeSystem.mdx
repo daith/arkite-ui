@@ -72,11 +72,23 @@ const css = themeToCSS(themePresets.default)
 | `--destructive` | `0 72% 51%` | Delete, error states |
 | `--success` | `145 65% 42%` | Success states |
 | `--warning` | `38 92% 50%` | Warning states |
+| `--info` | `217 91% 55%` | Informational states |
 | `--muted` | `220 14% 96%` | Muted text, subtle backgrounds |
 | `--background` | `0 0% 100%` | Page background |
 | `--foreground` | `220 15% 20%` | Main text color |
 | `--border` | `220 13% 91%` | Border color |
 | `--radius` | `0.5rem` | Border radius base |
+
+Each status color (`success`, `warning`, `destructive`, `info`) also has a **soft layer**
+for pale, tinted surfaces (Alert, Toast, soft Badge):
+
+| Token | Light Default (success) | Usage |
+|-------|------------------------|-------|
+| `--{status}-soft` | `138 76% 97%` | Pale status background |
+| `--{status}-soft-foreground` | `143 64% 24%` | Readable text on the soft background |
+| `--{status}-border` | `141 79% 85%` | Pale status border |
+
+Use them via utilities like `bg-success-soft`, `text-info-soft-foreground`, `border-warning-border`.
 
 ## Elevation Shadows
 
@@ -90,6 +102,8 @@ Consistent depth system for layered UI:
 | `shadow-lg` | Modal, Drawer |
 | `shadow-xl` | Command Palette |
 | `shadow-2xl` | Full-screen overlay |
+| `shadow-sticky-left` | Table sticky action column separator |
+| `shadow-sticky-header` | Table sticky header bottom hairline |
 
 ## Overriding Tokens
 

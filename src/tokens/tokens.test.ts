@@ -92,6 +92,24 @@ describe('semantic colors', () => {
     expect(colors.light.info).toBe(primitives.blue[600])
     expect(colors.light.warning).toBe(primitives.amber[500])
   })
+
+  it('soft layers use pale shades in light and deep shades in dark', () => {
+    // Light: 50 bg / 800 text / 200 border
+    expect(colors.light.successSoft).toBe(primitives.green[50])
+    expect(colors.light.successSoftForeground).toBe(primitives.green[800])
+    expect(colors.light.successBorder).toBe(primitives.green[200])
+    expect(colors.light.warningSoft).toBe(primitives.amber[50])
+    expect(colors.light.dangerSoft).toBe(primitives.red[50])
+    expect(colors.light.infoSoft).toBe(primitives.blue[50])
+
+    // Dark: 950 bg / 200 text / 900 border
+    expect(colors.dark.successSoft).toBe(primitives.green[950])
+    expect(colors.dark.successSoftForeground).toBe(primitives.green[200])
+    expect(colors.dark.successBorder).toBe(primitives.green[900])
+    expect(colors.dark.warningSoft).toBe(primitives.amber[950])
+    expect(colors.dark.dangerSoft).toBe(primitives.red[950])
+    expect(colors.dark.infoSoft).toBe(primitives.blue[950])
+  })
 })
 
 describe('spacing', () => {

@@ -50,6 +50,20 @@ export interface SemanticColors {
   info: string
   infoForeground: string
 
+  // Status soft layer — pale background / readable text / pale border
+  successSoft: string
+  successSoftForeground: string
+  successBorder: string
+  warningSoft: string
+  warningSoftForeground: string
+  warningBorder: string
+  dangerSoft: string
+  dangerSoftForeground: string
+  dangerBorder: string
+  infoSoft: string
+  infoSoftForeground: string
+  infoBorder: string
+
   // Form / interaction
   border: string
   input: string
@@ -83,6 +97,20 @@ const lightColors: SemanticColors = {
   info: primitives.blue[600],
   infoForeground: primitives.white,
 
+  // Status soft layer
+  successSoft: primitives.green[50],
+  successSoftForeground: primitives.green[800],
+  successBorder: primitives.green[200],
+  warningSoft: primitives.amber[50],
+  warningSoftForeground: primitives.amber[800],
+  warningBorder: primitives.amber[200],
+  dangerSoft: primitives.red[50],
+  dangerSoftForeground: primitives.red[800],
+  dangerBorder: primitives.red[200],
+  infoSoft: primitives.blue[50],
+  infoSoftForeground: primitives.blue[800],
+  infoBorder: primitives.blue[200],
+
   // Form / interaction
   border: primitives.gray[200],
   input: primitives.gray[200],
@@ -115,6 +143,20 @@ const darkColors: SemanticColors = {
   dangerForeground: primitives.white,
   info: primitives.blue[500],
   infoForeground: primitives.white,
+
+  // Status soft layer
+  successSoft: primitives.green[950],
+  successSoftForeground: primitives.green[200],
+  successBorder: primitives.green[900],
+  warningSoft: primitives.amber[950],
+  warningSoftForeground: primitives.amber[200],
+  warningBorder: primitives.amber[900],
+  dangerSoft: primitives.red[950],
+  dangerSoftForeground: primitives.red[200],
+  dangerBorder: primitives.red[900],
+  infoSoft: primitives.blue[950],
+  infoSoftForeground: primitives.blue[200],
+  infoBorder: primitives.blue[900],
 
   // Form / interaction
   border: primitives.gray[800],

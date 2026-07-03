@@ -163,7 +163,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                   <button
                     type="button"
                     onClick={openPicker}
-                    className="rounded-md bg-white/90 px-2 py-1 text-xs font-medium text-gray-900 hover:bg-white"
+                    className="rounded-md bg-white/90 px-2 py-1 text-xs font-medium text-black hover:bg-white"
                   >
                     Replace
                   </button>
@@ -200,7 +200,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                 {placeholder || defaultPlaceholder}
               </span>
               {maxSize && (
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-2xs text-muted-foreground">
                   Max {formatFileSize(maxSize)}
                 </span>
               )}
@@ -265,7 +265,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
               )}
             >
               <Plus className="h-5 w-5 text-muted-foreground" />
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-2xs text-muted-foreground">
                 {placeholder || defaultPlaceholder}
               </span>
             </button>

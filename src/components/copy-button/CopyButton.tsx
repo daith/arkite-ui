@@ -238,7 +238,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
           onClick={copy}
         >
           {copied ? (
-            <Check size={iconSize} className="shrink-0 text-green-500" />
+            <Check size={iconSize} className="shrink-0 text-success" />
           ) : (
             <Copy size={iconSize} className="shrink-0" />
           )}

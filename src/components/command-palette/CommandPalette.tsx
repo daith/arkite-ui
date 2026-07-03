@@ -161,7 +161,7 @@ export function CommandShortcut({
         ? children.split('+').map((key, i) => (
             <kbd
               key={i}
-              className="inline-flex min-w-5 items-center justify-center rounded border border-border bg-muted px-1 py-0.5 font-sans text-[10px] font-medium leading-none text-muted-foreground shadow-xs select-none"
+              className="inline-flex min-w-5 items-center justify-center rounded border border-border bg-muted px-1 py-0.5 font-sans text-2xs font-medium leading-none text-muted-foreground shadow-xs select-none"
             >
               {key.trim()}
             </kbd>

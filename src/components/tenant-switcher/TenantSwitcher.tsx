@@ -363,7 +363,7 @@ export function TenantSwitcher({
                             {tenant.status && (
                               <Badge
                                 variant={tenant.statusVariant || 'secondary'}
-                                className="text-[10px] px-1.5 py-0"
+                                className="text-2xs px-1.5 py-0"
                               >
                                 {tenant.status}
                               </Badge>

@@ -8,7 +8,7 @@ describe('Alert', () => {
     render(<Alert>Something happened</Alert>)
     const alert = screen.getByRole('alert')
     expect(alert).toBeInTheDocument()
-    expect(alert.className).toContain('bg-blue-50')
+    expect(alert.className).toContain('bg-info-soft')
   })
 
   it('renders children as description', () => {
@@ -20,29 +20,29 @@ describe('Alert', () => {
     it('applies info variant styles', () => {
       render(<Alert variant="info">Info</Alert>)
       const alert = screen.getByRole('alert')
-      expect(alert.className).toContain('bg-blue-50')
-      expect(alert.className).toContain('border-blue-200')
+      expect(alert.className).toContain('bg-info-soft')
+      expect(alert.className).toContain('border-info-border')
     })
 
     it('applies success variant styles', () => {
       render(<Alert variant="success">Success</Alert>)
       const alert = screen.getByRole('alert')
-      expect(alert.className).toContain('bg-green-50')
-      expect(alert.className).toContain('border-green-200')
+      expect(alert.className).toContain('bg-success-soft')
+      expect(alert.className).toContain('border-success-border')
     })
 
     it('applies warning variant styles', () => {
       render(<Alert variant="warning">Warning</Alert>)
       const alert = screen.getByRole('alert')
-      expect(alert.className).toContain('bg-yellow-50')
-      expect(alert.className).toContain('border-yellow-200')
+      expect(alert.className).toContain('bg-warning-soft')
+      expect(alert.className).toContain('border-warning-border')
     })
 
     it('applies destructive variant styles', () => {
       render(<Alert variant="destructive">Destructive</Alert>)
       const alert = screen.getByRole('alert')
-      expect(alert.className).toContain('bg-red-50')
-      expect(alert.className).toContain('border-red-200')
+      expect(alert.className).toContain('bg-destructive-soft')
+      expect(alert.className).toContain('border-destructive-border')
     })
 
     it('supports deprecated error variant as alias for destructive', () => {

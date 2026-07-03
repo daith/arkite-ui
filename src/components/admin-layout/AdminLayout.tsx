@@ -284,7 +284,7 @@ export function AdminLayout({
                     aria-label={group.label}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-medium leading-tight transition-colors',
+                      'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium leading-tight transition-colors',
                       'hover:bg-muted hover:text-foreground',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       active ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
@@ -309,7 +309,7 @@ export function AdminLayout({
                     type="button"
                     onClick={onLogout}
                     aria-label="Logout"
-                    className="flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     Logout
                   </button>

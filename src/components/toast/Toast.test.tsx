@@ -89,8 +89,8 @@ describe('Toast component variants', () => {
       <Toast id="t1" title="Boom" variant="destructive" onClose={() => {}} />
     )
     const alert = screen.getByRole('alert')
-    expect(alert.className).toContain('bg-red-50')
-    expect(alert.className).toContain('text-red-800')
+    expect(alert.className).toContain('bg-destructive-soft')
+    expect(alert.className).toContain('text-destructive-soft-foreground')
   })
 
   it('supports deprecated error variant as alias for destructive', () => {
@@ -102,7 +102,7 @@ describe('Toast component variants', () => {
     )
     const [oldToast, newToast] = screen.getAllByRole('alert')
     expect(oldToast.className).toBe(newToast.className)
-    expect(oldToast.className).toContain('bg-red-50')
+    expect(oldToast.className).toContain('bg-destructive-soft')
   })
 })
 
@@ -120,7 +120,7 @@ describe('ImperativeToastContainer variants', () => {
     })
     render(<ImperativeToastContainer />)
     const alert = screen.getByRole('alert')
-    expect(alert.className).toContain('bg-red-50')
-    expect(alert.className).toContain('text-red-800')
+    expect(alert.className).toContain('bg-destructive-soft')
+    expect(alert.className).toContain('text-destructive-soft-foreground')
   })
 })

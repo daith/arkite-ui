@@ -35,14 +35,30 @@ const arkiteConfig = {
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))',
+          soft: 'hsl(var(--destructive-soft))',
+          'soft-foreground': 'hsl(var(--destructive-soft-foreground))',
+          border: 'hsl(var(--destructive-border))',
         },
         success: {
           DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))',
+          soft: 'hsl(var(--success-soft))',
+          'soft-foreground': 'hsl(var(--success-soft-foreground))',
+          border: 'hsl(var(--success-border))',
         },
         warning: {
           DEFAULT: 'hsl(var(--warning))',
           foreground: 'hsl(var(--warning-foreground))',
+          soft: 'hsl(var(--warning-soft))',
+          'soft-foreground': 'hsl(var(--warning-soft-foreground))',
+          border: 'hsl(var(--warning-border))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+          soft: 'hsl(var(--info-soft))',
+          'soft-foreground': 'hsl(var(--info-soft-foreground))',
+          border: 'hsl(var(--info-border))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
@@ -82,6 +98,9 @@ const arkiteConfig = {
         ],
         mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'monospace'],
       },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '0.875rem' }],
+      },
       boxShadow: {
         xs: '0 1px 2px 0 rgb(0 0 0 / 0.03)',
         sm: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
@@ -89,6 +108,8 @@ const arkiteConfig = {
         lg: '0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
         xl: '0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04)',
         '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.18)',
+        'sticky-left': '-2px 0 4px -2px rgb(0 0 0 / 0.1)',
+        'sticky-header': '0 1px 0 0 hsl(var(--border))',
       },
       transitionTimingFunction: {
         DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',

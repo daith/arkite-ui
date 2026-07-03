@@ -29,6 +29,23 @@
   --color-warning: hsl(var(--warning));
   --color-warning-foreground: hsl(var(--warning-foreground));
 
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
+
+  /* Status soft layer — pale background / readable text / pale border */
+  --color-success-soft: hsl(var(--success-soft));
+  --color-success-soft-foreground: hsl(var(--success-soft-foreground));
+  --color-success-border: hsl(var(--success-border));
+  --color-warning-soft: hsl(var(--warning-soft));
+  --color-warning-soft-foreground: hsl(var(--warning-soft-foreground));
+  --color-warning-border: hsl(var(--warning-border));
+  --color-destructive-soft: hsl(var(--destructive-soft));
+  --color-destructive-soft-foreground: hsl(var(--destructive-soft-foreground));
+  --color-destructive-border: hsl(var(--destructive-border));
+  --color-info-soft: hsl(var(--info-soft));
+  --color-info-soft-foreground: hsl(var(--info-soft-foreground));
+  --color-info-border: hsl(var(--info-border));
+
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
 
@@ -55,6 +72,10 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
+  /* Typography — extra-small size below text-xs */
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: 0.875rem;
+
   --font-sans: 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI',
     'Roboto', sans-serif;
   --font-mono: 'JetBrains Mono', 'Menlo', 'Monaco', monospace;
@@ -66,6 +87,10 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.18);
+
+  /* Structural shadows — Table sticky column/header separators */
+  --shadow-sticky-left: -2px 0 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-sticky-header: 0 1px 0 0 hsl(var(--border));
 
   /* Transition tokens */
   --transition-timing-default: cubic-bezier(0.4, 0, 0.2, 1);
@@ -124,6 +149,24 @@
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
+  /* Info */
+  --info: 217 91% 55%;
+  --info-foreground: 0 0% 100%;
+
+  /* Status soft layer */
+  --success-soft: 138 76% 97%;
+  --success-soft-foreground: 143 64% 24%;
+  --success-border: 141 79% 85%;
+  --warning-soft: 55 92% 95%;
+  --warning-soft-foreground: 32 81% 29%;
+  --warning-border: 53 98% 77%;
+  --destructive-soft: 0 86% 97%;
+  --destructive-soft-foreground: 0 70% 35%;
+  --destructive-border: 0 96% 89%;
+  --info-soft: 214 100% 97%;
+  --info-soft-foreground: 226 71% 40%;
+  --info-border: 213 97% 87%;
+
   /* Neutral */
   --background: 0 0% 100%;
   --foreground: 220 15% 20%;
@@ -175,6 +218,23 @@
 
   --destructive: 0 72% 55%;
   --destructive-foreground: 0 0% 100%;
+
+  --info: 217 91% 60%;
+  --info-foreground: 0 0% 100%;
+
+  /* Status soft layer */
+  --success-soft: 145 80% 10%;
+  --success-soft-foreground: 141 79% 85%;
+  --success-border: 144 61% 20%;
+  --warning-soft: 26 83% 14%;
+  --warning-soft-foreground: 53 98% 77%;
+  --warning-border: 28 73% 26%;
+  --destructive-soft: 0 75% 15%;
+  --destructive-soft-foreground: 0 96% 89%;
+  --destructive-border: 0 63% 31%;
+  --info-soft: 226 57% 21%;
+  --info-soft-foreground: 213 97% 87%;
+  --info-border: 224 64% 33%;
 
   --background: 220 20% 10%;
   --foreground: 0 0% 95%;

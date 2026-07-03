@@ -57,7 +57,7 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
       className={cn(
         '[&_tr]:border-b',
         /* Sticky header: activated by parent table[data-sticky-header] */
-        '[table[data-sticky-header]_&]:sticky [table[data-sticky-header]_&]:top-0 [table[data-sticky-header]_&]:z-10 [table[data-sticky-header]_&]:bg-background [table[data-sticky-header]_&]:shadow-[0_1px_0_0_hsl(var(--border))]',
+        '[table[data-sticky-header]_&]:sticky [table[data-sticky-header]_&]:top-0 [table[data-sticky-header]_&]:z-10 [table[data-sticky-header]_&]:bg-background [table[data-sticky-header]_&]:shadow-sticky-header',
         className
       )}
       {...props}
@@ -140,7 +140,7 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
         'h-10 px-4 text-left align-middle font-medium text-muted-foreground',
         '[&:has([role=checkbox])]:pr-0',
         sortable && 'cursor-pointer select-none hover:text-foreground',
-        stickyAction && 'sticky right-0 bg-background shadow-[-2px_0_4px_-2px_rgb(0_0_0/0.1)]',
+        stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
         className
       )}
       data-sticky-action={stickyAction || undefined}
@@ -176,7 +176,7 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
       ref={ref}
       className={cn(
         'p-4 align-middle [&:has([role=checkbox])]:pr-0',
-        stickyAction && 'sticky right-0 bg-background shadow-[-2px_0_4px_-2px_rgb(0_0_0/0.1)]',
+        stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
         className
       )}
       data-sticky-action={stickyAction || undefined}

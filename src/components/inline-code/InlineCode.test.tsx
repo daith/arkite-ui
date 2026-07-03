@@ -22,9 +22,9 @@ describe('InlineCode', () => {
   })
 
   it('merges custom className', () => {
-    render(<InlineCode className="text-red-500">x</InlineCode>)
+    render(<InlineCode className="text-destructive">x</InlineCode>)
     const el = screen.getByText('x')
-    expect(el).toHaveClass('text-red-500')
+    expect(el).toHaveClass('text-destructive')
     expect(el).toHaveClass('font-mono')
   })
 

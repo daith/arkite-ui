@@ -27,7 +27,7 @@ const navigation: AdminNavGroup[] = [
       {
         path: '/runs',
         label: 'Runs',
-        badge: <Badge variant="info" className="text-[10px] px-1.5 py-0">3</Badge>,
+        badge: <Badge variant="info" className="text-2xs px-1.5 py-0">3</Badge>,
       },
       { path: '/items', label: 'Items' },
     ],

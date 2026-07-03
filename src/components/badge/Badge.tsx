@@ -36,14 +36,14 @@ const variantStyles: Record<BadgeVariant, string> = {
   outline:
     'border border-border text-foreground bg-transparent',
   info:
-    'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+    'bg-info-soft text-info-soft-foreground',
   count:
     'bg-muted text-muted-foreground tabular-nums',
 }
 
 const sizeStyles: Record<BadgeSize, string> = {
   sm: 'px-2.5 py-0.5 text-xs leading-tight',
-  md: 'px-3 py-1 text-[13px] leading-snug',
+  md: 'px-3 py-1 text-sm leading-snug',
 }
 
 /** Small inline label for status, categories, or counts with multiple color variants. */
