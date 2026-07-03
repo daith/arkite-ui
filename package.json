@@ -59,7 +59,8 @@
     "dist",
     "src/styles",
     "src/configs",
-    "cli"
+    "cli",
+    "DESIGN.md"
   ],
   "scripts": {
     "build": "tsup",
