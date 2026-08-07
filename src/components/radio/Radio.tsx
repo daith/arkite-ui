@@ -72,6 +72,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
               'peer-focus-visible:ring-1 peer-focus-visible:ring-ring/40 peer-focus-visible:ring-offset-0',
               'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
               'transition-colors duration-200',
+              'peer-checked:[&>div]:scale-100',
               styles.outer,
               error
                 ? 'border-destructive'
@@ -80,7 +81,7 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           >
             <div
               className={cn(
-                'rounded-full bg-primary scale-0 transition-transform peer-checked:scale-100',
+                'rounded-full bg-primary scale-0 transition-transform',
                 styles.inner
               )}
             />

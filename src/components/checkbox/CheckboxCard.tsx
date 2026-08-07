@@ -46,10 +46,10 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
           className={cn(
             'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border',
             'border-input transition-colors duration-200',
-            'peer-checked:border-primary peer-checked:bg-primary'
+            'peer-checked:border-primary peer-checked:bg-primary peer-checked:[&>svg]:opacity-100'
           )}
         >
-          <Check className="h-3.5 w-3.5 text-primary-foreground opacity-0 peer-checked:opacity-100 transition-opacity" />
+          <Check className="h-3.5 w-3.5 text-primary-foreground opacity-0 transition-opacity" />
         </div>
         <div className="space-y-1">
           <div className="text-sm font-medium leading-none">{label}</div>

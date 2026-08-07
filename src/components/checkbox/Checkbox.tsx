@@ -72,6 +72,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               'flex shrink-0 items-center justify-center rounded border',
               'peer-focus-visible:ring-1 peer-focus-visible:ring-ring/40 peer-focus-visible:ring-offset-0',
               'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+              'peer-checked:[&>svg]:opacity-100',
               'transition-colors duration-200',
               styles.box,
               error
@@ -81,7 +82,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           >
             <Check
               className={cn(
-                'text-primary-foreground opacity-0 transition-opacity peer-checked:opacity-100',
+                'text-primary-foreground opacity-0 transition-opacity',
                 styles.icon
               )}
             />
