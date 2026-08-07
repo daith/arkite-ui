@@ -1,3 +1,214 @@
+# @arkite-ui/core v0.13.0
+
+> React components for multi-tenant SaaS admin panels. Tailwind CSS v4 +
+> Radix UI + TypeScript. Pure UI only: no business logic, auth, stores, or
+> routing — data comes in via props, events go out via callbacks.
+
+## Setup
+
+```bash
+pnpm add @arkite-ui/core
+# peer deps: react react-dom tailwindcss zustand lucide-react
+# optional:  framer-motion (Animated* variants)
+```
+
+```css
+/* app.css — Tailwind v4, tokens included */
+@import "tailwindcss";
+@import "@arkite-ui/core/styles.css";
+```
+
+## Rules for generated code
+
+1. Import UI from `@arkite-ui/core` — never rebuild primitives that exist (see inventory below).
+2. Use semantic token utilities only (`bg-card`, `text-muted-foreground`, `border-border`) — never raw palette classes (`bg-red-50`), never `dark:` color overrides (tokens handle dark mode), never arbitrary values (`text-[13px]`).
+3. Components follow the controlled/uncontrolled React convention: `value`+`onChange` controls, `defaultValue` doesn't.
+4. Keep API calls, routes, and business models in the app layer.
+
+Full design rules (color/spacing/typography/layout recipes): DESIGN.md, shipped
+inside this package — also embedded in llms-full.txt.
+
+## Core patterns
+
+### Server-paginated table
+
+`useServerTable` owns the six controlled props server mode needs; you supply
+`data` + `totalRows` and fetch on `queryKey`:
+
+```tsx
+import { DataTable, useServerTable, type Column } from '@arkite-ui/core'
+
+const table = useServerTable({ initialPageSize: 20 })
+const [page, setPage] = useState({ items: [], total: 0 })
+useEffect(() => {
+  fetchUsers(table.query).then(setPage) // query = { page, pageSize, sort, filters }
+}, [table.queryKey])
+
+<DataTable columns={columns} data={page.items} totalRows={page.total}
+  getRowKey={(r) => r.id} {...table.props} />
+```
+
+Client-side tables need none of that: pass `data` and the table filters,
+sorts, and paginates itself.
+
+### Toasts
+
+```tsx
+import { useToast, ToastContainer } from '@arkite-ui/core'
+
+// once, near the app root:
+<ToastContainer position="bottom-right" />
+
+const toast = useToast()
+toast.success('Saved', { description: 'Changes are live.' })
+toast.error('Failed to save')
+```
+
+### Theming
+
+```tsx
+import { createTheme, applyTheme } from '@arkite-ui/core'
+applyTheme(createTheme({ primary: '#7c3aed' })) // HSL tokens from one hex
+```
+
+## Export inventory
+
+Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
+
+Hooks: useCommandPalette, useFormContext, useFormFieldContext, useLocale, useServerTable, useSidebar, useToast, useToastStore
+
+Utilities: applyDarkTheme, applyTheme, chartColorList, chartColors, cn, createTheme, defaultTheme, enUS, forestTheme, neutralTheme, oceanTheme, themePresets, themeToCSS, toast, zhTW
+
+Full typed signatures for every export: llms-full.txt (or api-report.txt in the repo).
+
+---
+
+# DESIGN.md — Arkite UI Design System
+
+> Machine-readable design spec for `@arkite-ui/core`. Feed this file to AI coding agents (and humans) building admin UIs with this library, so generated pages follow one consistent visual language instead of inventing their own.
+>
+> Source of truth: `src/styles/index.css` (tokens), `@arkite-ui/core/tokens` (JS values), Storybook (live docs). This file summarizes the rules; when in doubt, the code wins.
+
+## Identity
+
+**Arkite UI** is a component library for **multi-tenant SaaS admin panels**: data-dense, utilitarian, calm. React 18/19 + Tailwind CSS v4 + Radix UI. Light and dark mode are equal citizens — dark mode is automatic via tokens, never hand-tuned per page.
+
+Design philosophy:
+
+- **Clarity over decoration** — restrained color, generous whitespace inside a dense information layout
+- **Semantic, not literal** — every color/radius/shadow flows through named tokens; nothing is hardcoded
+- **Composable** — compound components (Card + CardHeader…), slots and render-props over configuration flags
+
+## Hard rules (for AI agents)
+
+1. **Import UI from `@arkite-ui/core`** (styles: `@arkite-ui/core/styles.css`). Never rebuild primitives that exist — check the component inventory below first.
+2. **Never use raw Tailwind palette classes** (`bg-red-50`, `text-blue-800`, `text-gray-500`…). Use semantic utilities only: `bg-destructive-soft`, `text-muted-foreground`, `border-border`.
+3. **Never write `dark:` color overrides.** Tokens already resolve dark mode. `dark:` is acceptable only for non-color adjustments in rare cases.
+4. **Never use arbitrary values** (`text-[13px]`, `shadow-[…]`, `rounded-[…]`). Use the token scale; if a size seems missing, use the nearest step.
+5. **Domain logic stays out of shared components.** API calls, routes, auth, and business models belong to the app layer; UI components receive data via props and emit events via callbacks.
+
+## Color system
+
+Colors are HSL triplets in CSS variables (`:root` light, `.dark` dark), exposed as Tailwind utilities via `@theme`. Always pair a background token with its `-foreground`.
+
+### Core
+
+| Token | Utility example | Use |
+|---|---|---|
+| `background` / `foreground` | `bg-background text-foreground` | Page base |
+| `card` / `card-foreground` | `bg-card` | Elevated surfaces |
+| `muted` / `muted-foreground` | `text-muted-foreground` | Secondary text, subtle fills |
+| `primary` / `primary-foreground` | `bg-primary text-primary-foreground` | Brand actions (violet) |
+| `secondary` / `secondary-foreground` | `bg-secondary` | Low-emphasis actions |
+| `accent` / `accent-foreground` | `bg-accent` | Highlights (teal) |
+| `border`, `input`, `ring` | `border-border`, `ring-ring` | Hairlines, form borders, focus |
+
+### Status (solid + soft layer)
+
+Four statuses: `success` (green), `warning` (amber), `destructive` (red), `info` (blue). Each has:
+
+- **Solid**: `bg-{status} text-{status}-foreground` — buttons, badges, dots
+- **Soft layer**: `bg-{status}-soft text-{status}-soft-foreground border-{status}-border` — alerts, toasts, tinted panels
+
+Naming rule: the "dangerous/negative" semantic is always **`destructive`** (never `error`) in variant props and tokens.
+
+### Contrast (WCAG AA)
+
+- Every built-in fg/bg pair — tokens, all four presets, light and dark, solid and soft — meets **WCAG AA (4.5:1)**, enforced by regression tests (`tokens.test.ts`, `presets.test.ts`). This is why rule 2 exists: paired tokens are guaranteed readable; hand-picked palette classes are not.
+- Foreground follows **background luminance, not semantics**: light backgrounds get dark text, dark backgrounds get light text (e.g. dark-mode `info` is black-on-blue, not white). Never re-pair a `-foreground` onto a different background.
+- `createTheme()` picks black/white foregrounds by real contrast ratio — any brand color yields AA-passing pairs automatically.
+- Custom palettes (raw CSS variable overrides): validate with the Storybook **Foundation / Design Tokens → Contrast Audit** page.
+
+### Charts & presence
+
+`chart-1`…`chart-5` for data series (use in order). `status-online/offline/busy/away` for presence dots (use `StatusDot`).
+
+## Typography
+
+- Sans: Inter (system fallback). Mono: JetBrains Mono — code, IDs, `InlineCode`, `Kbd`.
+- Scale: `text-2xs` (10px, micro labels) → `text-xs` (12px, captions/badges) → `text-sm` (14px, **default body in admin UIs**) → `text-base` (16px) → `text-xl`/`text-2xl`/`text-3xl` (headings via `PageHeader size`).
+- Numbers in tables/counters: `tabular-nums` (Badge `count` variant has it built in).
+
+## Spacing, radius, elevation
+
+- **Spacing**: 4px grid (Tailwind scale). Cards: compound children pad `p-4`; the root's `padding` prop defaults to `none` (`padding="lg"` = `p-6`). `density="compact"` for dashboard widgets. Forms stack on `gap-4`; sections on `gap-6`.
+- **Radius**: everything derives from one `--radius` (0.5rem): `rounded-lg` = var, `md` = −2px, `sm` = −4px. Pills/avatars use `rounded-full`. Changing `--radius` rethemes the whole library.
+- **Elevation**: soft low-alpha shadow scale `shadow-xs` → `shadow-2xl`. Cards sit at `xs/sm`; popovers `md/lg`; modals `xl`. Special: `shadow-sticky-left`, `shadow-sticky-header` for sticky table edges.
+- **Motion**: durations `fast` 100ms / `normal` 150ms / `slow` 300ms; easing tokens incl. `bounce`. Optional framer-motion components live in `@arkite-ui/core/motion`.
+
+## Component inventory — what to reach for
+
+| Need | Use | Not |
+|---|---|---|
+| Page title + actions | `PageHeader` (`size`, `badge`, `onBack`) | Hand-rolled flex headers |
+| Section on a page | `Card` (+`CardHeader actions`, `density="compact"` for widgets) | Bare bordered divs |
+| Data list w/ sorting/selection | `DataTable` (or `Table` family for full control; `VirtualList` for huge lists) | Custom tables |
+| KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
+| Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
+| Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
+| Mobile select | `SheetSelect` (bottom sheet) | Desktop `Select` on touch UIs |
+| Binary toggle | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
+| Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
+| Overlay panels | `Modal` (centered) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs |
+| Notifications | `toast.success/error/…` + `ImperativeToastContainer` (or `useToast` + `ToastContainer`) | Custom snackbars |
+| Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
+| Empty / error / loading | `EmptyState` / `ErrorState` / `Skeleton` family / `Spinner` / `LoadingOverlay` (`fullscreen`) | Blank screens |
+| Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |
+| App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells |
+| Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
+
+## API conventions (follow when composing or wrapping)
+
+- Change handlers on value components: **`onChange(value)`** (raw value, not event) — native-input wrappers keep React's event `onChange`
+- Error display on form controls: **`error?: boolean` + `errorMessage?: string`**
+- Open/close: **`open` + `onClose`** for dialogs/drawers/overlays; `defaultX` for uncontrolled counterparts. Exceptions: Radix passthrough components (Popover/Tooltip/DropdownMenu) and trigger-anchored pickers (Combobox/DatePicker/SheetSelect) expose Radix-style **`open` + `onOpenChange` + `defaultOpen`** — intentional, do not "fix"
+- Non-overlay expand/collapse state uses the **`x` / `onXChange` / `defaultX`** triple (CollapsibleSection `open`, Sidebar `collapsed`)
+- Sizes: **`sm | md | lg` as the baseline** (`md` default) — components may extend both ends (`xs`, `xl`, `icon`, `full`) when the domain calls for it; variants: `primary | secondary | outline | ghost | destructive` (Button additionally ships `gradient`)
+- Semantic status values are `success | warning | destructive | info` — never `error`/`danger` in props. `EmptyState`'s `error` variant is a *scenario* (error page), not a color, and `StatusDot`'s `online/offline/busy/away` is a presence axis — both are separate value domains
+- Booleans are bare (`disabled`, `loading`, `open`) — never `isDisabled`
+- Collection props: tabular/hierarchical data is **`data`** (DataTable/Tree/Sparkline), flat renderable lists are **`items`** (Timeline/VirtualList/Breadcrumb); `Steps.steps` is grandfathered. Key extraction is **`get{Noun}Key(x, index)`** (`getRowKey`, `getItemKey`)
+- Selection callbacks: **`onSelect(value, object?)`** — first arg is the selected value/key, optional second is the full object. Multi-select checkbox trees/tables use **`onSelectionChange`**
+- Navigation: data-layer props are **`path`** (router semantics), render-layer receives **`href`** (DOM semantics); custom link rendering is **`renderLink({ href, children, className, active })`** across all nav components
+- Definition objects (table columns, nav items) may use short render-prop names (`cell`, `icon`) — the `renderX` rule applies to component props, not def-object fields
+- Escape hatches: `className` everywhere (merged via `cn`), `renderX` props for custom item rendering
+
+## Theming
+
+Brand retheme = override CSS variables (or `createTheme()` from a hex, `applyTheme()` at runtime). Four built-in presets: Default, Neutral, Ocean, Forest. Because components consume only tokens, a future `[data-style="…"]` preset can restyle the entire library (radius, shadows, palette, density) with zero component changes.
+
+## Localization
+
+Every built-in string (placeholders, empty states, pagination, calendar month/weekday names, and all aria-labels) resolves through `LocaleProvider`. Rules:
+
+1. **Chinese apps must mount `<LocaleProvider locale={zhTW}>` at the root** — without it, screen readers announce English aria-labels inside a Chinese UI.
+2. Per-instance text still goes through props (`placeholder`, `emptyMessage`, …) — props always win over the locale.
+3. Never hardcode UI strings that a component already provides via locale; partial locales (`{ spinner: { loading: '…' } }`) fall back to English per key.
+
+
+---
+
+# Full public API (typed)
+
 type ActionButtonsProps {
   actions: ActionItem[]
   className?: string | undefined

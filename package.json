@@ -60,10 +60,13 @@
     "src/styles",
     "src/configs",
     "cli",
-    "DESIGN.md"
+    "DESIGN.md",
+    "llms.txt",
+    "llms-full.txt"
   ],
   "scripts": {
-    "build": "pnpm run clean && tsup",
+    "build": "pnpm run clean && pnpm run generate:llms && tsup",
+    "generate:llms": "node scripts/generate-llms.mjs",
     "dev": "tsup --watch",
     "test": "vitest run --project unit",
     "test:watch": "vitest --project unit",

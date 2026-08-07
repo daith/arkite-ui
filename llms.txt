@@ -1,0 +1,82 @@
+# @arkite-ui/core v0.13.0
+
+> React components for multi-tenant SaaS admin panels. Tailwind CSS v4 +
+> Radix UI + TypeScript. Pure UI only: no business logic, auth, stores, or
+> routing — data comes in via props, events go out via callbacks.
+
+## Setup
+
+```bash
+pnpm add @arkite-ui/core
+# peer deps: react react-dom tailwindcss zustand lucide-react
+# optional:  framer-motion (Animated* variants)
+```
+
+```css
+/* app.css — Tailwind v4, tokens included */
+@import "tailwindcss";
+@import "@arkite-ui/core/styles.css";
+```
+
+## Rules for generated code
+
+1. Import UI from `@arkite-ui/core` — never rebuild primitives that exist (see inventory below).
+2. Use semantic token utilities only (`bg-card`, `text-muted-foreground`, `border-border`) — never raw palette classes (`bg-red-50`), never `dark:` color overrides (tokens handle dark mode), never arbitrary values (`text-[13px]`).
+3. Components follow the controlled/uncontrolled React convention: `value`+`onChange` controls, `defaultValue` doesn't.
+4. Keep API calls, routes, and business models in the app layer.
+
+Full design rules (color/spacing/typography/layout recipes): DESIGN.md, shipped
+inside this package — also embedded in llms-full.txt.
+
+## Core patterns
+
+### Server-paginated table
+
+`useServerTable` owns the six controlled props server mode needs; you supply
+`data` + `totalRows` and fetch on `queryKey`:
+
+```tsx
+import { DataTable, useServerTable, type Column } from '@arkite-ui/core'
+
+const table = useServerTable({ initialPageSize: 20 })
+const [page, setPage] = useState({ items: [], total: 0 })
+useEffect(() => {
+  fetchUsers(table.query).then(setPage) // query = { page, pageSize, sort, filters }
+}, [table.queryKey])
+
+<DataTable columns={columns} data={page.items} totalRows={page.total}
+  getRowKey={(r) => r.id} {...table.props} />
+```
+
+Client-side tables need none of that: pass `data` and the table filters,
+sorts, and paginates itself.
+
+### Toasts
+
+```tsx
+import { useToast, ToastContainer } from '@arkite-ui/core'
+
+// once, near the app root:
+<ToastContainer position="bottom-right" />
+
+const toast = useToast()
+toast.success('Saved', { description: 'Changes are live.' })
+toast.error('Failed to save')
+```
+
+### Theming
+
+```tsx
+import { createTheme, applyTheme } from '@arkite-ui/core'
+applyTheme(createTheme({ primary: '#7c3aed' })) // HSL tokens from one hex
+```
+
+## Export inventory
+
+Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
+
+Hooks: useCommandPalette, useFormContext, useFormFieldContext, useLocale, useServerTable, useSidebar, useToast, useToastStore
+
+Utilities: applyDarkTheme, applyTheme, chartColorList, chartColors, cn, createTheme, defaultTheme, enUS, forestTheme, neutralTheme, oceanTheme, themePresets, themeToCSS, toast, zhTW
+
+Full typed signatures for every export: llms-full.txt (or api-report.txt in the repo).
