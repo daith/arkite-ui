@@ -15,7 +15,7 @@ addons.setConfig({
     base: 'light',
 
     brandTitle: 'Arkite UI',
-    brandUrl: './',
+    brandUrl: '../',
     brandImage,
     brandTarget: '_self',
 
