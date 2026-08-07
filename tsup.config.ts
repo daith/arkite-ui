@@ -18,6 +18,9 @@ const shared: Partial<Options> = {
   ],
 }
 
+// No `clean` here: tsup runs array configs in parallel (Promise.all), so one
+// config's clean can race the other's already-written output and wipe it.
+// The build script runs `pnpm run clean` before tsup instead.
 export default defineConfig([
   // Component entries — RSC client modules, so they carry the banner.
   {
@@ -26,7 +29,6 @@ export default defineConfig([
       index: 'src/index.ts',
       motion: 'src/motion.ts',
     },
-    clean: true,
     banner: { js: '"use client";' },
   },
   // Pure-data entries — server-safe by design. A "use client" banner here
@@ -38,6 +40,5 @@ export default defineConfig([
       'tailwind-preset': 'src/tailwind-preset.ts',
       tokens: 'src/tokens/index.ts',
     },
-    clean: false,
   },
 ])

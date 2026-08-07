@@ -63,7 +63,7 @@
     "DESIGN.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "pnpm run clean && tsup",
     "dev": "tsup --watch",
     "test": "vitest run --project unit",
     "test:watch": "vitest --project unit",

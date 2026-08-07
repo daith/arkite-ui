@@ -1,6 +1,6 @@
 import { Fragment, useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
-import { warnDeprecated } from '../../utils/deprecate'
+import { warnDeprecated, warnUsage } from '../../utils/deprecate'
 import { useLocale } from '../../locale'
 import {
   Table,
@@ -110,12 +110,23 @@ export interface DataTableProps<T> {
   /** Callback when page changes (1-based) */
   onPageChange?: (page: number) => void
   /**
+   * Callback when the rows-per-page selector changes. In server-side mode
+   * (`totalRows`) the selector only renders when this is provided, so the
+   * consumer can refetch with the new page size.
+   */
+  onPageSizeChange?: (pageSize: number) => void
+  /**
    * Total row count across all pages (server-side mode). When set, `data` is
    * treated as the already-fetched current page: the table skips client-side
    * filtering, sorting, and slicing, and the pagination footer derives page
-   * count and range info from this total instead of `data.length`. Combine
-   * with the controlled `page`/`sortState`/`filters` props and do the actual
-   * work on the server.
+   * count and range info from this total instead of `data.length`.
+   *
+   * Server-side mode expects the controlled `page` prop (the table cannot
+   * slice `data`, so an internal page would drift from what is shown), and
+   * `onPageSizeChange` if you keep the rows-per-page selector. Column filters
+   * only render when `filters`/`onFilterChange` are controlled AND the column
+   * provides `filterOptions` (options derived from the current page would be
+   * incomplete). Do the actual filtering/sorting/slicing on the server.
    */
   totalRows?: number
   /** Additional class name */
@@ -190,6 +201,7 @@ export function DataTable<T>({
   onFilterChange,
   page: controlledPage,
   onPageChange,
+  onPageSizeChange,
   totalRows,
   className,
 }: DataTableProps<T>) {
@@ -218,6 +230,13 @@ export function DataTable<T>({
   const isPageControlled = controlledPage !== undefined
   // Server-side mode: `data` is the already-processed current page
   const isServerMode = totalRows !== undefined
+  if (isServerMode && pagination && !isPageControlled) {
+    warnUsage(
+      'DataTable',
+      'server-uncontrolled-page',
+      'server-side mode (`totalRows`) without a controlled `page` prop — the table cannot slice `data`, so the pager and range info will not match the rendered rows unless you refetch in `onPageChange` and pass `page` back.'
+    )
+  }
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize,
@@ -276,6 +295,17 @@ export function DataTable<T>({
       return Array.from(unique).sort()
     },
     [data]
+  )
+
+  // In server mode filtering happens on the server: only render the filter UI
+  // when the consumer controls filters (and can react to changes) AND provides
+  // the full option list — options derived from the current page are incomplete,
+  // and an uncontrolled filter would do nothing but reset the page.
+  const canRenderFilter = useCallback(
+    (column: Column<T>): boolean =>
+      Boolean(column.filterable) &&
+      (!isServerMode || (isFiltersControlled && onFilterChange != null && column.filterOptions != null)),
+    [isServerMode, isFiltersControlled, onFilterChange]
   )
 
   const resetToFirstPage = useCallback(() => {
@@ -399,6 +429,7 @@ export function DataTable<T>({
   const setPageSize = (nextPageSize: number) => {
     setPaginationState({ pageIndex: 0, pageSize: nextPageSize })
     resetToFirstPage()
+    onPageSizeChange?.(nextPageSize)
   }
 
   // ─── Selection helpers ───
@@ -608,7 +639,7 @@ export function DataTable<T>({
                   ) : (
                     column.header
                   )}
-                  {column.filterable && (
+                  {canRenderFilter(column) && (
                     <div
                       ref={(el) => { filterDropdownRefs.current[column.key] = el }}
                       className="relative inline-block"
@@ -778,7 +809,7 @@ export function DataTable<T>({
       </Table>
       </div>
 
-      {pagination && totalRowCount > 0 && (
+      {pagination && totalRowCount > 0 && (!isServerMode || data.length > 0) && (
         <div className="flex items-center justify-between border-t px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {hasActiveFilters && !isServerMode && (
@@ -786,19 +817,25 @@ export function DataTable<T>({
                 {locale.dataTable.showing(filteredData.length, data.length)}
               </span>
             )}
-            <span>{locale.pagination.rowsPerPage}</span>
-            <select
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
-              aria-label={locale.pagination.rowsPerPage}
-              className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring/40 focus:ring-offset-0 cursor-pointer"
-            >
-              {pageSizeOptions.map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
+            {/* Server mode can't re-slice locally — without a callback the
+                selector would change the footer math but not the rows. */}
+            {(!isServerMode || onPageSizeChange != null) && (
+              <>
+                <span>{locale.pagination.rowsPerPage}</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                  aria-label={locale.pagination.rowsPerPage}
+                  className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring/40 focus:ring-offset-0 cursor-pointer"
+                >
+                  {pageSizeOptions.map((size) => (
+                    <option key={size} value={size}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-4">

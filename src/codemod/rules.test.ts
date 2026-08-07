@@ -287,13 +287,16 @@ export const A = () => (
 })
 
 describe('規則 10:DataTable expandable → renderExpandedRow', () => {
-  it('箭頭函式與識別字改名;布林形式不動', () => {
+  it('箭頭函式與函式型別的識別字改名;布林形式(含布林識別字)不動', () => {
     const { text, outcome } = apply(
       `import { DataTable } from '@arkite-ui/core'
+const renderRow = (row: { id: string }) => <p>{row.id}</p>
+const hasDetails = true as boolean
 export const A = () => (
   <div>
     <DataTable rows={rows} expandable={(row) => <p>{row.id}</p>} />
     <DataTable rows={rows} expandable={renderRow} />
+    <DataTable rows={rows} expandable={hasDetails} />
     <DataTable rows={rows} expandable />
     <DataTable rows={rows} expandable={true} />
     <DataTable rows={rows} expandable={false} />
@@ -303,6 +306,7 @@ export const A = () => (
     )
     expect(text).toContain('renderExpandedRow={(row) => <p>{row.id}</p>}')
     expect(text).toContain('renderExpandedRow={renderRow}')
+    expect(text).toContain('expandable={hasDetails}')
     expect(text).toContain('expandable />')
     expect(text).toContain('expandable={true}')
     expect(text).toContain('expandable={false}')
@@ -310,20 +314,23 @@ export const A = () => (
     expect(hit(outcome, 'data-table-render-expanded-row').todos).toBe(0)
   })
 
-  it('無法判定的表達式標 TODO', () => {
+  it('無法判定的表達式(含解析不出型別的識別字)標 TODO', () => {
     const { text, outcome } = apply(
       `import { DataTable } from '@arkite-ui/core'
+declare const canExpand: any
+declare const renderRow: any
 export const A = () => (
-  <DataTable
-    rows={rows}
-    expandable={canExpand && renderRow}
-  />
+  <div>
+    <DataTable rows={rows} expandable={canExpand && renderRow} />
+    <DataTable rows={rows} expandable={renderRow} />
+  </div>
 )
 `
     )
     expect(text).toContain('expandable={canExpand && renderRow}')
+    expect(text).toContain('expandable={renderRow}')
     expect(text).toContain(`// ${TODO_MARKER}`)
-    expect(hit(outcome, 'data-table-render-expanded-row').todos).toBe(1)
+    expect(hit(outcome, 'data-table-render-expanded-row').todos).toBe(2)
   })
 })
 
@@ -479,6 +486,26 @@ export function useX() {
     expect(text).toBe(code)
     expect(outcome.changed).toBe(false)
   })
+
+  it('干擾項:同檔另一 scope 的同名 toast(函式參數)不動,arkite 的照改', () => {
+    const { text } = apply(
+      `import { useToast } from '@arkite-ui/core'
+export function useSave() {
+  const toast = useToast()
+  return () => toast.clear()
+}
+export function other(toast: { clear: () => void; success: (a: string, b: string) => void }) {
+  toast.clear()
+  toast.success('a', 'b')
+}
+`
+    )
+    // arkite 的 useToast() 回傳值:改名
+    expect(text).toContain('return () => toast.dismissAll()')
+    // 同名參數:方法與第二參數都不動
+    expect(text).toContain('toast.clear()')
+    expect(text).toContain("toast.success('a', 'b')")
+  })
 })
 
 describe('re-export 安全性', () => {
@@ -562,6 +589,20 @@ export const Own = () => <Alert variant="error" />
       const again = runCodemod(dir, { dryRun: true })
       expect(again.changedFiles).toHaveLength(0)
       expect(again.totalChanges).toBe(0)
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('glob fallback:沒有 src/ 的專案(app/ 在根目錄)也掃得到', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'arkite-codemod-'))
+    const appDir = path.join(dir, 'app')
+    fs.mkdirSync(appDir)
+    fs.writeFileSync(path.join(appDir, 'page.tsx'), COMPREHENSIVE)
+    try {
+      const dry = runCodemod(dir, { dryRun: true })
+      expect(dry.fileCount).toBe(1)
+      expect(dry.changedFiles).toHaveLength(1)
     } finally {
       fs.rmSync(dir, { recursive: true, force: true })
     }

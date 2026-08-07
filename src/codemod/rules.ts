@@ -352,9 +352,15 @@ function classifyExpandableValue(attr: JsxAttribute): 'function' | 'boolean' | '
   const kind = inner.getKind()
   if (kind === SyntaxKind.TrueKeyword || kind === SyntaxKind.FalseKeyword) return 'boolean'
   if (Node.isIdentifier(inner) && inner.getText() === 'undefined') return 'boolean'
-  // 0.12 起 expandable 只該是 boolean,函式(或函式值的識別字)必為舊用法 → 照改
-  if (Node.isArrowFunction(inner) || Node.isFunctionExpression(inner) || Node.isIdentifier(inner)) {
-    return 'function'
+  if (Node.isArrowFunction(inner) || Node.isFunctionExpression(inner)) return 'function'
+  // 識別字等其他表達式:布林值是合法現行用法(expandable: boolean | fn),
+  // 只有可呼叫的值才是舊用法,必須問型別;解析不了就標 TODO,不用猜的
+  try {
+    const type = inner.getType()
+    if (type.isBoolean() || type.isBooleanLiteral()) return 'boolean'
+    if (type.getCallSignatures().length > 0) return 'function'
+  } catch {
+    // 型別解析失敗 → 走 unknown(標 TODO)
   }
   return 'unknown'
 }
@@ -430,23 +436,37 @@ const WRAPPABLE_KINDS = new Set<SyntaxKind>([
   SyntaxKind.JsxFragment,
 ])
 
-/** 檔內「確定來自 arkite」的 toast 物件名:import 的 toast、useToast() 的回傳變數 */
-function toastObjectNames(sf: SourceFile): Set<string> {
-  const names = new Set<string>()
+/** node 的 symbol 是否綁定到 decl(識別字與宣告同名不算,要同一個綁定) */
+function isBoundTo(node: Node, decl: Node): boolean {
+  return node.getSymbol()?.getDeclarations().some((d) => d === decl) ?? false
+}
+
+/**
+ * 檔內「確定來自 arkite」的 toast 物件宣告:import 的 toast specifier、
+ * useToast() 回傳值的變數宣告。呼叫點用 symbol 綁定比對這些宣告,
+ * 同名但不同來源的物件(函式參數、其他函式庫的 toast)不會誤中。
+ */
+function toastObjectDeclarations(sf: SourceFile): Set<Node> {
+  const decls = new Set<Node>()
   const direct = arkiteImportInfo(sf, 'toast')
-  if (direct != null) names.add(direct.localName)
+  if (direct != null) decls.add(direct.specifier)
   const hook = arkiteImportInfo(sf, 'useToast')
   if (hook != null) {
     for (const vd of sf.getDescendantsOfKind(SyntaxKind.VariableDeclaration)) {
       const init = vd.getInitializer()
       if (init == null || !Node.isCallExpression(init)) continue
       const callee = init.getExpression()
-      if (!Node.isIdentifier(callee) || callee.getText() !== hook.localName) continue
-      const nameNode = vd.getNameNode()
-      if (Node.isIdentifier(nameNode)) names.add(nameNode.getText())
+      if (!Node.isIdentifier(callee) || !isBoundTo(callee, hook.specifier)) continue
+      if (Node.isIdentifier(vd.getNameNode())) decls.add(vd)
     }
   }
-  return names
+  return decls
+}
+
+/** identifier 是否參照到 arkite 的 toast 物件(以宣告綁定判定,非名稱比對) */
+function isArkiteToastRef(node: Node, decls: Set<Node>): boolean {
+  if (!Node.isIdentifier(node)) return false
+  return node.getSymbol()?.getDeclarations().some((d) => decls.has(d)) ?? false
 }
 
 interface ToastMethodCall {
@@ -455,15 +475,14 @@ interface ToastMethodCall {
 }
 
 function toastMethodCalls(sf: SourceFile): ToastMethodCall[] {
-  const names = toastObjectNames(sf)
-  if (names.size === 0) return []
+  const decls = toastObjectDeclarations(sf)
+  if (decls.size === 0) return []
   const out: ToastMethodCall[] = []
   for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
     const target = call.getExpression()
     if (!Node.isPropertyAccessExpression(target)) continue
     if (!TOAST_METHODS.has(target.getName())) continue
-    const obj = target.getExpression()
-    if (!Node.isIdentifier(obj) || !names.has(obj.getText())) continue
+    if (!isArkiteToastRef(target.getExpression(), decls)) continue
     const args = call.getArguments()
     if (args.length < 2) continue
     out.push({ call, second: args[1] })
@@ -650,14 +669,13 @@ const toastDismissAllRule: Rule = {
   description: 'toast/useToast() 的 .clear() → .dismissAll()(含解構)',
   transform(sf) {
     let total = editUntilStable(() => {
-      const names = toastObjectNames(sf)
-      if (names.size === 0) return false
+      const decls = toastObjectDeclarations(sf)
+      if (decls.size === 0) return false
       for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
         const target = call.getExpression()
         if (!Node.isPropertyAccessExpression(target)) continue
         if (target.getName() !== 'clear') continue
-        const obj = target.getExpression()
-        if (!Node.isIdentifier(obj) || !names.has(obj.getText())) continue
+        if (!isArkiteToastRef(target.getExpression(), decls)) continue
         target.getNameNode().replaceWithText('dismissAll')
         return true
       }
@@ -670,7 +688,7 @@ const toastDismissAllRule: Rule = {
         const init = vd.getInitializer()
         if (init == null || !Node.isCallExpression(init)) continue
         const callee = init.getExpression()
-        if (!Node.isIdentifier(callee) || callee.getText() !== hook.localName) continue
+        if (!Node.isIdentifier(callee) || !isBoundTo(callee, hook.specifier)) continue
         const nameNode = vd.getNameNode()
         if (!Node.isObjectBindingPattern(nameNode)) continue
         for (const el of nameNode.getElements()) {

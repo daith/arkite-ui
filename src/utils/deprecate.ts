@@ -16,3 +16,12 @@ export function warnDeprecated(component: string, oldName: string, newName: stri
     `[arkite-ui] ${component}: \`${oldName}\` is deprecated and will be removed in v1.0 — use \`${newName}\` instead.`
   )
 }
+
+/** Dev-only, once-per-key warning for incorrect prop combinations. */
+export function warnUsage(component: string, key: string, message: string) {
+  if (process.env.NODE_ENV === 'production') return
+  const fullKey = `${component}.${key}`
+  if (warned.has(fullKey)) return
+  warned.add(fullKey)
+  console.warn(`[arkite-ui] ${component}: ${message}`)
+}

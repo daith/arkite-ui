@@ -66,4 +66,30 @@ describe('FilterSelect', () => {
     const select = container.querySelector('select')
     expect(select?.className).toContain('h-8')
   })
+
+  it('uses label as the accessible name when none is provided', () => {
+    render(<FilterSelect label="Status" options={statusOptions} />)
+    expect(screen.getByLabelText('Status')).toBeInTheDocument()
+  })
+
+  it('does not override a native <label htmlFor> with aria-label', () => {
+    render(
+      <>
+        <label htmlFor="status-filter">Order status</label>
+        <FilterSelect id="status-filter" label="Status" options={statusOptions} />
+      </>
+    )
+    const select = screen.getByLabelText('Order status')
+    expect(select).not.toHaveAttribute('aria-label')
+  })
+
+  it('does not set aria-label when aria-labelledby is provided', () => {
+    render(
+      <>
+        <span id="status-heading">Order status</span>
+        <FilterSelect aria-labelledby="status-heading" label="Status" options={statusOptions} />
+      </>
+    )
+    expect(screen.getByRole('combobox')).not.toHaveAttribute('aria-label')
+  })
 })

@@ -439,6 +439,7 @@ type DataTableProps {
   maxHeight?: string | number | undefined
   onFilterChange?: ((filters: Record<string, string[]>) => void) | undefined
   onPageChange?: ((page: number) => void) | undefined
+  onPageSizeChange?: ((pageSize: number) => void) | undefined
   onRowClick?: ((row: T, index: number) => void) | undefined
   onSelectionChange?: ((selected: Set<string | number>) => void) | undefined
   onSortChange?: ((sort: SortState | null) => void) | undefined
@@ -1578,7 +1579,7 @@ value CopyButton: React.ForwardRefExoticComponent<CopyButtonProps & React.RefAtt
 
 value CopyInput: React.ForwardRefExoticComponent<CopyInputProps & React.RefAttributes<HTMLInputElement>>
 
-value DataTable: <T>({ data, columns, pagination, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
+value DataTable: <T>({ data, columns, pagination, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
 
 value DatePicker: React.ForwardRefExoticComponent<DatePickerProps & React.RefAttributes<HTMLInputElement>>
 

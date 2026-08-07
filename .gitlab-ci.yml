@@ -71,7 +71,9 @@ keyboard:browser:
   stage: check
   image: mcr.microsoft.com/playwright:v1.58.2-noble
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    # 與 node:22-alpine(musl)的 cache 分開:同 key 共用 node_modules 會讓
+    # 平台原生二進位(rollup/esbuild)在 glibc/musl 間互踩,間歇性炸 pipeline
+    key: ${CI_COMMIT_REF_SLUG}-playwright
     paths:
       - node_modules/
   before_script:
@@ -88,7 +90,7 @@ smoke:next:
   stage: check
   image: mcr.microsoft.com/playwright:v1.58.2-noble
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key: ${CI_COMMIT_REF_SLUG}-playwright
     paths:
       - node_modules/
   before_script:

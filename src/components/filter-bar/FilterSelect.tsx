@@ -46,14 +46,18 @@ export const FilterSelect = forwardRef<HTMLSelectElement, FilterSelectProps>(
       return [allOption, ...options]
     }, [options, allLabel, label, locale])
 
+    // The label prop doubles as the accessible name — filter selects usually
+    // render without a visible <label>, which axe rightly flags. But when the
+    // consumer wires up their own name (a native <label htmlFor> via `id`, or
+    // `aria-labelledby`), an aria-label would silently override it in the
+    // accessible-name computation, so back off.
+    const hasOwnName = props.id != null || props['aria-labelledby'] != null
     return (
       <Select
         ref={ref}
         size={size}
         options={mergedOptions}
-        // The label prop doubles as the accessible name — filter selects
-        // render without a visible <label>, which axe rightly flags.
-        aria-label={label}
+        aria-label={hasOwnName ? undefined : label}
         className={cn('w-auto', className)}
         onChange={(e) => onChange?.(e.target.value)}
         {...props}

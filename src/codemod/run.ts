@@ -6,7 +6,7 @@
  *
  * 行為:
  * - 優先載入目標的 tsconfig.json;找不到(或沒列出任何檔案)時,
- *   改用 glob 掃描 `**\/src\/**\/*.{ts,tsx}`(略過 node_modules/dist 等)。
+ *   改用 glob 掃描整個目標資料夾的 *.{ts,tsx}(略過 node_modules/dist 等)。
  * - 逐檔套用 src/codemod/rules.ts 的規則;--dry-run 只回報不寫檔。
  * - 結束印出每條規則的變更數與 TODO 標記數。
  */
@@ -40,7 +40,9 @@ const IGNORED_DIRS = new Set([
   '.venv',
 ])
 
-function collectSourceFilePaths(dir: string, insideSrc: boolean, acc: string[]): void {
+// 不限定 src/:Next.js 常見 app/、pages/、components/ 直接放專案根目錄,
+// 只掃 src/ 會把這類專案回報成「0 檔案、沒有變更」的假成功
+function collectSourceFilePaths(dir: string, acc: string[]): void {
   let entries: fs.Dirent[]
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true })
@@ -50,10 +52,9 @@ function collectSourceFilePaths(dir: string, insideSrc: boolean, acc: string[]):
   for (const entry of entries) {
     if (entry.isDirectory()) {
       if (entry.name.startsWith('.') || IGNORED_DIRS.has(entry.name)) continue
-      collectSourceFilePaths(path.join(dir, entry.name), insideSrc || entry.name === 'src', acc)
+      collectSourceFilePaths(path.join(dir, entry.name), acc)
     } else if (
       entry.isFile() &&
-      insideSrc &&
       /\.(ts|tsx)$/.test(entry.name) &&
       !entry.name.endsWith('.d.ts')
     ) {
@@ -90,7 +91,7 @@ function createProject(target: string): Project {
     },
   })
   const paths: string[] = []
-  collectSourceFilePaths(target, false, paths)
+  collectSourceFilePaths(target, paths)
   for (const filePath of paths) project.addSourceFileAtPath(filePath)
   return project
 }

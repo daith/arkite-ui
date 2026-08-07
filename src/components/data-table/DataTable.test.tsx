@@ -632,6 +632,129 @@ describe('DataTable', () => {
     expect(screen.getByLabelText('Next page')).toBeDisabled()
   })
 
+  it('totalRows hides the rows-per-page selector unless onPageSizeChange is provided', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(
+      <DataTable
+        columns={columns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        totalRows={47}
+      />
+    )
+    // Without a callback the selector could only change the footer math, not
+    // the rows — so it must not render
+    expect(screen.queryByLabelText('Rows per page:')).not.toBeInTheDocument()
+
+    const onPageSizeChange = vi.fn()
+    rerender(
+      <DataTable
+        columns={columns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        onPageSizeChange={onPageSizeChange}
+        totalRows={47}
+      />
+    )
+    await user.selectOptions(screen.getByLabelText('Rows per page:'), '50')
+    expect(onPageSizeChange).toHaveBeenCalledWith(50)
+  })
+
+  it('totalRows hides the pagination footer while data is empty (loading)', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        getRowKey={(r) => r.id}
+        loading
+        defaultPageSize={10}
+        page={1}
+        onPageChange={() => {}}
+        totalRows={47}
+      />
+    )
+    // No rows rendered → no "1-10 of 47" claim
+    expect(screen.queryByText(/1-10 of 47/)).not.toBeInTheDocument()
+  })
+
+  it('totalRows only renders column filters when controlled and filterOptions provided', () => {
+    const filterableColumns: Column<TestRow>[] = [
+      { key: 'name', header: 'Name', filterable: true },
+      { key: 'age', header: 'Age' },
+    ]
+    const { rerender } = render(
+      <DataTable
+        columns={filterableColumns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        totalRows={47}
+      />
+    )
+    // Uncontrolled filter in server mode would do nothing but reset the page
+    expect(screen.queryByLabelText('Filter Name')).not.toBeInTheDocument()
+
+    rerender(
+      <DataTable
+        columns={[
+          { key: 'name', header: 'Name', filterable: true, filterOptions: ['User 1', 'User 21'] },
+          { key: 'age', header: 'Age' },
+        ]}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        filters={{}}
+        onFilterChange={() => {}}
+        totalRows={47}
+      />
+    )
+    expect(screen.getByLabelText('Filter Name')).toBeInTheDocument()
+  })
+
+  it('totalRows without a controlled page warns in dev', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      render(
+        <DataTable
+          columns={columns}
+          data={serverPage}
+          getRowKey={(r) => r.id}
+          defaultPageSize={10}
+          totalRows={47}
+        />
+      )
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('controlled `page`'))
+    } finally {
+      warnSpy.mockRestore()
+    }
+  })
+
+  it('onPageSizeChange also fires in client-side mode', async () => {
+    const user = userEvent.setup()
+    const onPageSizeChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        onPageSizeChange={onPageSizeChange}
+      />
+    )
+    await user.selectOptions(screen.getByLabelText('Rows per page:'), '20')
+    expect(onPageSizeChange).toHaveBeenCalledWith(20)
+  })
+
   // ─── Uncontrolled Selection Tests ───
 
   it('defaultSelectedRows sets initial uncontrolled selection', () => {
