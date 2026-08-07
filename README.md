@@ -316,6 +316,10 @@ applyTheme(myTheme)
 
 Foregrounds are picked by actual WCAG contrast (black or white, whichever contrasts more), so every generated pair meets AA (4.5:1) for any brand color — in light and dark mode alike.
 
+## API Stability
+
+The entire public API surface — every export, and every own-declared member of every Props type — is snapshotted in [`api-report.txt`](./api-report.txt) and enforced by a test. Any change to the surface fails CI until the snapshot is deliberately regenerated (`pnpm vitest run src/api-surface.test.ts -u`), which turns the API diff into a reviewable artifact in the merge request. Deprecations warn for at least one minor before removal; v1.0 removals ship with a codemod.
+
 ## Localization
 
 All built-in strings — placeholders, empty states, pagination, calendar month/weekday names, and every aria-label — resolve through `LocaleProvider`. Ships with `enUS` (default) and `zhTW`:
