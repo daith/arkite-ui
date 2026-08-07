@@ -150,7 +150,7 @@
   --destructive-foreground: 0 0% 100%;
 
   /* Info */
-  --info: 217 91% 55%;
+  --info: 217 91% 53%;
   --info-foreground: 0 0% 100%;
 
   /* Status soft layer */
@@ -201,7 +201,7 @@
 
 /* Design token values — dark mode */
 .dark {
-  --primary: 250 100% 70%;
+  --primary: 250 100% 67%;
   --primary-foreground: 0 0% 100%;
 
   --secondary: 220 15% 18%;
@@ -216,11 +216,11 @@
   --warning: 38 92% 55%;
   --warning-foreground: 0 0% 0%;
 
-  --destructive: 0 72% 55%;
+  --destructive: 0 72% 53%;
   --destructive-foreground: 0 0% 100%;
 
   --info: 217 91% 60%;
-  --info-foreground: 0 0% 100%;
+  --info-foreground: 0 0% 0%;
 
   /* Status soft layer */
   --success-soft: 145 80% 10%;
@@ -246,7 +246,7 @@
 
   --border: 220 15% 22%;
   --input: 220 15% 22%;
-  --ring: 250 100% 70%;
+  --ring: 250 100% 67%;
 
   --chart-1: 250 100% 70%;
   --chart-2: 168 80% 55%;

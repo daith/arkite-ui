@@ -77,7 +77,7 @@ const lightColors: SemanticColors = {
   card: primitives.white,
   cardForeground: primitives.gray[900],
   muted: primitives.gray[100],
-  mutedForeground: primitives.gray[500],
+  mutedForeground: primitives.gray[600],
 
   // Brand
   primary: primitives.purple[600],
@@ -128,21 +128,21 @@ const darkColors: SemanticColors = {
 
   // Brand
   primary: primitives.purple[500],
-  primaryForeground: primitives.white,
+  primaryForeground: primitives.gray[950],
   secondary: primitives.gray[800],
   secondaryForeground: primitives.gray[100],
   accent: primitives.teal[400],
-  accentForeground: primitives.gray[900],
+  accentForeground: primitives.gray[950],
 
   // Status
   success: primitives.green[500],
-  successForeground: primitives.gray[900],
+  successForeground: primitives.gray[950],
   warning: primitives.amber[400],
-  warningForeground: primitives.gray[900],
+  warningForeground: primitives.gray[950],
   danger: primitives.red[500],
-  dangerForeground: primitives.white,
+  dangerForeground: primitives.gray[950],
   info: primitives.blue[500],
-  infoForeground: primitives.white,
+  infoForeground: primitives.gray[950],
 
   // Status soft layer
   successSoft: primitives.green[950],
