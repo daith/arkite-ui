@@ -8,6 +8,7 @@ import {
   radius,
   spacing,
 } from './index'
+import { contrastRatio, hexLuminance, WCAG_AA } from '../test-utils/contrast'
 
 describe('primitives', () => {
   it('exposes white and black', () => {
@@ -110,6 +111,43 @@ describe('semantic colors', () => {
     expect(colors.dark.dangerSoft).toBe(primitives.red[950])
     expect(colors.dark.infoSoft).toBe(primitives.blue[950])
   })
+})
+
+describe('semantic color contrast (WCAG AA regression guard)', () => {
+  // Every background/foreground pair the token API promises. If a color
+  // change drops any pair below 4.5:1, this fails instead of waiting for
+  // someone to eyeball the Storybook contrast audit page.
+  const pairs = [
+    ['primary', 'primaryForeground'],
+    ['secondary', 'secondaryForeground'],
+    ['accent', 'accentForeground'],
+    ['success', 'successForeground'],
+    ['warning', 'warningForeground'],
+    ['danger', 'dangerForeground'],
+    ['info', 'infoForeground'],
+    ['background', 'foreground'],
+    ['card', 'cardForeground'],
+    ['muted', 'mutedForeground'],
+    ['successSoft', 'successSoftForeground'],
+    ['warningSoft', 'warningSoftForeground'],
+    ['dangerSoft', 'dangerSoftForeground'],
+    ['infoSoft', 'infoSoftForeground'],
+  ] as const
+
+  for (const scheme of ['light', 'dark'] as const) {
+    it(`every ${scheme} pair meets 4.5:1`, () => {
+      for (const [bgKey, fgKey] of pairs) {
+        const ratio = contrastRatio(
+          hexLuminance(colors[scheme][fgKey]),
+          hexLuminance(colors[scheme][bgKey]),
+        )
+        expect(
+          ratio,
+          `${scheme}.${fgKey} (${colors[scheme][fgKey]}) on ${scheme}.${bgKey} (${colors[scheme][bgKey]}) = ${ratio.toFixed(2)}:1`,
+        ).toBeGreaterThanOrEqual(WCAG_AA)
+      }
+    })
+  }
 })
 
 describe('spacing', () => {
