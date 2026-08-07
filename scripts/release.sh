@@ -14,7 +14,7 @@ printf "    Arkite UI — Release Cut\n"
 printf "========================================\n"
 
 # Step 1: 前置檢查
-printf "\n${YELLOW}[1/5] 前置檢查...${NC}\n"
+printf "\n${YELLOW}[1/6] 前置檢查...${NC}\n"
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [ "$BRANCH" != "main" ]; then
@@ -35,7 +35,7 @@ fi
 printf "${GREEN}✓ main 分支、工作目錄乾淨、與遠端同步${NC}\n"
 
 # Step 2: 確認有待發布的 changeset
-printf "\n${YELLOW}[2/5] 檢查 changesets...${NC}\n"
+printf "\n${YELLOW}[2/6] 檢查 changesets...${NC}\n"
 if ! ls .changeset/*.md 2>/dev/null | grep -v README > /dev/null; then
     printf "${RED}✗ 沒有待發布的 changeset，無事可發。${NC}\n"
     exit 1
@@ -43,14 +43,14 @@ fi
 pnpm changeset status || exit 1
 
 # Step 3: 驗證 + 測試 + build
-printf "\n${YELLOW}[3/5] 驗證與測試...${NC}\n"
+printf "\n${YELLOW}[3/6] 驗證與測試...${NC}\n"
 ./scripts/verify-changesets.sh || exit 1
 pnpm test || exit 1
 pnpm run build || exit 1
 printf "${GREEN}✓ 測試與 build 通過${NC}\n"
 
 # Step 4: bump 版本並確認
-printf "\n${YELLOW}[4/5] 消化 changesets、bump 版本...${NC}\n"
+printf "\n${YELLOW}[4/6] 消化 changesets、bump 版本...${NC}\n"
 pnpm changeset version || exit 1
 NEW_VERSION=$(node -p "require('./package.json').version" 2>/dev/null)
 
@@ -73,16 +73,34 @@ if [ "$CONFIRM" != "y" ] && [ "$CONFIRM" != "Y" ]; then
 fi
 
 # Step 5: commit + tag + push（tag pipeline 接手發布）
-printf "\n${YELLOW}[5/5] commit + tag + push...${NC}\n"
+printf "\n${YELLOW}[5/6] commit + tag + push...${NC}\n"
 git add -A
 git commit -m "chore: release v${NEW_VERSION}" || exit 1
 git tag "v${NEW_VERSION}" || exit 1
 # 只推新 tag，避免 --tags 把本地殘留的舊 tag 一起推上去觸發舊 pipeline
 git push origin main "refs/tags/v${NEW_VERSION}" || exit 1
 
+# Step 6: 同步 GitHub 鏡像（daith/arkite-ui；push 會觸發 Pages 部署展示站）
+# 鏡像屬 daith 帳號，走 gh credential helper 繞過 keychain 預設憑證。
+# 鏡像失敗不影響發版（npm 已由 GitLab pipeline 接手），僅提示手動補推。
+printf "\n${YELLOW}[6/6] 同步 GitHub 鏡像...${NC}\n"
+if git remote get-url github > /dev/null 2>&1; then
+    gh auth switch --user daith > /dev/null 2>&1
+    if git -c credential.helper= -c credential.helper='!gh auth git-credential' \
+        push github main "refs/tags/v${NEW_VERSION}"; then
+        printf "${GREEN}✓ GitHub 鏡像已同步（main + v%s），Pages 部署已觸發${NC}\n" "$NEW_VERSION"
+    else
+        printf "${YELLOW}⚠ 鏡像推送失敗（發版不受影響），稍後手動補推：${NC}\n"
+        printf "  gh auth switch --user daith && git -c credential.helper= -c credential.helper='!gh auth git-credential' push github main refs/tags/v%s\n" "$NEW_VERSION"
+    fi
+else
+    printf "${YELLOW}⚠ 找不到 github remote，略過鏡像同步${NC}\n"
+fi
+
 printf "\n${GREEN}========================================${NC}\n"
 printf "${GREEN}  v%s 已推送，GitLab CI 接手發布${NC}\n" "$NEW_VERSION"
 printf "${GREEN}========================================${NC}\n"
 printf "Pipeline:  https://gitlab.com/foson.co/arkite-ui/-/pipelines\n"
 printf "npm:       https://www.npmjs.com/package/@arkite-ui/core\n"
-printf "GitLab:    https://gitlab.com/foson.co/arkite-ui/-/packages\n\n"
+printf "GitLab:    https://gitlab.com/foson.co/arkite-ui/-/packages\n"
+printf "Pages:     https://daith.github.io/arkite-ui/\n\n"
