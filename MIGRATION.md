@@ -1,5 +1,56 @@
 # Migration Guide
 
+## v0.x → v1.0 Codemod
+
+v1.0 移除所有 v0.7 起標記棄用的 API。本 repo 內建 codemod（`src/codemod/`，不進 npm 打包），消費端專案跑一條指令即可完成大部分遷移：
+
+```bash
+# 在 arkite-ui repo 根目錄執行，目標指向消費端專案根目錄
+pnpm codemod:v1 ~/workspace/work/<專案>            # 直接改檔
+pnpm codemod:v1 ~/workspace/work/<專案> --dry-run  # 只列報告與將變更的檔案，不寫檔
+```
+
+### 行為
+
+- 優先載入目標的 `tsconfig.json`；找不到（或沒列出任何檔案，如 monorepo 根目錄）時，改掃描 `**/src/**/*.{ts,tsx}`（略過 node_modules / dist / build 等）。
+- **安全第一**：只轉換確定 import 自 `@arkite-ui/core`（或消費端自己 re-export 該名稱的模組）的元件與 API，同名的專案自有元件不會被動到。
+- 無法安全自動化的用法會插入 `// TODO(arkite-v1): <說明>` 註解並在報告中計數——**不會用猜的**。
+- 結束時印出每條規則的變更數與 TODO 標記數。codemod 可重跑（冪等，TODO 註解不會重複插入）。
+
+### 涵蓋的轉換
+
+| 元件 / API | 轉換 |
+|-----------|------|
+| `Alert` | `variant="error"` → `"destructive"`；`onDismiss` → `onClose` |
+| `Progress` / `CircularProgress` | `variant="error"` → `"destructive"` |
+| `CircularProgress` | `size={數值}` → `diameter={數值}`（`size="sm"⎮"md"⎮"lg"` 不動） |
+| `Tabs` | `onValueChange` → `onChange` |
+| `LoadingOverlay` | `visible` → `open` |
+| `Toggle` | → `Switch`（import 與 JSX 一起改；檔內已有 `Switch` 則合併） |
+| `ImperativeToastContainer(Props)` | → `ToastContainer(Props)`（import、JSX、型別註記） |
+| `FormField` / `FormMessage` / `ImageUpload` | `error={字串字面量/模板}` → `errorMessage={同值}` |
+| `DataTable` | `expandable={函式/識別字}` → `renderExpandedRow={同值}`（布林形式不動） |
+| `Tree` | `onCheckChange` → `onSelectionChange` |
+| `Pagination` | `mode=` → `variant=` |
+| `Timeline` | 內聯 `items` 陣列字面量中的 `variant: 'default'` → `'muted'` |
+| `TenantSwitcher` | `currentTenant` → `value`；`onSelect` → `onChange` |
+| toast API | `.clear()` → `.dismissAll()`（含解構）；`toast.success/error/warning/info/show(t, 字串/模板/JSX)` → 第二參數包成 `{ description: ... }`。`toast.error()` 等便捷方法名保留不變 |
+
+### 一律標 TODO（需人工處理）
+
+- `CommandDialog` 的 `onOpenChange`：簽名由 `(open: boolean) => void` 改為 `onClose: () => void`，需手動改寫。
+- `error={非字面量表達式}`：可能已是 v1.0 的 boolean 新契約，不動。
+- `Timeline items={變數}`：無法檢查變數內容是否含 `variant: 'default'`。
+- `CircularProgress size={無法判定型別的表達式}`、`DataTable expandable={無法判定的表達式}`、無法判定的 toast 第二參數。
+- 元素上新舊 prop 同時存在（自動改會產生重複 prop）。
+
+### 跑完之後
+
+1. 全域搜尋 `TODO(arkite-v1)`，逐一人工處理後刪除註解。
+2. 在目標專案跑 typecheck / lint / prettier（codemod 保留原格式，少數插入處的排版交給 prettier 收尾）。
+
+---
+
 ## v0.6.x → v0.7.0
 
 ### Prop 命名統一（漸進式，非破壞性）
