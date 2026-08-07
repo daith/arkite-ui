@@ -80,6 +80,7 @@ const preview: Preview = {
           'Introduction',
           'Getting Started',
           'Recipes',
+          'Accessibility',
           'Component Guidelines',
           'Foundation',
           'Form Patterns',

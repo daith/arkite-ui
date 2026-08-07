@@ -1,0 +1,48 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Accessibility" />
+
+# Accessibility
+
+What this library guarantees, how each guarantee is enforced, and what still
+requires a human.
+
+## Enforced by CI (every merge request)
+
+| Guarantee | Enforcement |
+|---|---|
+| Every built-in color pair meets **WCAG AA (4.5:1)** — tokens, all four presets, light and dark, solid and soft | Contrast regression tests (`tokens.test.ts`, `presets.test.ts`); `createTheme()` picks foregrounds by real contrast ratio, so custom brand colors are guaranteed too |
+| **APG keyboard interaction** for the compound components — DataTable, Combobox, DatePicker, Calendar, TagInput, Modal, CommandPalette | 74 keyboard specs written against the WAI-ARIA APG patterns, run **twice**: in jsdom for fast feedback and in real Chromium (`keyboard-browser` project) for real focus/key semantics |
+| **Focus management**: Modal/Drawer/CommandDialog trap focus, restore it to the opener on close, and close on Escape | Keyboard specs above + unit tests |
+| No static-analysis violations (roles, names, labels, structure) | axe runs error-based against every story; `eslint-plugin-jsx-a11y` at lint time |
+| Every built-in string — including all aria-labels — localizes | `LocaleProvider` + en/zh-TW key-parity tests |
+
+## Manual screen reader pass (release checklist)
+
+Automation cannot judge how an interface *sounds*. Before a major release, run
+this 10-minute pass with VoiceOver (macOS, `⌘F5`) or NVDA (Windows):
+
+1. **Form page** — Tab through a form with an error: the label, the required
+   state, and the error message must all be announced on the field.
+2. **DataTable** — sort a column (sorted state announced via `aria-sort`),
+   select rows (checkbox states announced), open the filter dropdown.
+3. **Modal** — open: title announced, focus lands inside; Escape: focus
+   returns to the trigger and the trigger is re-announced.
+4. **Combobox** — arrow through options: each option announced as the
+   highlight moves (`aria-activedescendant`); Enter announces the selection
+   on the trigger.
+5. **DatePicker** — open: the focused day is announced; arrow keys announce
+   each day; Escape returns to the input.
+6. **Toast** — trigger one: it must be announced without stealing focus.
+
+Log failures as bugs — each maps to a spec we can pin.
+
+## Known limits (deliberate)
+
+- **RTL layouts are not supported.** No consumer market requires them; the
+  keyboard specs assume LTR arrow semantics.
+- Screen reader testing is manual (above). Automated tooling exercises the
+  accessibility *tree*; only humans can validate the *experience*.
+- Grid-level arrow navigation exists in the date components; DataTable
+  deliberately uses tabbable widgets per row instead of APG grid navigation —
+  documented in the DataTable keyboard spec.

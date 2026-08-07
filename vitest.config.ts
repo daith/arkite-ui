@@ -29,6 +29,23 @@ export default defineConfig({
           },
         },
       },
+      // Keyboard interaction specs re-run in a real browser — jsdom's
+      // focus and key semantics differ from Chromium's, so the APG specs
+      // must hold in both. Same files as the unit run, real DOM truth.
+      {
+        extends: true,
+        test: {
+          name: 'keyboard-browser',
+          include: ['src/**/*.keyboard.test.tsx'],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright({}),
+            instances: [{ browser: 'chromium' }],
+          },
+          setupFiles: ['./src/test-setup.ts'],
+        },
+      },
       // Storybook browser tests
       {
         extends: true,
