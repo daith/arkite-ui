@@ -85,11 +85,11 @@ const lightColors: SemanticColors = {
   secondary: primitives.gray[100],
   secondaryForeground: primitives.gray[700],
   accent: primitives.teal[500],
-  accentForeground: primitives.white,
+  accentForeground: primitives.gray[900],
 
   // Status
   success: primitives.green[600],
-  successForeground: primitives.white,
+  successForeground: primitives.gray[900],
   warning: primitives.amber[500],
   warningForeground: primitives.gray[900],
   danger: primitives.red[600],
