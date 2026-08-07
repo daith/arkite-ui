@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.11.0
+### Minor Changes
+
+- fa224f4: Add `LocaleProvider` + built-in `enUS` / `zhTW` locales. Every built-in component string (placeholders, empty states, pagination labels, calendar weekday/month names, and all aria-labels) now resolves through the locale context, so Chinese apps get Chinese screen-reader labels with one provider at the root:
+  
+  ```tsx
+  import { LocaleProvider, zhTW } from '@arkite-ui/core'
+  
+  <LocaleProvider locale={zhTW}>
+    <App />
+  </LocaleProvider>
+  ```
+  
+  Partial locales are supported (missing keys fall back to English), and explicit component props always win over locale values. Without a provider nothing changes — defaults are the same English strings as before.
+
+### Patch Changes
+
+- a865209: `createTheme()` now picks black/white foregrounds by real WCAG contrast instead of an L>55% lightness heuristic, and computes dark-mode foregrounds instead of hardcoding white — every generated pair is guaranteed ≥4.5:1 for any brand color. Behavior change: themes built from mid-luminance brand colors (e.g. `hsl(210 100% 50%)` blues) may flip their button text between white and black.
+- a865209: `npx @arkite-ui/core init` works again — the CLI's install list still referenced the pre-rename `@arkite/ui` package, so it has been broken since the rename. All docs now use the correct package name, and install guides lead with the one-shot `init` (installs peer deps + writes the Tailwind v4 theme CSS) instead of implying the package is a zero-dependency drop-in.
+- a865209: FilterBarSearch / SearchInput: guard against password-manager autofill. Inputs now render `type="search"` + `name="search"` + `autoComplete="off"` (overridable via props on SearchInput), so a `type="password"` field on the same page no longer makes browsers autofill the saved username into the search box and silently filter your list.
+- a865209: All built-in color pairs now meet WCAG AA (4.5:1), enforced by regression tests. Visible changes to note: dark-mode `info` (all presets) and ocean/forest dark-mode `primary` switch from white to black text; ocean/forest light-mode `primary` darkens one step (50%→45% / 38%→33%); light `info` and dark `destructive` get imperceptible lightness nudges. Cross-platform JS tokens (`/tokens`): light `mutedForeground` gray-500→gray-600, dark on-color foregrounds unified to gray-950.
+
 ## 0.10.0
 ### Minor Changes
 
