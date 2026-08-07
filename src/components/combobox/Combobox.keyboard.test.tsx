@@ -16,7 +16,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       render(<Combobox options={options} />)
 
       await user.tab()
-      expect(screen.getByRole('button')).toHaveFocus()
+      expect(screen.getByRole('combobox')).toHaveFocus()
       await user.keyboard('{Enter}')
 
       expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
@@ -32,8 +32,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
     })
 
-    // FINDING: 聚焦 trigger 後按 ArrowDown 不會開啟下拉(Radix Popover trigger 只回應 click/Enter/Space,APG 要求 ArrowDown 開啟)
-    it.fails('opens on ArrowDown when trigger is focused', async () => {
+    it('opens on ArrowDown when trigger is focused', async () => {
       const user = userEvent.setup()
       render(<Combobox options={options} />)
 
@@ -55,8 +54,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
   })
 
   describe('navigating and selecting options', () => {
-    // FINDING: 搜尋框內按 ArrowDown/ArrowUp 完全沒有反應——元件未實作選項高亮與方向鍵導航(無 aria-activedescendant、焦點也不移動)
-    it.fails('ArrowDown/ArrowUp move the highlight between options', async () => {
+    it('ArrowDown/ArrowUp move the highlight between options', async () => {
       const user = userEvent.setup()
       render(<Combobox options={options} />)
 
@@ -68,8 +66,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       expect(searchInput.getAttribute('aria-activedescendant')).toBeTruthy()
     })
 
-    // FINDING: 無高亮機制,搜尋框內按 Enter 不會選取任何項目——不呼叫 onChange、不關閉下拉
-    it.fails('Enter selects the highlighted option, calls onChange and closes', async () => {
+    it('Enter selects the highlighted option, calls onChange and closes', async () => {
       const onChange = vi.fn()
       const user = userEvent.setup()
       render(<Combobox options={options} onChange={onChange} />)
@@ -96,7 +93,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       const user = userEvent.setup()
       render(<Combobox options={options} onChange={onChange} />)
 
-      const trigger = screen.getByRole('button')
+      const trigger = screen.getByRole('combobox')
       await user.tab()
       await user.keyboard('{Enter}')
       expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
@@ -108,8 +105,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       expect(trigger).toHaveFocus()
     })
 
-    // FINDING: Tab 不會關閉下拉——焦點從搜尋框 Tab 出去會落在彈層內的選項按鈕上,彈層維持開啟(APG 要求 Tab 關閉 popup 並把焦點移出元件)
-    it.fails('Tab closes the popup and moves focus out', async () => {
+    it('Tab closes the popup and moves focus out', async () => {
       const user = userEvent.setup()
       render(<Combobox options={options} />)
 
@@ -128,7 +124,7 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       const user = userEvent.setup()
       render(<Combobox options={options} />)
 
-      const trigger = screen.getByRole('button')
+      const trigger = screen.getByRole('combobox')
       expect(trigger).toHaveAttribute('aria-expanded', 'false')
 
       await user.click(trigger)
@@ -136,18 +132,16 @@ describe('Combobox keyboard interaction (WAI-ARIA APG combobox pattern)', () => 
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
     })
 
-    // FINDING: trigger 是普通 button(Radix Popover 給 aria-haspopup="dialog"),非 APG 要求的 role="combobox"
-    it.fails('trigger has role combobox', () => {
+    it('trigger has role combobox', () => {
       render(<Combobox options={options} />)
-      expect(screen.getByRole('button')).toHaveAttribute('role', 'combobox')
+      expect(screen.getByRole('combobox')).toHaveAttribute('role', 'combobox')
     })
 
-    // FINDING: 彈層是 role="dialog",選項清單為 div + button——無 role="listbox" 與 role="option" 結構
-    it.fails('popup exposes listbox and option roles', async () => {
+    it('popup exposes listbox and option roles', async () => {
       const user = userEvent.setup()
       render(<Combobox options={options} />)
 
-      await user.click(screen.getByRole('button'))
+      await user.click(screen.getByRole('combobox'))
 
       const listbox = screen.getByRole('listbox')
       expect(within(listbox).getAllByRole('option')).toHaveLength(options.length)

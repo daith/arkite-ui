@@ -1,6 +1,7 @@
-import { useState, forwardRef, type HTMLAttributes } from 'react'
+import { useState, useRef, useId, forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
+import { useGridKeyboard, toDayKey } from './use-grid-keyboard'
 
 export interface CalendarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   /** Selected date */
@@ -78,6 +79,8 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     ref
   ) => {
     const locale = useLocale()
+    const gridRef = useRef<HTMLDivElement>(null)
+    const monthLabelId = useId()
     const [uncontrolledMonth, setUncontrolledMonth] = useState(
       () => value ?? new Date()
     )
@@ -87,6 +90,13 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       setUncontrolledMonth(date)
       onMonthChange?.(date)
     }
+
+    const { handleDayKeyDown } = useGridKeyboard({
+      containerRef: gridRef,
+      currentMonth,
+      onNavigateToMonth: setCurrentMonth,
+      weekStartsOn,
+    })
 
     const year = currentMonth.getFullYear()
     const month = currentMonth.getMonth()
@@ -108,6 +118,14 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     }
     for (let d = 1; d <= daysInMonth; d++) {
       days.push(new Date(year, month, d))
+    }
+    while (days.length % 7 !== 0) {
+      days.push(null)
+    }
+
+    const weeks: (Date | null)[][] = []
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7))
     }
 
     const isDisabled = (date: Date): boolean => {
@@ -149,7 +167,9 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
           >
             <ChevronLeftIcon />
           </button>
-          <span className="text-sm font-medium">{monthLabel}</span>
+          <span id={monthLabelId} className="text-sm font-medium">
+            {monthLabel}
+          </span>
           <button
             type="button"
             onClick={goToNextMonth}
@@ -173,36 +193,47 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
         </div>
 
         {/* Days grid */}
-        <div className="grid grid-cols-7">
-          {days.map((date, index) => {
-            if (!date) {
-              return <div key={`empty-${index}`} />
-            }
+        <div ref={gridRef} role="grid" aria-labelledby={monthLabelId}>
+          {weeks.map((week, weekIndex) => (
+            <div key={weekIndex} role="row" className="grid grid-cols-7">
+              {week.map((date, dayIndex) => {
+                if (!date) {
+                  return <div key={`empty-${dayIndex}`} role="gridcell" />
+                }
 
-            const isSelected = value ? isSameDay(date, value) : false
-            const isToday = isSameDay(date, today)
-            const disabled = isDisabled(date)
-            const highlighted = isHighlighted(date)
+                const isSelected = value ? isSameDay(date, value) : false
+                const isToday = isSameDay(date, today)
+                const disabled = isDisabled(date)
+                const highlighted = isHighlighted(date)
 
-            return (
-              <button
-                key={date.toISOString()}
-                type="button"
-                disabled={disabled}
-                onClick={() => onSelect?.(date)}
-                className={cn(
-                  'h-8 w-8 mx-auto flex items-center justify-center rounded-md text-sm transition-colors',
-                  'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
-                  !isSelected && isToday && 'border border-primary text-primary font-medium',
-                  !isSelected && highlighted && 'bg-primary/10 text-foreground font-medium',
-                  disabled && 'opacity-30 pointer-events-none'
-                )}
-              >
-                {date.getDate()}
-              </button>
-            )
-          })}
+                return (
+                  <div
+                    key={date.toISOString()}
+                    role="gridcell"
+                    aria-selected={isSelected || undefined}
+                  >
+                    <button
+                      type="button"
+                      disabled={disabled}
+                      data-day={toDayKey(date)}
+                      onClick={() => onSelect?.(date)}
+                      onKeyDown={(event) => handleDayKeyDown(event, date)}
+                      className={cn(
+                        'h-8 w-8 mx-auto flex items-center justify-center rounded-md text-sm transition-colors',
+                        'hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                        isSelected && 'bg-primary text-primary-foreground hover:bg-primary/90',
+                        !isSelected && isToday && 'border border-primary text-primary font-medium',
+                        !isSelected && highlighted && 'bg-primary/10 text-foreground font-medium',
+                        disabled && 'opacity-30 pointer-events-none'
+                      )}
+                    >
+                      {date.getDate()}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          ))}
         </div>
       </div>
     )

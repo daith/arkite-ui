@@ -4,9 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { DatePicker } from './DatePicker'
 
 // Keyboard interaction acceptance tests against the WAI-ARIA APG
-// "Date Picker Dialog" pattern. Specs the component meets use it(...);
-// gaps are pinned with it.fails(...) plus a FINDING comment so the suite
-// stays green while documenting the bug list.
+// "Date Picker Dialog" pattern.
 //
 // June 2025: the 1st falls on a Sunday, so the grid has no leading blanks.
 // 18 June 2025 is a Wednesday (its week runs 15–21).
@@ -50,8 +48,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(screen.getByText('June 2025')).toBeInTheDocument()
     })
 
-    // FINDING: opening the popup leaves focus on the trigger — APG expects initial focus to move to the selected day (or today)
-    it.fails('moves focus to the selected day when the calendar opens', async () => {
+    it('moves focus to the selected day when the calendar opens', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
 
@@ -63,8 +60,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
   })
 
   describe('grid navigation', () => {
-    // FINDING: ArrowRight on a focused day does nothing — no keydown handling on the days grid
-    it.fails('ArrowRight moves focus to the next day', async () => {
+    it('ArrowRight moves focus to the next day', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -75,8 +71,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(19)).toHaveFocus()
     })
 
-    // FINDING: ArrowLeft on a focused day does nothing — no keydown handling on the days grid
-    it.fails('ArrowLeft moves focus to the previous day', async () => {
+    it('ArrowLeft moves focus to the previous day', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -87,8 +82,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(17)).toHaveFocus()
     })
 
-    // FINDING: ArrowDown on a focused day does nothing — should move focus one week later
-    it.fails('ArrowDown moves focus to the same day next week', async () => {
+    it('ArrowDown moves focus to the same day next week', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -99,8 +93,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(25)).toHaveFocus()
     })
 
-    // FINDING: ArrowUp on a focused day does nothing — should move focus one week earlier
-    it.fails('ArrowUp moves focus to the same day previous week', async () => {
+    it('ArrowUp moves focus to the same day previous week', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -111,8 +104,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(11)).toHaveFocus()
     })
 
-    // FINDING: Home does nothing — should move focus to the first day of the week
-    it.fails('Home moves focus to the first day of the week', async () => {
+    it('Home moves focus to the first day of the week', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -123,8 +115,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(15)).toHaveFocus()
     })
 
-    // FINDING: End does nothing — should move focus to the last day of the week
-    it.fails('End moves focus to the last day of the week', async () => {
+    it('End moves focus to the last day of the week', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -135,8 +126,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(day(21)).toHaveFocus()
     })
 
-    // FINDING: PageUp does nothing — should show the previous month
-    it.fails('PageUp changes the grid to the previous month', async () => {
+    it('PageUp changes the grid to the previous month', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -147,8 +137,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
       expect(screen.getByText('May 2025')).toBeInTheDocument()
     })
 
-    // FINDING: PageDown does nothing — should show the next month
-    it.fails('PageDown changes the grid to the next month', async () => {
+    it('PageDown changes the grid to the next month', async () => {
       const user = userEvent.setup()
       render(<DatePicker value={JUNE_18} />)
       await openCalendar(user)
@@ -193,8 +182,7 @@ describe('DatePicker keyboard interaction (APG date picker dialog)', () => {
   })
 
   describe('dismissal', () => {
-    // FINDING: Escape does not close the popup (no Escape handler); focus also never returns to the input
-    it.fails('Escape closes the calendar without selecting and returns focus to the input', async () => {
+    it('Escape closes the calendar without selecting and returns focus to the input', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
       render(<DatePicker value={JUNE_18} onChange={onChange} />)

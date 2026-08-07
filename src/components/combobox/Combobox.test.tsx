@@ -13,7 +13,7 @@ const options: ComboboxOption[] = [
 describe('Combobox', () => {
   it('renders trigger button', () => {
     render(<Combobox options={options} />)
-    expect(screen.getByRole('button')).toBeInTheDocument()
+    expect(screen.getByRole('combobox')).toBeInTheDocument()
   })
 
   it('shows placeholder text', () => {
@@ -30,7 +30,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
 
     expect(screen.getByText('Apple')).toBeInTheDocument()
     expect(screen.getByText('Banana')).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     const searchInput = screen.getByPlaceholderText('Search...')
     await user.type(searchInput, 'ban')
 
@@ -54,7 +54,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     const searchInput = screen.getByPlaceholderText('Search...')
     await user.type(searchInput, 'red fruit')
 
@@ -67,7 +67,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} onChange={onChange} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     await user.click(screen.getByText('Apple'))
 
     expect(onChange).toHaveBeenCalledWith('apple')
@@ -83,7 +83,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} onChange={vi.fn()} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     expect(screen.getByText('Apple')).toBeInTheDocument()
 
     await user.click(screen.getByText('Apple'))
@@ -98,7 +98,7 @@ describe('Combobox', () => {
       <Combobox options={options} multiple value={['apple']} onChange={onChange} />
     )
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     await user.click(screen.getByText('Banana'))
 
     expect(onChange).toHaveBeenCalledWith(['apple', 'banana'])
@@ -116,7 +116,7 @@ describe('Combobox', () => {
       />
     )
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     // "Apple" appears both in the trigger badge and the dropdown option list,
     // so target the one inside the popover content (dialog role).
     const dialog = screen.getByRole('dialog')
@@ -140,7 +140,7 @@ describe('Combobox', () => {
       <Combobox options={options} multiple value={[]} onChange={vi.fn()} />
     )
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     await user.click(screen.getByText('Apple'))
 
     // Dropdown should remain open for multiple selection
@@ -149,27 +149,27 @@ describe('Combobox', () => {
 
   it('disables the trigger button when disabled', () => {
     render(<Combobox options={options} disabled />)
-    expect(screen.getByRole('button')).toBeDisabled()
+    expect(screen.getByRole('combobox')).toBeDisabled()
   })
 
   it('does not open dropdown when disabled', async () => {
     const user = userEvent.setup()
     render(<Combobox options={options} disabled />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
 
     expect(screen.queryByPlaceholderText('Search...')).not.toBeInTheDocument()
   })
 
   it('applies error styling when error is true', () => {
     render(<Combobox options={options} error />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).toContain('border-destructive')
   })
 
   it('does not apply error styling when error is false', () => {
     render(<Combobox options={options} />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).not.toContain('border-destructive')
   })
 
@@ -177,7 +177,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={[]} loading />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
 
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
@@ -186,7 +186,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     const searchInput = screen.getByPlaceholderText('Search...')
     await user.type(searchInput, 'xyz nothing matches')
 
@@ -197,35 +197,35 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={[]} emptyMessage="Nothing here!" />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
 
     expect(screen.getByText('Nothing here!')).toBeInTheDocument()
   })
 
   it('applies sm size variant', () => {
     render(<Combobox options={options} size="sm" />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).toContain('h-8')
     expect(trigger.className).toContain('text-xs')
   })
 
   it('applies md size variant by default', () => {
     render(<Combobox options={options} />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).toContain('h-10')
     expect(trigger.className).toContain('text-sm')
   })
 
   it('applies lg size variant', () => {
     render(<Combobox options={options} size="lg" />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).toContain('h-12')
     expect(trigger.className).toContain('text-base')
   })
 
   it('applies custom className to trigger', () => {
     render(<Combobox options={options} className="my-custom-class" />)
-    const trigger = screen.getByRole('button')
+    const trigger = screen.getByRole('combobox')
     expect(trigger.className).toContain('my-custom-class')
   })
 
@@ -233,7 +233,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} searchPlaceholder="Type to search..." />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
 
     expect(screen.getByPlaceholderText('Type to search...')).toBeInTheDocument()
   })
@@ -243,7 +243,7 @@ describe('Combobox', () => {
     const user = userEvent.setup()
     render(<Combobox options={options} onSearch={onSearch} />)
 
-    await user.click(screen.getByRole('button'))
+    await user.click(screen.getByRole('combobox'))
     const searchInput = screen.getByPlaceholderText('Search...')
     await user.type(searchInput, 'abc')
 

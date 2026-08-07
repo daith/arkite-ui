@@ -1,4 +1,13 @@
-import { useState, useRef, useMemo, forwardRef, type ReactNode } from 'react'
+import {
+  useState,
+  useRef,
+  useMemo,
+  useEffect,
+  useId,
+  forwardRef,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
@@ -59,6 +68,16 @@ const searchSizeStyles: Record<ComboboxSize, string> = {
   lg: 'h-12 text-base',
 }
 
+const filterOptions = (options: ComboboxOption[], query: string) => {
+  if (!query) return options
+  const q = query.toLowerCase()
+  return options.filter(
+    (o) =>
+      o.label.toLowerCase().includes(q) ||
+      o.description?.toLowerCase().includes(q)
+  )
+}
+
 /** Searchable select dropdown with single or multi-select, async search, and custom option rendering. */
 export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
   (
@@ -83,8 +102,12 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     ref
   ) => {
     const locale = useLocale()
+    const baseId = useId()
+    const listboxId = `${baseId}-listbox`
+    const valueId = `${baseId}-value`
     const [open, setOpen] = useState(false)
     const [search, setSearch] = useState('')
+    const [highlightedIndex, setHighlightedIndex] = useState(-1)
     const inputRef = useRef<HTMLInputElement>(null)
 
     const selectedValues = useMemo(() => {
@@ -94,14 +117,43 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
 
     const filtered = useMemo(() => {
       if (onSearch) return options // async search handles filtering
-      if (!search) return options
-      const q = search.toLowerCase()
-      return options.filter(
-        (o) =>
-          o.label.toLowerCase().includes(q) ||
-          o.description?.toLowerCase().includes(q)
-      )
+      return filterOptions(options, search)
     }, [options, search, onSearch])
+
+    const showOptions = !loading && filtered.length > 0
+    const highlightedOption: ComboboxOption | undefined =
+      filtered[highlightedIndex]
+
+    useEffect(() => {
+      if (highlightedIndex < 0) return
+      document
+        .getElementById(`${baseId}-option-${highlightedIndex}`)
+        ?.scrollIntoView?.({ block: 'nearest' })
+    }, [highlightedIndex, baseId])
+
+    const handleOpenChange = (nextOpen: boolean) => {
+      setOpen(nextOpen)
+      if (nextOpen) {
+        setHighlightedIndex(
+          filtered.findIndex((o) => !o.disabled && selectedValues.has(o.value))
+        )
+      }
+    }
+
+    const moveHighlight = (direction: 1 | -1) => {
+      if (filtered.length === 0) return
+      setHighlightedIndex((current) => {
+        let next =
+          current === -1 && direction === -1
+            ? filtered.length - 1
+            : current + direction
+        while (next >= 0 && next < filtered.length && filtered[next].disabled) {
+          next += direction
+        }
+        if (next < 0 || next >= filtered.length) return current
+        return next
+      })
+    }
 
     const handleSelect = (optionValue: string) => {
       if (multiple) {
@@ -122,6 +174,23 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     const handleSearchChange = (q: string) => {
       setSearch(q)
       onSearch?.(q)
+      const next = onSearch ? options : filterOptions(options, q)
+      setHighlightedIndex(next.findIndex((o) => !o.disabled))
+    }
+
+    const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        moveHighlight(1)
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        moveHighlight(-1)
+      } else if (event.key === 'Enter') {
+        if (highlightedOption && !highlightedOption.disabled) {
+          event.preventDefault()
+          handleSelect(highlightedOption.value)
+        }
+      }
     }
 
     const displayLabel = useMemo(() => {
@@ -137,11 +206,22 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     }, [selectedValues, options, multiple])
 
     const combobox = (
-      <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+      <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
         <PopoverPrimitive.Trigger asChild>
           <button
             ref={ref}
             disabled={disabled}
+            role="combobox"
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            aria-controls={open && showOptions ? listboxId : undefined}
+            aria-labelledby={valueId}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowDown' && !open) {
+                event.preventDefault()
+                handleOpenChange(true)
+              }
+            }}
             className={cn(
               'flex items-center justify-between rounded-md border bg-background py-2',
               fullWidth ? 'w-full' : 'w-fit',
@@ -153,7 +233,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
               className
             )}
           >
-            <span className="flex flex-1 flex-wrap gap-1 truncate">
+            <span id={valueId} className="flex flex-1 flex-wrap gap-1 truncate">
               {displayLabel ? (
                 multiple ? (
                   displayLabel.map((label) => (
@@ -198,6 +278,11 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
               e.preventDefault()
               inputRef.current?.focus()
             }}
+            onKeyDown={(event) => {
+              if (event.key === 'Tab') {
+                handleOpenChange(false)
+              }
+            }}
           >
             {/* Search input */}
             <div className="flex items-center border-b px-3">
@@ -216,13 +301,26 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                 ref={inputRef}
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
+                onKeyDown={handleInputKeyDown}
+                aria-controls={showOptions ? listboxId : undefined}
+                aria-activedescendant={
+                  highlightedOption
+                    ? `${baseId}-option-${highlightedIndex}`
+                    : undefined
+                }
+                aria-autocomplete="list"
                 placeholder={searchPlaceholder ?? locale.combobox.searchPlaceholder}
                 className={cn('flex w-full bg-transparent py-3 outline-none placeholder:text-muted-foreground', searchSizeStyles[size])}
               />
             </div>
 
             {/* Options list */}
-            <div className="max-h-60 overflow-y-auto p-1">
+            <div
+              id={showOptions ? listboxId : undefined}
+              role={showOptions ? 'listbox' : undefined}
+              aria-multiselectable={showOptions && multiple ? true : undefined}
+              className="max-h-60 overflow-y-auto p-1"
+            >
               {loading ? (
                 <div className="py-6 text-center text-sm text-muted-foreground">
                   {locale.combobox.loading}
@@ -232,18 +330,27 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                   {emptyMessage ?? locale.combobox.emptyMessage}
                 </div>
               ) : (
-                filtered.map((option) => {
+                filtered.map((option, index) => {
                   const isSelected = selectedValues.has(option.value)
+                  const isHighlighted = index === highlightedIndex
                   return (
                     <button
                       key={option.value}
+                      id={`${baseId}-option-${index}`}
+                      role="option"
+                      aria-selected={isHighlighted}
+                      tabIndex={-1}
                       disabled={option.disabled}
                       onClick={() => handleSelect(option.value)}
+                      onMouseEnter={() => {
+                        if (!option.disabled) setHighlightedIndex(index)
+                      }}
                       className={cn(
                         'relative flex w-full cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm outline-none',
                         'hover:bg-secondary hover:text-secondary-foreground',
                         'disabled:pointer-events-none disabled:opacity-50',
-                        isSelected && 'bg-primary/5'
+                        isSelected && 'bg-primary/5',
+                        isHighlighted && 'bg-secondary text-secondary-foreground'
                       )}
                     >
                       {renderOption ? (

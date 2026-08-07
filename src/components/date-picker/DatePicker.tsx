@@ -3,10 +3,12 @@ import {
   useState,
   useRef,
   useEffect,
+  useId,
   type InputHTMLAttributes,
 } from 'react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
+import { useGridKeyboard, toDayKey } from '../calendar/use-grid-keyboard'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
 
 function getDaysInMonth(year: number, month: number): number {
@@ -108,6 +110,17 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     const [inputValue, setInputValue] = useState(value ? formatDate(value, format) : '')
     const [viewDate, setViewDate] = useState(value || new Date())
     const containerRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement | null>(null)
+    // Set when we programmatically return focus to the input (Escape/select),
+    // so the focus handler does not immediately reopen the popup.
+    const skipOpenOnFocusRef = useRef(false)
+    const monthLabelId = useId()
+
+    const { focusDay, handleDayKeyDown } = useGridKeyboard({
+      containerRef,
+      currentMonth: viewDate,
+      onNavigateToMonth: setViewDate,
+    })
 
     // Sync input value with prop value
     useEffect(() => {
@@ -118,6 +131,23 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
         setInputValue('')
       }
     }, [value, format])
+
+    // Close on Escape without selecting, returning focus to the input
+    useEffect(() => {
+      if (!isOpen) return
+
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key !== 'Escape') return
+        setIsOpen(false)
+        if (document.activeElement !== inputRef.current) {
+          skipOpenOnFocusRef.current = true
+          inputRef.current?.focus()
+        }
+      }
+
+      document.addEventListener('keydown', handleEscape)
+      return () => document.removeEventListener('keydown', handleEscape)
+    }, [isOpen])
 
     // Close on click outside
     useEffect(() => {
@@ -150,11 +180,19 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       }
     }
 
+    const closeAndFocusInput = () => {
+      setIsOpen(false)
+      if (document.activeElement !== inputRef.current) {
+        skipOpenOnFocusRef.current = true
+        inputRef.current?.focus()
+      }
+    }
+
     const handleDateSelect = (day: number) => {
       const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
       if (!isDateDisabled(newDate)) {
         onChange?.(newDate)
-        setIsOpen(false)
+        closeAndFocusInput()
       }
     }
 
@@ -197,7 +235,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-sm font-medium">
+            <span id={monthLabelId} className="text-sm font-medium">
               {new Date(year, month).toLocaleDateString(locale.dateLocale, { month: 'long', year: 'numeric' })}
             </span>
             <button
@@ -239,7 +277,9 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                   key={index}
                   type="button"
                   disabled={isDisabled}
+                  data-day={toDayKey(date)}
                   onClick={() => handleDateSelect(day)}
+                  onKeyDown={(event) => handleDayKeyDown(event, date)}
                   className={cn(
                     'h-8 w-8 rounded-md text-sm transition-colors',
                     'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring',
@@ -262,7 +302,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                 const today = new Date()
                 if (!isDateDisabled(today)) {
                   onChange?.(today)
-                  setIsOpen(false)
+                  closeAndFocusInput()
                 }
               }}
               className="w-full text-sm text-primary hover:underline"
@@ -278,11 +318,21 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       <div ref={containerRef} className={cn('relative', className)}>
         <div className="relative">
           <input
-            ref={ref}
+            ref={(node) => {
+              inputRef.current = node
+              if (typeof ref === 'function') ref(node)
+              else if (ref) ref.current = node
+            }}
             type="text"
             value={inputValue}
             onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
+            onFocus={() => {
+              if (skipOpenOnFocusRef.current) {
+                skipOpenOnFocusRef.current = false
+                return
+              }
+              setIsOpen(true)
+            }}
             placeholder={placeholder ?? locale.datePicker.placeholder}
             disabled={disabled}
             className={cn(
@@ -298,7 +348,17 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           <button
             type="button"
             aria-label={locale.datePicker.openCalendar}
-            onClick={() => !disabled && setIsOpen(!isOpen)}
+            onClick={() => {
+              if (disabled) return
+              if (isOpen) {
+                setIsOpen(false)
+              } else {
+                // APG: opening the dialog moves focus to the selected day
+                // (or today when nothing is selected).
+                setIsOpen(true)
+                focusDay(value ?? new Date())
+              }
+            }}
             className={cn(
               'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',
               disabled && 'cursor-not-allowed'
@@ -310,7 +370,11 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute z-50 mt-1 rounded-md border bg-card shadow-lg">
+          <div
+            role="dialog"
+            aria-labelledby={monthLabelId}
+            className="absolute z-50 mt-1 rounded-md border bg-card shadow-lg"
+          >
             {renderCalendar()}
           </div>
         )}

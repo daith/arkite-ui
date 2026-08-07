@@ -4,9 +4,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { Calendar } from './Calendar'
 
 // Keyboard interaction acceptance tests against the WAI-ARIA APG
-// grid pattern for date grids. Specs the component meets use it(...);
-// gaps are pinned with it.fails(...) plus a FINDING comment so the suite
-// stays green while documenting the bug list.
+// grid pattern for date grids.
 //
 // June 2025: the 1st falls on a Sunday, so the grid has no leading blanks.
 // 18 June 2025 is a Wednesday (its week runs 15–21).
@@ -36,8 +34,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
   })
 
   describe('grid navigation', () => {
-    // FINDING: ArrowRight on a focused date does nothing — no keydown handling on the days grid
-    it.fails('ArrowRight moves focus to the next day', async () => {
+    it('ArrowRight moves focus to the next day', async () => {
       const user = userEvent.setup()
       render(<Calendar value={JUNE_18} />)
 
@@ -47,8 +44,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
       expect(day(19)).toHaveFocus()
     })
 
-    // FINDING: ArrowLeft on a focused date does nothing — no keydown handling on the days grid
-    it.fails('ArrowLeft moves focus to the previous day', async () => {
+    it('ArrowLeft moves focus to the previous day', async () => {
       const user = userEvent.setup()
       render(<Calendar value={JUNE_18} />)
 
@@ -58,8 +54,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
       expect(day(17)).toHaveFocus()
     })
 
-    // FINDING: ArrowDown on a focused date does nothing — should move focus one week later
-    it.fails('ArrowDown moves focus to the same day next week', async () => {
+    it('ArrowDown moves focus to the same day next week', async () => {
       const user = userEvent.setup()
       render(<Calendar value={JUNE_18} />)
 
@@ -69,8 +64,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
       expect(day(25)).toHaveFocus()
     })
 
-    // FINDING: ArrowUp on a focused date does nothing — should move focus one week earlier
-    it.fails('ArrowUp moves focus to the same day previous week', async () => {
+    it('ArrowUp moves focus to the same day previous week', async () => {
       const user = userEvent.setup()
       render(<Calendar value={JUNE_18} />)
 
@@ -80,8 +74,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
       expect(day(11)).toHaveFocus()
     })
 
-    // FINDING: ArrowRight on the last day of the month does nothing — should advance the view to the next month and focus its first day
-    it.fails('ArrowRight on the last day of the month moves into the next month', async () => {
+    it('ArrowRight on the last day of the month moves into the next month', async () => {
       const user = userEvent.setup()
       render(<Calendar value={JUNE_18} />)
 
@@ -141,8 +134,7 @@ describe('Calendar keyboard interaction (APG grid)', () => {
   })
 
   describe('grid semantics', () => {
-    // FINDING: days grid is plain divs + buttons — no role="grid"/"gridcell" (or table) semantics for assistive tech
-    it.fails('exposes the days grid with grid semantics', () => {
+    it('exposes the days grid with grid semantics', () => {
       render(<Calendar value={JUNE_18} />)
 
       expect(screen.getByRole('grid')).toBeInTheDocument()
