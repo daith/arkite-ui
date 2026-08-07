@@ -2,3 +2,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* Deep-skin overrides. Stable selectors only (semantic ids / data-attrs);
+     if Storybook renames one, that rule silently reverts to default —
+     never target hashed emotion classes. */
+
+  /* Sidebar: neutralize the multicolor type icons, soften rows */
+  #storybook-explorer-tree .sidebar-item { border-radius: 7px; }
+  #storybook-explorer-tree .sidebar-item svg { color: #a4a9b4; }
+  #storybook-explorer-tree .sidebar-item[data-selected="true"] svg { color: #ffffff; }
+  .sidebar-subheading { font-size: 10.5px; letter-spacing: 0.09em; font-weight: 700; }
+
+  /* Quiet, thin scrollbars */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #d4d7dd; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b8bcc4; }
+  ::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+</style>
