@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.13.0
+### Minor Changes
+
+- 9b5afc5: Six end-to-end **Recipes** land in Storybook (CRUD List Page, Form Page, Server-Side Table, Dashboard, Tenant Admin Shell, Detail + Drawer Edit) — each a complete, copyable page whose live demo and code sample share one source file. Building them surfaced and fixed four component gaps:
+  
+  - **DataTable `totalRows`**: controlled `page` alone still sliced client-side, so true server-side pagination was impossible — a server returning one page of rows rendered an empty table past page 1. With `totalRows` set, `data` is treated as the already-processed current page and pagination math comes from the total.
+  - **CardHeader `headingLevel`**: the title was hardcoded `<h3>`, tripping axe heading-order under a `PageHeader` `<h1>`; now configurable (default unchanged).
+  - **FilterSelect**: the `label` prop now doubles as the select's accessible name (axe flagged the unnamed `<select>`).
+  - **Form**: props now extend `FormHTMLAttributes`, so `noValidate`/`autoComplete`/`action` type-check.
+
+### Patch Changes
+
+- f7e2f0c: `@arkite-ui/core/tokens` and `@arkite-ui/core/tailwind` are now server-safe: the build no longer stamps `"use client"` on these pure-data entries, so Server Components can `import { colors } from '@arkite-ui/core/tokens'` and get real values instead of client references. Caught by the new Next.js App Router smoke test, which now runs in CI: `next build` + Chromium checks for hydration mismatches and post-hydration interactivity on every merge request.
+
 ## 0.12.0
 ### Minor Changes
 
