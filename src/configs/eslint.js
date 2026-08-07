@@ -1,12 +1,12 @@
 /**
- * @arkite/ui/eslint-config
+ * @arkite-ui/core/eslint-config
  *
  * 共享 ESLint Flat Config — 所有 Ark 前端專案統一使用。
  * 依據: arkite-frontend/FRONTEND-ARCHITECTURE-REVIEW.md §5.5, §5.13, §5.14
  *
  * 用法:
  *   // eslint.config.js
- *   import { createEslintConfig } from '@arkite/ui/eslint-config'
+ *   import { createEslintConfig } from '@arkite-ui/core/eslint-config'
  *   export default createEslintConfig()
  *
  * 自訂 (保留專案特有規則):

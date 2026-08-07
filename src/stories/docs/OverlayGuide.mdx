@@ -25,7 +25,7 @@ Arkite UI 提供多種 overlay 元件，各有適合的使用場景。以下是�
 - 設定側欄
 
 ```tsx
-import { Drawer } from '@arkite/ui'
+import { Drawer } from '@arkite-ui/core'
 
 <Drawer
   open={open}
@@ -55,7 +55,7 @@ import { Drawer } from '@arkite/ui'
 - 選擇器（從列表中選取項目）
 
 ```tsx
-import { Modal } from '@arkite/ui'
+import { Modal } from '@arkite-ui/core'
 
 <Modal
   open={open}
@@ -84,7 +84,7 @@ import { Modal } from '@arkite/ui'
 - 一般確認（匯出、送出）→ 用 `variant="default"`
 
 ```tsx
-import { DeleteConfirmDialog } from '@arkite/ui'
+import { DeleteConfirmDialog } from '@arkite-ui/core'
 
 <DeleteConfirmDialog
   open={open}
@@ -110,10 +110,10 @@ Props 完全相同，可直接替換 import：
 
 ```tsx
 // 替換前
-import { Drawer } from '@arkite/ui'
+import { Drawer } from '@arkite-ui/core'
 
 // 替換後
-import { AnimatedDrawer as Drawer } from '@arkite/ui'
+import { AnimatedDrawer as Drawer } from '@arkite-ui/core'
 ```
 
 ## 選擇決策樹

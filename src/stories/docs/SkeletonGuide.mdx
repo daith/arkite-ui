@@ -21,7 +21,7 @@ Arkite UI 除了基礎 `Skeleton` 元件外，還提供 4 個預設變體，可�
 最底層的佔位元件，所有變體都基於它。
 
 ```tsx
-import { Skeleton } from '@arkite/ui'
+import { Skeleton } from '@arkite-ui/core'
 
 // 自訂尺寸
 <Skeleton width={200} height={16} />
@@ -58,7 +58,7 @@ import { Skeleton } from '@arkite/ui'
 模擬多行文字段落，最後一行自動縮短至 60%。
 
 ```tsx
-import { SkeletonText } from '@arkite/ui'
+import { SkeletonText } from '@arkite-ui/core'
 
 // 預設 3 行
 <SkeletonText />
@@ -91,7 +91,7 @@ import { SkeletonText } from '@arkite/ui'
 圓形頭像佔位。
 
 ```tsx
-import { SkeletonAvatar } from '@arkite/ui'
+import { SkeletonAvatar } from '@arkite-ui/core'
 
 <SkeletonAvatar size="sm" />  // 32×32
 <SkeletonAvatar size="md" />  // 40×40（預設）
@@ -121,7 +121,7 @@ import { SkeletonAvatar } from '@arkite/ui'
 卡片骨架，含可選的圖片區和頭像。
 
 ```tsx
-import { SkeletonCard } from '@arkite/ui'
+import { SkeletonCard } from '@arkite-ui/core'
 
 // 帶圖片的卡片
 <SkeletonCard />
@@ -161,7 +161,7 @@ import { SkeletonCard } from '@arkite/ui'
 表格骨架，含 header 和資料列。
 
 ```tsx
-import { SkeletonTable } from '@arkite/ui'
+import { SkeletonTable } from '@arkite-ui/core'
 
 // 預設 5 行 4 欄
 <SkeletonTable />
@@ -203,7 +203,7 @@ import { SkeletonTable } from '@arkite/ui'
 ### 列表頁 Loading State
 
 ```tsx
-import { SkeletonTable, Skeleton } from '@arkite/ui'
+import { SkeletonTable, Skeleton } from '@arkite-ui/core'
 
 function UsersPageSkeleton() {
   return (
@@ -224,7 +224,7 @@ function UsersPageSkeleton() {
 ### Detail Panel Loading State
 
 ```tsx
-import { SkeletonAvatar, SkeletonText, Skeleton } from '@arkite/ui'
+import { SkeletonAvatar, SkeletonText, Skeleton } from '@arkite-ui/core'
 
 function UserDetailSkeleton() {
   return (
@@ -245,7 +245,7 @@ function UserDetailSkeleton() {
 ### 卡片網格 Loading State
 
 ```tsx
-import { SkeletonCard } from '@arkite/ui'
+import { SkeletonCard } from '@arkite-ui/core'
 
 function DashboardSkeleton() {
   return (

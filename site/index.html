@@ -212,11 +212,11 @@
 <section class="wrap">
   <div class="qs">
     <div class="sec-head">
-      <h2>Two lines to start</h2>
-      <p>Install from the registry, import the stylesheet, wrap once for 繁體中文 — every placeholder, empty state, and screen-reader label follows.</p>
+      <h2>One command to start</h2>
+      <p>Not a zero-dependency drop-in: components need React, Tailwind CSS v4, and a few peer packages. <code class="mono">init</code> sets all of it up — installs the peers and writes the theme CSS. Prefer manual control? The <a href="./storybook/?path=/docs/getting-started--docs" style="color:var(--brand)">Getting Started</a> guide lists every step.</p>
     </div>
-    <pre><span class="tok-c"># install</span>
-pnpm add @arkite-ui/core
+    <pre><span class="tok-c"># scaffolds peer deps + Tailwind v4 theme CSS</span>
+npx @arkite-ui/core init
 
 <span class="tok-k">import</span> { Button, LocaleProvider, zhTW } <span class="tok-k">from</span> <span class="tok-s">'@arkite-ui/core'</span>
 <span class="tok-k">import</span> <span class="tok-s">'@arkite-ui/core/styles.css'</span>

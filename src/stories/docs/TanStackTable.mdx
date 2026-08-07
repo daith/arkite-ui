@@ -30,7 +30,7 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@arkite/ui'
+} from '@arkite-ui/core'
 
 interface User {
   id: string
@@ -168,10 +168,10 @@ import {
   flexRender,
   type RowSelectionState,
 } from '@tanstack/react-table'
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@arkite/ui'
-import { BulkActionBar } from '@arkite/ui'
-import { Checkbox } from '@arkite/ui'
-import { Button } from '@arkite/ui'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@arkite-ui/core'
+import { BulkActionBar } from '@arkite-ui/core'
+import { Checkbox } from '@arkite-ui/core'
+import { Button } from '@arkite-ui/core'
 
 function SelectableTable({ data, columns }) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -272,7 +272,7 @@ function SelectableTable({ data, columns }) {
 
 ```tsx
 import { getPaginationRowModel } from '@tanstack/react-table'
-import { Pagination } from '@arkite/ui'
+import { Pagination } from '@arkite-ui/core'
 
 function PaginatedTable({ data, columns, pageCount, onPageChange }) {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 20 })

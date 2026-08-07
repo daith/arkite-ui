@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Project
-`@arkite/ui` — Ark 生態系共用 React 元件庫（SaaS admin panel 專用），發佈成 npm 套件。
+`@arkite-ui/core` — Ark 生態系共用 React 元件庫（SaaS admin panel 專用），發佈成 npm 套件。
 Tailwind CSS v4 + TypeScript，tsup 打包，Storybook 文件，changesets 發版。
 
 ## ⚠️ 核心設計原則（必守）

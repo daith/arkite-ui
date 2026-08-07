@@ -6,8 +6,18 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 ## Installation
 
+### Recommended: one-shot setup
+
+Installs the package and its required peer dependencies, then writes the Tailwind v4 theme CSS and a theme setup helper:
+
 ```bash
-pnpm add @arkite/ui
+npx @arkite-ui/core init
+```
+
+### Manual install
+
+```bash
+pnpm add @arkite-ui/core
 ```
 
 ### Peer Dependencies
@@ -29,7 +39,7 @@ pnpm add framer-motion
 In your app's entry point (e.g. `main.tsx` or `layout.tsx`):
 
 ```tsx
-import '@arkite/ui/styles.css'
+import '@arkite-ui/core/styles.css'
 ```
 
 This includes all theme tokens, base styles, and utility classes.
@@ -40,13 +50,13 @@ Arkite UI uses **Tailwind CSS v4**. Your project's CSS file should import Tailwi
 
 ```css
 @import "tailwindcss";
-@import "@arkite/ui/styles.css";
+@import "@arkite-ui/core/styles.css";
 ```
 
 ### 3. Use Components
 
 ```tsx
-import { Button, Input, Badge, DataTable } from '@arkite/ui'
+import { Button, Input, Badge, DataTable } from '@arkite-ui/core'
 
 function App() {
   return (
@@ -62,7 +72,7 @@ function App() {
 If you use any Tooltip components, wrap your app with `TooltipProvider`:
 
 ```tsx
-import { TooltipProvider } from '@arkite/ui'
+import { TooltipProvider } from '@arkite-ui/core'
 
 function App() {
   return (
@@ -82,5 +92,5 @@ For consuming projects during local development:
 pnpm link
 
 # In your project
-pnpm link @arkite/ui
+pnpm link @arkite-ui/core
 ```

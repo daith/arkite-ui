@@ -25,8 +25,8 @@ This design lets you use any form library: `react-hook-form`, `formik`, native `
 ## Basic Usage
 
 ```tsx
-import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite/ui'
-import { Input, Button } from '@arkite/ui'
+import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite-ui/core'
+import { Input, Button } from '@arkite-ui/core'
 
 <Form onSubmit={handleSubmit}>
   <FormField name="email" error={errors.email}>
@@ -49,8 +49,8 @@ import { Input, Button } from '@arkite/ui'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite/ui'
-import { Input, Button } from '@arkite/ui'
+import { Form, FormField, FormLabel, FormControl, FormMessage, FormActions } from '@arkite-ui/core'
+import { Input, Button } from '@arkite-ui/core'
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -101,8 +101,8 @@ use `Form` + `FormField` with a field config array. **Do not build a separate `D
 compose with existing primitives.
 
 ```tsx
-import { Form, FormField, FormLabel, FormControl, FormSection } from '@arkite/ui'
-import { Input, Select, Textarea } from '@arkite/ui'
+import { Form, FormField, FormLabel, FormControl, FormSection } from '@arkite-ui/core'
+import { Input, Select, Textarea } from '@arkite-ui/core'
 
 // Field definition from your API / database
 interface FieldDefinition {
@@ -186,8 +186,8 @@ Usage:
 ```
 
 Key points:
-- Use `Select` from `@arkite/ui` instead of native `<select>` — it supports `options` array, placeholder, error state, and theming.
-- The renderer lives in **your project**, not in `@arkite/ui`.
+- Use `Select` from `@arkite-ui/core` instead of native `<select>` — it supports `options` array, placeholder, error state, and theming.
+- The renderer lives in **your project**, not in `@arkite-ui/core`.
 - Extend field types as needed (e.g. `multi_select` → `Combobox`, `color` → `ColorPicker`).
 
 ## Key Principles

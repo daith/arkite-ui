@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
 /**
- * @arkite/ui init CLI
+ * @arkite-ui/core init CLI
  *
  * Sets up Arkite UI in a new or existing project:
  * 1. Detects package manager
- * 2. Installs @arkite/ui + required peer deps
+ * 2. Installs @arkite-ui/core + required peer deps
  * 3. Writes CSS theme file with tokens
  * 4. Writes theme setup helper
  *
  * Usage:
- *   npx @arkite/ui init
- *   npx @arkite/ui init --pm bun
+ *   npx @arkite-ui/core init
+ *   npx @arkite-ui/core init --pm bun
  */
 
 import { existsSync, writeFileSync, readFileSync, mkdirSync } from 'node:fs'
@@ -58,15 +58,15 @@ const command = args[0]
 
 if (command !== 'init') {
   console.log(`
-\x1b[1m@arkite/ui CLI\x1b[0m
+\x1b[1m@arkite-ui/core CLI\x1b[0m
 
 Commands:
   init          Set up Arkite UI in your project
   init --pm     Specify package manager (npm|yarn|pnpm|bun)
 
 Usage:
-  npx @arkite/ui init
-  npx @arkite/ui init --pm bun
+  npx @arkite-ui/core init
+  npx @arkite-ui/core init --pm bun
 `)
   process.exit(0)
 }
@@ -79,7 +79,7 @@ log(`Detected package manager: ${pm}`)
 // ─── Step 1: Install dependencies ───
 
 const deps = [
-  '@arkite/ui',
+  '@arkite-ui/core',
   'lucide-react',
   'tailwindcss@^4',
   'tw-animate-css',
@@ -106,7 +106,7 @@ if (existsSync(cssPath)) {
 
   const cssContent = `@import "tailwindcss";
 @import "tw-animate-css";
-@import "@arkite/ui/styles.css";
+@import "@arkite-ui/core/styles.css";
 
 /*
  * Override theme tokens here:
@@ -118,7 +118,7 @@ if (existsSync(cssPath)) {
  *
  * Or use createTheme() at runtime:
  *
- * import { createTheme, applyTheme } from '@arkite/ui'
+ * import { createTheme, applyTheme } from '@arkite-ui/core'
  * const theme = createTheme({ primary: '#FF6B00' })
  * applyTheme(theme)
  */
@@ -136,7 +136,7 @@ if (existsSync(themePath)) {
 } else {
   mkdirSync(resolve(cwd, 'src/lib'), { recursive: true })
 
-  const themeContent = `import { createTheme, applyTheme, applyDarkTheme, type ThemePreset } from '@arkite/ui'
+  const themeContent = `import { createTheme, applyTheme, applyDarkTheme, type ThemePreset } from '@arkite-ui/core'
 
 /**
  * Your application theme.
@@ -188,7 +188,7 @@ for (const f of possibleEntries) {
 
 if (entryFile) {
   const content = readFileSync(entryFile, 'utf-8')
-  if (!content.includes('arkite.css') && !content.includes('@arkite/ui/styles')) {
+  if (!content.includes('arkite.css') && !content.includes('@arkite-ui/core/styles')) {
     warn(`Don't forget to import the CSS in your entry file:`)
     console.log(`  \x1b[2mimport './styles/arkite.css'\x1b[0m  \x1b[90m// add to ${entryFile}\x1b[0m`)
   }
@@ -203,6 +203,6 @@ console.log('  Next steps:')
 console.log('  1. Import CSS in your entry file:')
 console.log(`     \x1b[2mimport './styles/arkite.css'\x1b[0m`)
 console.log('  2. Start using components:')
-console.log(`     \x1b[2mimport { Button } from '@arkite/ui'\x1b[0m`)
+console.log(`     \x1b[2mimport { Button } from '@arkite-ui/core'\x1b[0m`)
 console.log('  3. Customize your theme in src/lib/theme.ts')
 console.log('')
