@@ -119,7 +119,15 @@ describe('Modal', () => {
     )
     const dialog = screen.getByRole('dialog')
     expect(dialog).toHaveAttribute('aria-modal', 'true')
-    expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title')
-    expect(dialog).toHaveAttribute('aria-describedby', 'modal-description')
+    // ids are generated with useId so multiple modals on the same page don't
+    // collide — assert the linkage, not a hardcoded id value
+    expect(dialog).toHaveAttribute(
+      'aria-labelledby',
+      screen.getByText('Dialog Title').id
+    )
+    expect(dialog).toHaveAttribute(
+      'aria-describedby',
+      screen.getByText('Dialog Description').id
+    )
   })
 })

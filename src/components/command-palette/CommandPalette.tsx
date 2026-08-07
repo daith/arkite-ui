@@ -182,75 +182,91 @@ export interface CommandDialogProps {
   onClose?: () => void
   /** @deprecated use `onClose` instead — removed in v1.0 */
   onOpenChange?: (open: boolean) => void
+  /** Close on escape key */
+  closeOnEscape?: boolean
+  /** Close on backdrop click */
+  closeOnBackdropClick?: boolean
   /** Additional class name applied to the dialog content element */
   className?: string
   children: ReactNode
 }
 
 /** Modal overlay that wraps a Command component for use as a Cmd+K palette. */
-export function CommandDialog({
-  open,
-  onClose,
-  onOpenChange,
-  className,
-  children,
-}: CommandDialogProps) {
-  const locale = useLocale()
-  const dialogRef = useRef<HTMLDivElement>(null)
-  const requestClose = useCallback(() => {
-    if (onClose) {
-      onClose()
-    } else if (onOpenChange) {
-      warnDeprecated('CommandDialog', 'onOpenChange', 'onClose')
-      onOpenChange(false)
-    }
-  }, [onClose, onOpenChange])
-
-  // Close on escape
-  useEffect(() => {
-    if (!open) return
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        requestClose()
+export const CommandDialog = forwardRef<HTMLDivElement, CommandDialogProps>(
+  (
+    {
+      open,
+      onClose,
+      onOpenChange,
+      closeOnEscape = true,
+      closeOnBackdropClick = true,
+      className,
+      children,
+    },
+    ref
+  ) => {
+    const locale = useLocale()
+    const dialogRef = useRef<HTMLDivElement>(null)
+    const requestClose = useCallback(() => {
+      if (onClose) {
+        onClose()
+      } else if (onOpenChange) {
+        warnDeprecated('CommandDialog', 'onOpenChange', 'onClose')
+        onOpenChange(false)
       }
-    }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [open, requestClose])
+    }, [onClose, onOpenChange])
 
-  // Focus the search input on open — cmdk's Input doesn't autofocus
-  useEffect(() => {
-    if (!open) return
-    dialogRef.current?.querySelector<HTMLInputElement>('[cmdk-input]')?.focus()
-  }, [open])
+    // Close on escape
+    useEffect(() => {
+      if (!open || !closeOnEscape) return
+      const handler = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          requestClose()
+        }
+      }
+      document.addEventListener('keydown', handler)
+      return () => document.removeEventListener('keydown', handler)
+    }, [open, closeOnEscape, requestClose])
 
-  if (!open) return null
+    // Focus the search input on open — cmdk's Input doesn't autofocus
+    useEffect(() => {
+      if (!open) return
+      dialogRef.current?.querySelector<HTMLInputElement>('[cmdk-input]')?.focus()
+    }, [open])
 
-  return (
-    <div className="fixed inset-0 z-50">
-      {/* Backdrop */}
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- backdrop dismiss handled by Escape key listener */}
-      <div
-        className="fixed inset-0 bg-black/50 animate-in fade-in-0"
-        onClick={requestClose}
-      />
-      {/* Dialog */}
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-label={locale.commandPalette.label}
-        className={cn(
-          'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95',
-          className
-        )}
-      >
-        <Command className="rounded-lg border shadow-2xl">
-          {children}
-        </Command>
+    if (!open) return null
+
+    return (
+      <div className="fixed inset-0 z-50">
+        {/* Backdrop */}
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- backdrop dismiss handled by Escape key listener */}
+        <div
+          className="fixed inset-0 bg-black/50 animate-in fade-in-0"
+          onClick={closeOnBackdropClick ? requestClose : undefined}
+        />
+        {/* Dialog */}
+        <div
+          ref={(node) => {
+            (dialogRef as React.MutableRefObject<HTMLDivElement | null>).current = node
+            if (typeof ref === 'function') ref(node)
+            else if (ref) ref.current = node
+          }}
+          role="dialog"
+          aria-label={locale.commandPalette.label}
+          className={cn(
+            'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95',
+            className
+          )}
+        >
+          <Command className="rounded-lg border shadow-2xl">
+            {children}
+          </Command>
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  }
+)
+CommandDialog.displayName = 'CommandDialog'
 
 // --- useCommandPalette hook ---
 

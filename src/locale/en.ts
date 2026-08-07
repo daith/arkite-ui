@@ -81,6 +81,8 @@ export const enUS: ArkiteLocale = {
   confirmDialog: {
     cancelLabel: 'Cancel',
     confirmLabel: 'Confirm',
+    confirmTitle: 'Are you sure?',
+    confirmDescription: 'This action cannot be undone.',
     deleteTitle: (itemName) => `Delete ${itemName}?`,
     deleteFallbackItem: 'this item',
     deleteDescription:
@@ -108,6 +110,15 @@ export const enUS: ArkiteLocale = {
     copiedAria: 'Copied',
     copyValue: 'Copy value',
   },
+  modal: {
+    close: 'Close',
+  },
+  drawer: {
+    close: 'Close',
+  },
+  toast: {
+    close: 'Close',
+  },
   spinner: {
     loading: 'Loading',
     loadingText: 'Loading...',
@@ -132,11 +143,14 @@ export const enUS: ArkiteLocale = {
     addImage: 'Add image',
     upload: 'Upload',
     remove: 'Remove',
+    replace: 'Replace',
+    removeImage: 'Remove image',
     preview: 'Preview',
     dropzone: 'Drop files here or click to upload',
     anyFileType: 'Any file type accepted',
     acceptedTypes: (accept) => `Accepted: ${accept}`,
     maxSizeNote: (size) => `Max size: ${size}`,
+    maxSizeHint: (size) => `Max ${size}`,
     fileTooLarge: (name, size) => `File "${name}" exceeds maximum size of ${size}`,
     fileNotAccepted: (name) => `File "${name}" is not an accepted file type`,
     tooManyFiles: (max) => `Maximum ${max} files allowed`,
@@ -150,11 +164,39 @@ export const enUS: ArkiteLocale = {
     pickColor: 'Pick a color',
     hexValue: 'Hex color value',
     presetColors: 'Preset colors',
+    selectColor: (color) => `Select color ${color}`,
   },
   progress: {
     label: 'Progress',
   },
   breadcrumb: {
     label: 'Breadcrumb',
+  },
+  label: {
+    optional: '(optional)',
+  },
+  passwordInput: {
+    hide: 'Hide password',
+    show: 'Show password',
+  },
+  tagInput: {
+    remove: (tag) => `Remove ${tag}`,
+  },
+  tree: {
+    collapse: 'Collapse',
+    expand: 'Expand',
+    toggle: 'Toggle',
+  },
+  filterSelect: {
+    all: 'All',
+  },
+  pageHeader: {
+    back: 'Go back',
+  },
+  sidebar: {
+    toggle: 'Toggle sidebar',
+  },
+  actionButtons: {
+    label: 'Actions',
   },
 }

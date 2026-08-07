@@ -23,6 +23,10 @@ export interface ConfirmDialogProps {
   onConfirm: () => void
   /** Loading state (disables buttons during async operation) */
   loading?: boolean
+  /** Close on escape key (ignored while loading) */
+  closeOnEscape?: boolean
+  /** Close on backdrop click (ignored while loading) */
+  closeOnBackdropClick?: boolean
   /** Modal size */
   size?: ModalSize
   /** Custom icon */
@@ -54,6 +58,8 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
       cancelLabel,
       onConfirm,
       loading = false,
+      closeOnEscape = true,
+      closeOnBackdropClick = true,
       size = 'sm',
       icon,
       className,
@@ -76,8 +82,8 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
         className={className}
         size={size}
         showCloseButton={false}
-        closeOnBackdropClick={!loading}
-        closeOnEscape={!loading}
+        closeOnBackdropClick={closeOnBackdropClick && !loading}
+        closeOnEscape={closeOnEscape && !loading}
       >
         <div className="flex flex-col items-center text-center sm:flex-row sm:items-start sm:text-left gap-4">
           {(icon || hasIcon) && (

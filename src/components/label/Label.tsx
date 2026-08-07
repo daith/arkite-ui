@@ -1,5 +1,6 @@
 import { forwardRef, type LabelHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   /** Required indicator */
@@ -13,6 +14,7 @@ export interface LabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
 /** Form label with optional required/optional indicators and description text. */
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(
   ({ className, children, required, optional, description, ...props }, ref) => {
+    const locale = useLocale()
     return (
       <div className="space-y-1">
         <label
@@ -32,7 +34,7 @@ export const Label = forwardRef<HTMLLabelElement, LabelProps>(
           )}
           {optional && (
             <span className="ml-1 text-muted-foreground font-normal">
-              (optional)
+              {locale.label.optional}
             </span>
           )}
         </label>

@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type TagInputSize = 'sm' | 'md' | 'lg'
 
@@ -77,14 +78,13 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [inputValue, setInputValue] = useState('')
-    const internalRef = useRef<HTMLInputElement>(null)
-
-    const inputRef = (ref as React.RefObject<HTMLInputElement>) ?? internalRef
+    const internalRef = useRef<HTMLInputElement | null>(null)
 
     const focusInput = useCallback(() => {
-      inputRef.current?.focus()
-    }, [inputRef])
+      internalRef.current?.focus()
+    }, [])
 
     const addTag = useCallback(
       (raw: string) => {
@@ -172,7 +172,7 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
             {!disabled && (
               <button
                 type="button"
-                aria-label={`Remove ${tag}`}
+                aria-label={locale.tagInput.remove(tag)}
                 className="rounded-full outline-none hover:bg-secondary-foreground/20 focus-visible:ring-1 focus-visible:ring-ring"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -185,7 +185,11 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
           </span>
         ))}
         <input
-          ref={inputRef}
+          ref={(node) => {
+            internalRef.current = node
+            if (typeof ref === 'function') ref(node)
+            else if (ref) ref.current = node
+          }}
           type="text"
           value={inputValue}
           onChange={handleChange}

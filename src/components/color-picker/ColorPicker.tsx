@@ -247,7 +247,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
                       ? expandHex(normalized)
                       : undefined,
                   }}
-                  aria-label={`Select color ${normalized}`}
+                  aria-label={locale.colorPicker.selectColor(normalized)}
                 />
               )
             })}

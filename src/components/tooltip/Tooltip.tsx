@@ -52,6 +52,8 @@ export interface SimpleTooltipProps {
   side?: 'top' | 'right' | 'bottom' | 'left'
   /** Delay before showing (ms) */
   delayDuration?: number
+  /** Additional class name applied to the tooltip content */
+  className?: string
   children: ReactNode
 }
 
@@ -60,12 +62,13 @@ export function SimpleTooltip({
   content,
   side = 'top',
   delayDuration = 200,
+  className,
   children,
 }: SimpleTooltipProps) {
   return (
     <Tooltip delayDuration={delayDuration}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side={side}>{content}</TooltipContent>
+      <TooltipContent side={side} className={className}>{content}</TooltipContent>
     </Tooltip>
   )
 }

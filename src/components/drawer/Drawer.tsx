@@ -1,6 +1,7 @@
 import {
   forwardRef,
   useEffect,
+  useId,
   useRef,
   useState,
   type HTMLAttributes,
@@ -8,6 +9,7 @@ import {
 } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { X } from 'lucide-react'
 
 export type DrawerPosition = 'left' | 'right' | 'top' | 'bottom'
@@ -122,6 +124,9 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
     ref
   ) => {
     const drawerRef = useRef<HTMLDivElement>(null)
+    const locale = useLocale()
+    const titleId = useId()
+    const descriptionId = useId()
     const [isVisible, setIsVisible] = useState(false)
     const [isAnimating, setIsAnimating] = useState(false)
 
@@ -174,10 +179,56 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
       }
     }, [open])
 
+    // Focus trap
+    useEffect(() => {
+      if (!open || !isVisible) return
+
+      const drawer = drawerRef.current
+      if (!drawer) return
+
+      const previouslyFocused = document.activeElement as HTMLElement | null
+
+      const focusableElements = drawer.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      const firstElement = focusableElements[0] as HTMLElement
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+      const handleTab = (e: KeyboardEvent) => {
+        if (e.key !== 'Tab') return
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault()
+            lastElement?.focus()
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault()
+            firstElement?.focus()
+          }
+        }
+      }
+
+      drawer.addEventListener('keydown', handleTab)
+      firstElement?.focus()
+
+      return () => {
+        drawer.removeEventListener('keydown', handleTab)
+        previouslyFocused?.focus?.()
+      }
+    }, [open, isVisible])
+
     if (!isVisible) return null
 
     const drawerContent = (
-      <div className="fixed inset-0 z-50">
+      <div
+        className="fixed inset-0 z-50"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
+      >
         {/* Backdrop */}
         <div
           className={cn(
@@ -210,10 +261,10 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
             <div className="flex items-start justify-between gap-4 border-b p-4">
               <div className="space-y-1">
                 {title && (
-                  <h2 className="text-lg font-semibold leading-none">{title}</h2>
+                  <h2 id={titleId} className="text-lg font-semibold leading-none">{title}</h2>
                 )}
                 {description && (
-                  <p className="text-sm text-muted-foreground">{description}</p>
+                  <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
                 )}
               </div>
               {showCloseButton && (
@@ -222,7 +273,7 @@ export const Drawer = forwardRef<HTMLDivElement, DrawerProps>(
                   className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <X className="h-5 w-5" />
-                  <span className="sr-only">Close</span>
+                  <span className="sr-only">{locale.drawer.close}</span>
                 </button>
               )}
             </div>

@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type PageHeaderSize = 'sm' | 'md' | 'lg'
 
@@ -38,7 +39,8 @@ const sizeStyles: Record<PageHeaderSize, { title: string; description: string }>
 
 /** Page header with title, description, breadcrumb, and action slots. */
 export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
-  ({ title, size = 'md', description, actions, breadcrumb, badge, onBack, backLabel = 'Go back', className, children, ...props }, ref) => {
+  ({ title, size = 'md', description, actions, breadcrumb, badge, onBack, backLabel, className, children, ...props }, ref) => {
+    const locale = useLocale()
     return (
       <div
         ref={ref}
@@ -54,7 +56,7 @@ export const PageHeader = forwardRef<HTMLDivElement, PageHeaderProps>(
                   type="button"
                   onClick={onBack}
                   className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label={backLabel}
+                  aria-label={backLabel ?? locale.pageHeader.back}
                 >
                   <ArrowLeftIcon />
                 </button>

@@ -1,17 +1,25 @@
 import {
   forwardRef,
   useEffect,
+  useId,
   useRef,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { X } from 'lucide-react'
 import { useReducedMotion } from './use-reduced-motion'
 import type { DrawerPosition, DrawerSize } from '../drawer/Drawer'
 
-export interface AnimatedDrawerProps {
+// framer-motion redefines these handlers with its own signatures on motion.div,
+// so they are excluded from the passthrough props
+type MotionConflictProps = 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'
+
+export interface AnimatedDrawerProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | MotionConflictProps> {
   open: boolean
   onClose: () => void
   position?: DrawerPosition
@@ -22,8 +30,6 @@ export interface AnimatedDrawerProps {
   closeOnBackdropClick?: boolean
   closeOnEscape?: boolean
   footer?: ReactNode
-  children?: ReactNode
-  className?: string
 }
 
 const positionStyles: Record<DrawerPosition, string> = {
@@ -79,10 +85,14 @@ export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
       footer,
       children,
       className,
+      ...rest
     },
     ref
   ) => {
     const drawerRef = useRef<HTMLDivElement>(null)
+    const locale = useLocale()
+    const titleId = useId()
+    const descriptionId = useId()
     const prefersReducedMotion = useReducedMotion()
 
     useEffect(() => {
@@ -104,6 +114,42 @@ export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
       }
     }, [open])
 
+    useEffect(() => {
+      if (!open) return
+      const drawer = drawerRef.current
+      if (!drawer) return
+
+      const previouslyFocused = document.activeElement as HTMLElement | null
+
+      const focusableElements = drawer.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      const firstElement = focusableElements[0] as HTMLElement
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+
+      const handleTab = (e: KeyboardEvent) => {
+        if (e.key !== 'Tab') return
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault()
+            lastElement?.focus()
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault()
+            firstElement?.focus()
+          }
+        }
+      }
+
+      drawer.addEventListener('keydown', handleTab)
+      firstElement?.focus()
+      return () => {
+        drawer.removeEventListener('keydown', handleTab)
+        previouslyFocused?.focus?.()
+      }
+    }, [open])
+
     const duration = prefersReducedMotion ? 0 : 0.3
     const variant = slideVariants[position]
 
@@ -119,7 +165,13 @@ export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
     const drawerContent = (
       <AnimatePresence>
         {open && (
-          <div className="fixed inset-0 z-50">
+          <div
+            className="fixed inset-0 z-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={title ? titleId : undefined}
+            aria-describedby={description ? descriptionId : undefined}
+          >
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -148,15 +200,16 @@ export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
                 sizeStyles[position][size],
                 className
               )}
+              {...rest}
             >
               {(title || showCloseButton) && (
                 <div className="flex items-start justify-between gap-4 border-b p-4">
                   <div className="space-y-1">
                     {title && (
-                      <h2 className="text-lg font-semibold leading-none">{title}</h2>
+                      <h2 id={titleId} className="text-lg font-semibold leading-none">{title}</h2>
                     )}
                     {description && (
-                      <p className="text-sm text-muted-foreground">{description}</p>
+                      <p id={descriptionId} className="text-sm text-muted-foreground">{description}</p>
                     )}
                   </div>
                   {showCloseButton && (
@@ -165,7 +218,7 @@ export const AnimatedDrawer = forwardRef<HTMLDivElement, AnimatedDrawerProps>(
                       className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                       <X className="h-5 w-5" />
-                      <span className="sr-only">Close</span>
+                      <span className="sr-only">{locale.drawer.close}</span>
                     </button>
                   )}
                 </div>

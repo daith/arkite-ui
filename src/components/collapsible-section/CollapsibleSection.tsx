@@ -11,7 +11,7 @@ import { cn } from '../../utils/cn'
 export interface CollapsibleSectionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Section title displayed in the header */
-  title: string
+  title: ReactNode
   /** Content to show/hide when toggling */
   children: ReactNode
   /** Whether the section is open by default (uncontrolled mode) */
@@ -76,38 +76,41 @@ export const CollapsibleSection = forwardRef<
         )}
         {...props}
       >
-        <button
-          type="button"
-          aria-expanded={isOpen}
-          disabled={disabled}
-          onClick={handleToggle}
+        <div
           className={cn(
-            'flex w-full items-center gap-2 p-4 text-left select-none',
-            !disabled && 'cursor-pointer hover:bg-muted/50',
+            'flex w-full items-center',
+            !disabled && 'hover:bg-muted/50',
             isOpen && 'border-b'
           )}
         >
-          <ChevronRight
+          <button
+            type="button"
+            aria-expanded={isOpen}
+            disabled={disabled}
+            onClick={handleToggle}
             className={cn(
-              'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-              isOpen && 'rotate-90'
+              'flex flex-1 min-w-0 items-center gap-2 text-left select-none',
+              rightSlot ? 'py-4 pl-4 pr-2' : 'p-4',
+              !disabled && 'cursor-pointer'
             )}
-          />
-          <div className="flex-1 min-w-0">
-            <span className="text-sm font-medium">{title}</span>
-            {description && (
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {description}
-              </p>
-            )}
-          </div>
-          {rightSlot && (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
-              {rightSlot}
+          >
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                isOpen && 'rotate-90'
+              )}
+            />
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium">{title}</span>
+              {description && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {description}
+                </p>
+              )}
             </div>
-          )}
-        </button>
+          </button>
+          {rightSlot && <div className="shrink-0 pr-4">{rightSlot}</div>}
+        </div>
         {isOpen && <div className="p-4">{children}</div>}
       </div>
     )

@@ -85,6 +85,8 @@ export interface ArkiteLocale {
   confirmDialog: {
     cancelLabel: string
     confirmLabel: string
+    confirmTitle: string
+    confirmDescription: string
     deleteTitle: (itemName: string) => string
     /** Used in `deleteTitle` when no item name is given. */
     deleteFallbackItem: string
@@ -112,6 +114,15 @@ export interface ArkiteLocale {
     copiedAria: string
     copyValue: string
   }
+  modal: {
+    close: string
+  }
+  drawer: {
+    close: string
+  }
+  toast: {
+    close: string
+  }
   spinner: {
     loading: string
     loadingText: string
@@ -136,11 +147,14 @@ export interface ArkiteLocale {
     addImage: string
     upload: string
     remove: string
+    replace: string
+    removeImage: string
     preview: string
     dropzone: string
     anyFileType: string
     acceptedTypes: (accept: string) => string
     maxSizeNote: (size: string) => string
+    maxSizeHint: (size: string) => string
     fileTooLarge: (name: string, size: string) => string
     fileNotAccepted: (name: string) => string
     tooManyFiles: (max: number) => string
@@ -154,11 +168,39 @@ export interface ArkiteLocale {
     pickColor: string
     hexValue: string
     presetColors: string
+    selectColor: (color: string) => string
   }
   progress: {
     label: string
   }
   breadcrumb: {
+    label: string
+  }
+  label: {
+    optional: string
+  }
+  passwordInput: {
+    hide: string
+    show: string
+  }
+  tagInput: {
+    remove: (tag: string) => string
+  }
+  tree: {
+    collapse: string
+    expand: string
+    toggle: string
+  }
+  filterSelect: {
+    all: string
+  }
+  pageHeader: {
+    back: string
+  }
+  sidebar: {
+    toggle: string
+  }
+  actionButtons: {
     label: string
   }
 }

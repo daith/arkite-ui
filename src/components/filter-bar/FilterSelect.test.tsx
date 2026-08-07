@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import { FilterSelect } from './FilterSelect'
+import { LocaleProvider, zhTW } from '../../locale'
 
 const statusOptions = [
   { value: 'active', label: 'Active' },
@@ -9,28 +10,37 @@ const statusOptions = [
 ]
 
 describe('FilterSelect', () => {
-  it('renders options with default "全部" option', () => {
+  it('renders options with default "All" option', () => {
     render(<FilterSelect options={statusOptions} />)
     const select = screen.getByRole('combobox')
     expect(select).toBeInTheDocument()
-    expect(screen.getByText('全部')).toBeInTheDocument()
+    expect(screen.getByText('All')).toBeInTheDocument()
     expect(screen.getByText('Active')).toBeInTheDocument()
     expect(screen.getByText('Inactive')).toBeInTheDocument()
   })
 
+  it('localizes the all option through LocaleProvider', () => {
+    render(
+      <LocaleProvider locale={zhTW}>
+        <FilterSelect options={statusOptions} />
+      </LocaleProvider>
+    )
+    expect(screen.getByText('全部')).toBeInTheDocument()
+  })
+
   it('prepends label to all option text', () => {
-    render(<FilterSelect label="狀態" options={statusOptions} />)
-    expect(screen.getByText('狀態: 全部')).toBeInTheDocument()
+    render(<FilterSelect label="Status" options={statusOptions} />)
+    expect(screen.getByText('Status: All')).toBeInTheDocument()
   })
 
   it('supports custom allLabel', () => {
-    render(<FilterSelect allLabel="All" options={statusOptions} />)
-    expect(screen.getByText('All')).toBeInTheDocument()
+    render(<FilterSelect allLabel="全部" options={statusOptions} />)
+    expect(screen.getByText('全部')).toBeInTheDocument()
   })
 
   it('hides all option when allLabel is false', () => {
     render(<FilterSelect allLabel={false} options={statusOptions} />)
-    expect(screen.queryByText('全部')).not.toBeInTheDocument()
+    expect(screen.queryByText('All')).not.toBeInTheDocument()
   })
 
   it('calls onChange with value string', async () => {

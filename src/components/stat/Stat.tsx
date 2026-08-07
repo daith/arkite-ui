@@ -117,13 +117,14 @@ export const StatCard = forwardRef<HTMLDivElement, StatCardProps>(
 
     return (
       <div
+        ref={ref}
         className={cn(
           'rounded-lg p-6',
           variantStyles[variant],
           className
         )}
       >
-        <Stat ref={ref} {...props} />
+        <Stat {...props} />
       </div>
     )
   }

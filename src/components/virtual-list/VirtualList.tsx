@@ -1,8 +1,36 @@
-import { useRef, useCallback, useEffect, type ReactNode, type CSSProperties } from 'react'
+import {
+  forwardRef,
+  useRef,
+  useCallback,
+  useEffect,
+  type ReactNode,
+  type ReactElement,
+  type CSSProperties,
+  type ForwardedRef,
+  type MutableRefObject,
+} from 'react'
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
 import { Spinner } from '../spinner/Spinner'
+
+/** Merges the internal scroll-element ref with a forwarded ref. */
+function useMergedRef(
+  localRef: MutableRefObject<HTMLDivElement | null>,
+  forwardedRef: ForwardedRef<HTMLDivElement>
+) {
+  return useCallback(
+    (node: HTMLDivElement | null) => {
+      localRef.current = node
+      if (typeof forwardedRef === 'function') {
+        forwardedRef(node)
+      } else if (forwardedRef) {
+        forwardedRef.current = node
+      }
+    },
+    [localRef, forwardedRef]
+  )
+}
 
 export interface VirtualListProps<T> {
   /** Array of items to render */
@@ -33,24 +61,27 @@ export interface VirtualListProps<T> {
   innerClassName?: string
 }
 
-/** Efficiently renders large lists by only mounting visible items. */
-export function VirtualList<T>({
-  items,
-  getItemKey,
-  renderItem,
-  estimateSize = 48,
-  height = 400,
-  dynamicSize = false,
-  gap = 0,
-  overscan = 5,
-  loading = false,
-  emptyContent,
-  'aria-label': ariaLabel,
-  className,
-  innerClassName,
-}: VirtualListProps<T>) {
+function VirtualListInner<T>(
+  {
+    items,
+    getItemKey,
+    renderItem,
+    estimateSize = 48,
+    height = 400,
+    dynamicSize = false,
+    gap = 0,
+    overscan = 5,
+    loading = false,
+    emptyContent,
+    'aria-label': ariaLabel,
+    className,
+    innerClassName,
+  }: VirtualListProps<T>,
+  ref: ForwardedRef<HTMLDivElement>
+) {
   const locale = useLocale()
   const parentRef = useRef<HTMLDivElement>(null)
+  const setRefs = useMergedRef(parentRef, ref)
 
   const virtualizer = useVirtualizer({
     count: items.length,
@@ -68,6 +99,7 @@ export function VirtualList<T>({
   if (loading) {
     return (
       <div
+        ref={ref}
         className={cn('flex items-center justify-center', className)}
         style={{ height }}
       >
@@ -79,6 +111,7 @@ export function VirtualList<T>({
   if (items.length === 0) {
     return (
       <div
+        ref={ref}
         className={cn('flex items-center justify-center text-muted-foreground text-sm', className)}
         style={{ height }}
       >
@@ -89,7 +122,7 @@ export function VirtualList<T>({
 
   return (
     <div
-      ref={parentRef}
+      ref={setRefs}
       className={cn('overflow-auto', className)}
       style={{ height }}
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
@@ -122,6 +155,11 @@ export function VirtualList<T>({
   )
 }
 
+/** Efficiently renders large lists by only mounting visible items. */
+export const VirtualList = forwardRef(VirtualListInner) as <T>(
+  props: VirtualListProps<T> & { ref?: ForwardedRef<HTMLDivElement> }
+) => ReactElement
+
 // --- Infinite Scroll ---
 
 export interface InfiniteScrollProps<T> extends Omit<VirtualListProps<T>, 'loading'> {
@@ -139,29 +177,32 @@ export interface InfiniteScrollProps<T> extends Omit<VirtualListProps<T>, 'loadi
   loadingMoreContent?: ReactNode
 }
 
-/** Virtualized list with automatic loading of additional items on scroll. */
-export function InfiniteScroll<T>({
-  items,
-  hasMore,
-  onLoadMore,
-  loadingMore = false,
-  loading = false,
-  threshold = 200,
-  loadingMoreContent,
-  renderItem,
-  estimateSize = 48,
-  height = 400,
-  gap = 0,
-  overscan = 5,
-  getItemKey,
-  dynamicSize = false,
-  emptyContent,
-  'aria-label': ariaLabel,
-  className,
-  innerClassName,
-}: InfiniteScrollProps<T>) {
+function InfiniteScrollInner<T>(
+  {
+    items,
+    hasMore,
+    onLoadMore,
+    loadingMore = false,
+    loading = false,
+    threshold = 200,
+    loadingMoreContent,
+    renderItem,
+    estimateSize = 48,
+    height = 400,
+    gap = 0,
+    overscan = 5,
+    getItemKey,
+    dynamicSize = false,
+    emptyContent,
+    'aria-label': ariaLabel,
+    className,
+    innerClassName,
+  }: InfiniteScrollProps<T>,
+  ref: ForwardedRef<HTMLDivElement>
+) {
   const locale = useLocale()
   const parentRef = useRef<HTMLDivElement>(null)
+  const setRefs = useMergedRef(parentRef, ref)
 
   const virtualizer = useVirtualizer({
     count: items.length,
@@ -194,6 +235,7 @@ export function InfiniteScroll<T>({
   if (loading) {
     return (
       <div
+        ref={ref}
         className={cn('flex items-center justify-center', className)}
         style={{ height }}
       >
@@ -205,6 +247,7 @@ export function InfiniteScroll<T>({
   if (items.length === 0) {
     return (
       <div
+        ref={ref}
         className={cn('flex items-center justify-center text-muted-foreground text-sm', className)}
         style={{ height }}
       >
@@ -232,7 +275,7 @@ export function InfiniteScroll<T>({
 
   return (
     <div
-      ref={parentRef}
+      ref={setRefs}
       className={cn('overflow-auto', className)}
       style={{ height }}
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
@@ -262,3 +305,8 @@ export function InfiniteScroll<T>({
     </div>
   )
 }
+
+/** Virtualized list with automatic loading of additional items on scroll. */
+export const InfiniteScroll = forwardRef(InfiniteScrollInner) as <T>(
+  props: InfiniteScrollProps<T> & { ref?: ForwardedRef<HTMLDivElement> }
+) => ReactElement

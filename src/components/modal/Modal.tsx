@@ -1,12 +1,14 @@
 import {
   forwardRef,
   useEffect,
+  useId,
   useRef,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { X } from 'lucide-react'
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full'
@@ -63,6 +65,9 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
     ref
   ) => {
     const modalRef = useRef<HTMLDivElement>(null)
+    const locale = useLocale()
+    const titleId = useId()
+    const descriptionId = useId()
 
     // Handle escape key
     useEffect(() => {
@@ -136,8 +141,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'modal-title' : undefined}
-        aria-describedby={description ? 'modal-description' : undefined}
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
       >
         {/* Backdrop */}
         <div
@@ -167,7 +172,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
               <div className="space-y-1">
                 {title && (
                   <h2
-                    id="modal-title"
+                    id={titleId}
                     className="text-lg font-semibold leading-none"
                   >
                     {title}
@@ -175,7 +180,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                 )}
                 {description && (
                   <p
-                    id="modal-description"
+                    id={descriptionId}
                     className="text-sm text-muted-foreground"
                   >
                     {description}
@@ -188,7 +193,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
                   className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 >
                   <X className="h-5 w-5" />
-                  <span className="sr-only">Close</span>
+                  <span className="sr-only">{locale.modal.close}</span>
                 </button>
               )}
             </div>

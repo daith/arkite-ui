@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
   type ButtonHTMLAttributes,
+  type InputHTMLAttributes,
   type ReactNode,
 } from 'react'
 import { Check, Copy } from 'lucide-react'
@@ -171,7 +172,8 @@ CopyButton.displayName = 'CopyButton'
 /*  CopyInput                                                                 */
 /* -------------------------------------------------------------------------- */
 
-export interface CopyInputProps {
+export interface CopyInputProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'value'> {
   /** The text value displayed in the input and copied to the clipboard. */
   value: string
   /** Callback fired after a successful copy. */
@@ -198,6 +200,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
       size = 'md',
       feedbackDuration = 2000,
       className,
+      ...props
     },
     ref
   ) => {
@@ -227,6 +230,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
             inputSizeStyles[size],
             'pr-10'
           )}
+          {...props}
         />
         <button
           type="button"

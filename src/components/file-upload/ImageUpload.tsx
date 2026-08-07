@@ -169,14 +169,14 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                     onClick={openPicker}
                     className="rounded-md bg-white/90 px-2 py-1 text-xs font-medium text-black hover:bg-white"
                   >
-                    Replace
+                    {locale.fileUpload.replace}
                   </button>
                   <button
                     type="button"
                     onClick={() => onRemove?.(url)}
                     className="rounded-md bg-white/90 px-2 py-1 text-xs font-medium text-destructive hover:bg-white"
                   >
-                    Remove
+                    {locale.fileUpload.remove}
                   </button>
                 </div>
               )}
@@ -205,7 +205,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
               </span>
               {maxSize && (
                 <span className="text-2xs text-muted-foreground">
-                  Max {formatFileSize(maxSize)}
+                  {locale.fileUpload.maxSizeHint(formatFileSize(maxSize))}
                 </span>
               )}
             </button>
@@ -242,7 +242,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
                   type="button"
                   onClick={() => onRemove?.(url)}
                   className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity hover:bg-black/80 group-hover:opacity-100"
-                  aria-label={`Remove image`}
+                  aria-label={locale.fileUpload.removeImage}
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

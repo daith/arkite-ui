@@ -4,7 +4,15 @@
  * Props-driven: works with any state management solution.
  */
 
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { cn } from '../../utils/cn'
 import { Badge, type BadgeVariant } from '../badge/Badge'
 import { Spinner } from '../spinner/Spinner'
@@ -29,7 +37,8 @@ export interface TenantItem {
   planLabel?: string
 }
 
-export interface TenantSwitcherProps {
+export interface TenantSwitcherProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   /** List of available tenants */
   tenants: TenantItem[]
   /** Currently selected tenant (null = all tenants / platform view) */
@@ -149,242 +158,264 @@ function GlobeIcon({ className }: { className?: string }) {
 // --- Component ---
 
 /** Dropdown for switching between tenants with search and optional "All Tenants" view. */
-export function TenantSwitcher({
-  tenants = [],
-  currentTenant = null,
-  onSelect,
-  onSearch,
-  loading = false,
-  showAllOption = true,
-  allLabel,
-  allDescription,
-  emptyMessage,
-  searchPlaceholder,
-  renderTenant,
-  className,
-}: TenantSwitcherProps) {
-  const locale = useLocale()
-  const resolvedAllLabel = allLabel ?? locale.tenantSwitcher.allLabel
-  const [isOpen, setIsOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
+export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
+  (
+    {
+      tenants = [],
+      currentTenant = null,
+      onSelect,
+      onSearch,
+      loading = false,
+      showAllOption = true,
+      allLabel,
+      allDescription,
+      emptyMessage,
+      searchPlaceholder,
+      renderTenant,
+      className,
+      ...rest
+    },
+    ref
+  ) => {
+    const locale = useLocale()
+    const resolvedAllLabel = allLabel ?? locale.tenantSwitcher.allLabel
+    const [isOpen, setIsOpen] = useState(false)
+    const [search, setSearch] = useState('')
+    const dropdownRef = useRef<HTMLDivElement | null>(null)
+    const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Close on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
-        setSearch('')
+    const setRootRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        dropdownRef.current = node
+        if (typeof ref === 'function') {
+          ref(node)
+        } else if (ref) {
+          ref.current = node
+        }
+      },
+      [ref]
+    )
+
+    // Close on click outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false)
+          setSearch('')
+        }
       }
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
+
+    // Focus search on open
+    useEffect(() => {
+      if (isOpen && searchInputRef.current) {
+        searchInputRef.current.focus()
+      }
+    }, [isOpen])
+
+    // Filter tenants (local filtering unless onSearch is provided)
+    const filteredTenants = onSearch
+      ? tenants
+      : tenants.filter((t) => {
+          const q = search.toLowerCase()
+          return (
+            t.name.toLowerCase().includes(q) ||
+            (t.slug?.toLowerCase().includes(q) ?? false)
+          )
+        })
+
+    const handleSearchChange = (q: string) => {
+      setSearch(q)
+      onSearch?.(q)
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
-  // Focus search on open
-  useEffect(() => {
-    if (isOpen && searchInputRef.current) {
-      searchInputRef.current.focus()
+    const handleSelect = (tenant: TenantItem | null) => {
+      onSelect?.(tenant)
+      setIsOpen(false)
+      setSearch('')
     }
-  }, [isOpen])
 
-  // Filter tenants (local filtering unless onSearch is provided)
-  const filteredTenants = onSearch
-    ? tenants
-    : tenants.filter((t) => {
-        const q = search.toLowerCase()
-        return (
-          t.name.toLowerCase().includes(q) ||
-          (t.slug?.toLowerCase().includes(q) ?? false)
-        )
-      })
-
-  const handleSearchChange = (q: string) => {
-    setSearch(q)
-    onSearch?.(q)
-  }
-
-  const handleSelect = (tenant: TenantItem | null) => {
-    onSelect?.(tenant)
-    setIsOpen(false)
-    setSearch('')
-  }
-
-  return (
-    <div ref={dropdownRef} className={cn('relative', className)}>
-      {/* Trigger */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          'flex items-center gap-2 px-3 py-2 rounded-md',
-          'bg-card hover:bg-secondary',
-          'border border-border shadow-sm',
-          'text-sm font-medium',
-          'transition-colors duration-200',
-          'min-w-[180px] max-w-[240px]'
-        )}
-      >
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          {currentTenant ? (
-            <>
-              <BuildingIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-              <span className="truncate">{currentTenant.name}</span>
-            </>
-          ) : (
-            <>
-              <GlobeIcon className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-primary">{resolvedAllLabel}</span>
-            </>
-          )}
-        </div>
-        <ChevronDownIcon
+    return (
+      <div ref={setRootRef} className={cn('relative', className)} {...rest}>
+        {/* Trigger */}
+        <button
+          type="button"
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            'h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200',
-            isOpen && 'rotate-180'
-          )}
-        />
-      </button>
-
-      {/* Dropdown */}
-      {isOpen && (
-        <div
-          className={cn(
-            'absolute top-full left-0 mt-1 z-50',
-            'w-[280px] max-h-[400px]',
-            'bg-card border border-border rounded-lg shadow-lg',
-            'overflow-hidden'
+            'flex items-center gap-2 px-3 py-2 rounded-md',
+            'bg-card hover:bg-secondary',
+            'border border-border shadow-sm',
+            'text-sm font-medium',
+            'transition-colors duration-200',
+            'min-w-[180px] max-w-[240px]'
           )}
         >
-          {/* Search */}
-          <div className="p-2 border-b border-border">
-            <div className="relative">
-              <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={searchPlaceholder ?? locale.tenantSwitcher.searchPlaceholder}
-                value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className={cn(
-                  'w-full h-9 pl-8 pr-3 text-sm',
-                  'bg-background border border-input rounded-md',
-                  'focus:outline-none focus:ring-2 focus:ring-ring'
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Options */}
-          <div className="overflow-y-auto max-h-[320px]">
-            {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Spinner size="md" />
-              </div>
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {currentTenant ? (
+              <>
+                <BuildingIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+                <span className="truncate">{currentTenant.name}</span>
+              </>
             ) : (
               <>
-                {/* All Tenants option */}
-                {showAllOption && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => handleSelect(null)}
-                      className={cn(
-                        'w-full flex items-center gap-3 px-3 py-2.5',
-                        'hover:bg-muted transition-colors',
-                        'text-left',
-                        !currentTenant && 'bg-secondary'
-                      )}
-                    >
-                      <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/10">
-                        <GlobeIcon className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-primary">{resolvedAllLabel}</p>
-                        <p className="text-xs text-muted-foreground">{allDescription ?? locale.tenantSwitcher.allDescription}</p>
-                      </div>
-                      {!currentTenant && (
-                        <CheckIcon className="h-4 w-4 text-primary shrink-0" />
-                      )}
-                    </button>
-                    <div className="h-px bg-border mx-2 my-1" />
-                  </>
-                )}
+                <GlobeIcon className="h-4 w-4 text-primary shrink-0" />
+                <span className="text-primary">{resolvedAllLabel}</span>
+              </>
+            )}
+          </div>
+          <ChevronDownIcon
+            className={cn(
+              'h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200',
+              isOpen && 'rotate-180'
+            )}
+          />
+        </button>
 
-                {/* Tenant list */}
-                {filteredTenants.length === 0 ? (
-                  <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                    {emptyMessage ?? locale.tenantSwitcher.emptyMessage}
-                  </div>
-                ) : (
-                  filteredTenants.map((tenant) => {
-                    const selected = currentTenant?.id === tenant.id
-                    if (renderTenant) {
+        {/* Dropdown */}
+        {isOpen && (
+          <div
+            className={cn(
+              'absolute top-full left-0 mt-1 z-50',
+              'w-[280px] max-h-[400px]',
+              'bg-card border border-border rounded-lg shadow-lg',
+              'overflow-hidden'
+            )}
+          >
+            {/* Search */}
+            <div className="p-2 border-b border-border">
+              <div className="relative">
+                <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={searchPlaceholder ?? locale.tenantSwitcher.searchPlaceholder}
+                  value={search}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className={cn(
+                    'w-full h-9 pl-8 pr-3 text-sm',
+                    'bg-background border border-input rounded-md',
+                    'focus:outline-none focus:ring-2 focus:ring-ring'
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Options */}
+            <div className="overflow-y-auto max-h-[320px]">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Spinner size="md" />
+                </div>
+              ) : (
+                <>
+                  {/* All Tenants option */}
+                  {showAllOption && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleSelect(null)}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-3 py-2.5',
+                          'hover:bg-muted transition-colors',
+                          'text-left',
+                          !currentTenant && 'bg-secondary'
+                        )}
+                      >
+                        <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/10">
+                          <GlobeIcon className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-primary">{resolvedAllLabel}</p>
+                          <p className="text-xs text-muted-foreground">{allDescription ?? locale.tenantSwitcher.allDescription}</p>
+                        </div>
+                        {!currentTenant && (
+                          <CheckIcon className="h-4 w-4 text-primary shrink-0" />
+                        )}
+                      </button>
+                      <div className="h-px bg-border mx-2 my-1" />
+                    </>
+                  )}
+
+                  {/* Tenant list */}
+                  {filteredTenants.length === 0 ? (
+                    <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                      {emptyMessage ?? locale.tenantSwitcher.emptyMessage}
+                    </div>
+                  ) : (
+                    filteredTenants.map((tenant) => {
+                      const selected = currentTenant?.id === tenant.id
+                      if (renderTenant) {
+                        return (
+                          <button
+                            key={tenant.id}
+                            type="button"
+                            onClick={() => handleSelect(tenant)}
+                            className="w-full text-left hover:bg-muted transition-colors"
+                          >
+                            {renderTenant(tenant, selected)}
+                          </button>
+                        )
+                      }
                       return (
                         <button
                           key={tenant.id}
                           type="button"
                           onClick={() => handleSelect(tenant)}
-                          className="w-full text-left hover:bg-muted transition-colors"
-                        >
-                          {renderTenant(tenant, selected)}
-                        </button>
-                      )
-                    }
-                    return (
-                      <button
-                        key={tenant.id}
-                        type="button"
-                        onClick={() => handleSelect(tenant)}
-                        className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2.5',
-                          'hover:bg-muted transition-colors',
-                          'text-left',
-                          selected && 'bg-secondary'
-                        )}
-                      >
-                        <div className="flex items-center justify-center h-8 w-8 rounded-md bg-secondary text-secondary-foreground font-medium text-sm">
-                          {tenant.logoUrl ? (
-                            <img
-                              src={tenant.logoUrl}
-                              alt={tenant.name}
-                              className="h-8 w-8 rounded-md object-cover"
-                            />
-                          ) : (
-                            tenant.name.charAt(0).toUpperCase()
+                          className={cn(
+                            'w-full flex items-center gap-3 px-3 py-2.5',
+                            'hover:bg-muted transition-colors',
+                            'text-left',
+                            selected && 'bg-secondary'
                           )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{tenant.name}</p>
-                          <div className="flex items-center gap-2">
-                            {tenant.planLabel && (
-                              <span className="text-xs text-muted-foreground">
-                                {tenant.planLabel}
-                              </span>
-                            )}
-                            {tenant.status && (
-                              <Badge
-                                variant={tenant.statusVariant || 'secondary'}
-                                className="text-2xs px-1.5 py-0"
-                              >
-                                {tenant.status}
-                              </Badge>
+                        >
+                          <div className="flex items-center justify-center h-8 w-8 rounded-md bg-secondary text-secondary-foreground font-medium text-sm">
+                            {tenant.logoUrl ? (
+                              <img
+                                src={tenant.logoUrl}
+                                alt={tenant.name}
+                                className="h-8 w-8 rounded-md object-cover"
+                              />
+                            ) : (
+                              tenant.name.charAt(0).toUpperCase()
                             )}
                           </div>
-                        </div>
-                        {selected && (
-                          <CheckIcon className="h-4 w-4 text-primary shrink-0" />
-                        )}
-                      </button>
-                    )
-                  })
-                )}
-              </>
-            )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{tenant.name}</p>
+                            <div className="flex items-center gap-2">
+                              {tenant.planLabel && (
+                                <span className="text-xs text-muted-foreground">
+                                  {tenant.planLabel}
+                                </span>
+                              )}
+                              {tenant.status && (
+                                <Badge
+                                  variant={tenant.statusVariant || 'secondary'}
+                                  className="text-2xs px-1.5 py-0"
+                                >
+                                  {tenant.status}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                          {selected && (
+                            <CheckIcon className="h-4 w-4 text-primary shrink-0" />
+                          )}
+                        </button>
+                      )
+                    })
+                  )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-    </div>
-  )
-}
+        )}
+      </div>
+    )
+  }
+)
+
+TenantSwitcher.displayName = 'TenantSwitcher'

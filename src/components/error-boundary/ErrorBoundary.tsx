@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { Button } from '../button/Button'
+import { useLocale } from '../../locale'
 
 export interface ErrorBoundaryProps {
   /** Content to render */
@@ -46,26 +47,43 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (fallback) return fallback
 
     return (
-      <div
-        className={cn(
-          'flex flex-col items-center justify-center gap-4 rounded-lg border border-destructive/20 bg-destructive/5 p-8 text-center',
-          className
-        )}
-        role="alert"
-      >
-        <AlertTriangleIcon className="h-10 w-10 text-destructive" />
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold">Something went wrong</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            {error.message || 'An unexpected error occurred.'}
-          </p>
-        </div>
-        <Button variant="outline" onClick={this.reset}>
-          Try again
-        </Button>
-      </div>
+      <DefaultErrorFallback error={error} reset={this.reset} className={className} />
     )
   }
+}
+
+/** Default fallback UI — a function component so it can read the locale context. */
+function DefaultErrorFallback({
+  error,
+  reset,
+  className,
+}: {
+  error: Error
+  reset: () => void
+  className?: string
+}) {
+  const locale = useLocale()
+
+  return (
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-4 rounded-lg border border-destructive/20 bg-destructive/5 p-8 text-center',
+        className
+      )}
+      role="alert"
+    >
+      <AlertTriangleIcon className="h-10 w-10 text-destructive" />
+      <div className="space-y-1">
+        <h3 className="text-lg font-semibold">{locale.emptyState.errorTitle}</h3>
+        <p className="text-sm text-muted-foreground max-w-md">
+          {error.message || 'An unexpected error occurred.'}
+        </p>
+      </div>
+      <Button variant="outline" onClick={reset}>
+        {locale.emptyState.retryLabel}
+      </Button>
+    </div>
+  )
 }
 
 function AlertTriangleIcon({ className }: { className?: string }) {

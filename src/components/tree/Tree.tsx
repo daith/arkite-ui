@@ -1,11 +1,14 @@
 import {
+  forwardRef,
   useCallback,
   useMemo,
   useState,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { Check, ChevronRight, Minus } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 /* ─── Types ─── */
 
@@ -22,7 +25,8 @@ export interface TreeNode {
   icon?: ReactNode
 }
 
-export interface TreeProps {
+export interface TreeProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   /** Tree data */
   data: TreeNode[]
   /** Default expanded keys (uncontrolled) */
@@ -161,6 +165,7 @@ function TreeNodeRow({
   onSelect,
   showLines,
 }: TreeNodeRowProps) {
+  const locale = useLocale()
   const hasChildren = (node.children?.length ?? 0) > 0
   const isSelected = selectedKey === node.key
 
@@ -195,7 +200,7 @@ function TreeNodeRow({
       {hasChildren ? (
         <button
           type="button"
-          aria-label={`${expanded ? 'Collapse' : 'Expand'} ${typeof node.label === 'string' ? node.label : node.key}`}
+          aria-label={`${expanded ? locale.tree.collapse : locale.tree.expand} ${typeof node.label === 'string' ? node.label : node.key}`}
           className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-sm hover:bg-accent"
           onClick={(e) => {
             e.stopPropagation()
@@ -220,7 +225,7 @@ function TreeNodeRow({
           state={checkState}
           onChange={() => onCheck(node.key)}
           disabled={node.disabled}
-          aria-label={typeof node.label === 'string' ? node.label : 'Toggle'}
+          aria-label={typeof node.label === 'string' ? node.label : locale.tree.toggle}
         />
       )}
 
@@ -245,20 +250,24 @@ function TreeNodeRow({
  * Supports both controlled and uncontrolled expand state, and parent-child
  * cascading check behavior when `checkable` is enabled.
  */
-export function Tree({
-  data,
-  defaultExpandedKeys = [],
-  expandedKeys: controlledExpandedKeys,
-  onExpandChange,
-  checkable = false,
-  defaultCheckedKeys = [],
-  checkedKeys: controlledCheckedKeys,
-  onCheckChange,
-  onSelect,
-  selectedKey,
-  showLines = false,
-  className,
-}: TreeProps) {
+export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
+  {
+    data,
+    defaultExpandedKeys = [],
+    expandedKeys: controlledExpandedKeys,
+    onExpandChange,
+    checkable = false,
+    defaultCheckedKeys = [],
+    checkedKeys: controlledCheckedKeys,
+    onCheckChange,
+    onSelect,
+    selectedKey,
+    showLines = false,
+    className,
+    ...rest
+  },
+  ref
+) {
   /* ── Expand state ── */
   const isExpandControlled = controlledExpandedKeys !== undefined
   const [uncontrolledExpanded, setUncontrolledExpanded] = useState<Set<string>>(
@@ -377,10 +386,10 @@ export function Tree({
     })
 
   return (
-    <div role="tree" className={cn('text-foreground', className)}>
+    <div ref={ref} role="tree" className={cn('text-foreground', className)} {...rest}>
       {renderNodes(data, 0)}
     </div>
   )
-}
+})
 
 Tree.displayName = 'Tree'

@@ -1,4 +1,4 @@
-import { forwardRef, useState, type ImgHTMLAttributes } from 'react'
+import { forwardRef, useState, type HTMLAttributes, type ImgHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 import { StatusDot, type StatusType, type StatusDotSize } from '../status-dot/StatusDot'
 
@@ -102,7 +102,7 @@ export const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
 
 Avatar.displayName = 'Avatar'
 
-export interface AvatarGroupProps {
+export interface AvatarGroupProps extends HTMLAttributes<HTMLDivElement> {
   /** Maximum number of avatars to show */
   max?: number
   /** Children avatars */
@@ -122,32 +122,34 @@ const spacingStyles: Record<NonNullable<AvatarGroupProps['spacing']>, string> = 
 }
 
 /** Renders a stack of overlapping avatars with a "+N" overflow indicator. */
-export function AvatarGroup({
-  max = 5,
-  children,
-  size = 'md',
-  spacing = 'normal',
-  className,
-}: AvatarGroupProps) {
-  const childrenArray = Array.isArray(children) ? children : [children]
-  const visibleChildren = childrenArray.slice(0, max)
-  const remainingCount = childrenArray.length - max
+export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
+  ({ max = 5, children, size = 'md', spacing = 'normal', className, ...rest }, ref) => {
+    const childrenArray = Array.isArray(children) ? children : [children]
+    const visibleChildren = childrenArray.slice(0, max)
+    const remainingCount = childrenArray.length - max
 
-  return (
-    <div className={cn('flex items-center', spacingStyles[spacing], className)}>
-      {visibleChildren}
-      {remainingCount > 0 && (
-        <div
-          className={cn(
-            'inline-flex items-center justify-center bg-muted ring-2 ring-background',
-            sizeStyles[size].container,
-            sizeStyles[size].text,
-            'rounded-full font-medium text-muted-foreground'
-          )}
-        >
-          +{remainingCount}
-        </div>
-      )}
-    </div>
-  )
-}
+    return (
+      <div
+        ref={ref}
+        className={cn('flex items-center', spacingStyles[spacing], className)}
+        {...rest}
+      >
+        {visibleChildren}
+        {remainingCount > 0 && (
+          <div
+            className={cn(
+              'inline-flex items-center justify-center bg-muted ring-2 ring-background',
+              sizeStyles[size].container,
+              sizeStyles[size].text,
+              'rounded-full font-medium text-muted-foreground'
+            )}
+          >
+            +{remainingCount}
+          </div>
+        )}
+      </div>
+    )
+  }
+)
+
+AvatarGroup.displayName = 'AvatarGroup'

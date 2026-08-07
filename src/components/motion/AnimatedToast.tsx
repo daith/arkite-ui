@@ -1,6 +1,7 @@
 import { useEffect, useMemo, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react'
 import { useReducedMotion } from './use-reduced-motion'
 import {
@@ -68,6 +69,7 @@ function AnimatedToastItem({
   onClose,
   position,
 }: AnimatedToastItemProps) {
+  const locale = useLocale()
   const prefersReducedMotion = useReducedMotion()
   const IconComponent = iconMap[variant]
   const slide = getSlideDirection(position)
@@ -117,7 +119,7 @@ function AnimatedToastItem({
         className="shrink-0 rounded-md p-1 opacity-70 hover:opacity-100"
       >
         <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
+        <span className="sr-only">{locale.toast.close}</span>
       </button>
     </motion.div>
   )

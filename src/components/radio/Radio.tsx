@@ -148,54 +148,62 @@ export interface RadioGroupProps {
 }
 
 /** Group of radio buttons rendered from an options array. */
-export const RadioGroup = ({
-  name,
-  options,
-  value,
-  defaultValue,
-  onChange,
-  size = 'md',
-  orientation = 'vertical',
-  error = false,
-  errorMessage,
-  disabled = false,
-  className,
-}: RadioGroupProps) => {
-  const group = (
-    <div
-      role="radiogroup"
-      className={cn(
-        'flex',
-        orientation === 'vertical' ? 'flex-col gap-3' : 'flex-row gap-6',
-        className
-      )}
-    >
-      {options.map((option) => (
-        <Radio
-          key={option.value}
-          name={name}
-          value={option.value}
-          label={option.label}
-          description={option.description}
-          size={size}
-          error={error}
-          disabled={disabled || option.disabled}
-          checked={value !== undefined ? value === option.value : undefined}
-          defaultChecked={defaultValue === option.value}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      ))}
-    </div>
-  )
+export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
+  (
+    {
+      name,
+      options,
+      value,
+      defaultValue,
+      onChange,
+      size = 'md',
+      orientation = 'vertical',
+      error = false,
+      errorMessage,
+      disabled = false,
+      className,
+    },
+    ref
+  ) => {
+    const group = (
+      <div
+        ref={ref}
+        role="radiogroup"
+        className={cn(
+          'flex',
+          orientation === 'vertical' ? 'flex-col gap-3' : 'flex-row gap-6',
+          className
+        )}
+      >
+        {options.map((option) => (
+          <Radio
+            key={option.value}
+            name={name}
+            value={option.value}
+            label={option.label}
+            description={option.description}
+            size={size}
+            error={error}
+            disabled={disabled || option.disabled}
+            checked={value !== undefined ? value === option.value : undefined}
+            defaultChecked={defaultValue === option.value}
+            onChange={(e) => onChange?.(e.target.value)}
+          />
+        ))}
+      </div>
+    )
 
-  if (!errorMessage) {
-    return group
+    if (!errorMessage) {
+      return group
+    }
+
+    return (
+      <div>
+        {group}
+        <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
+      </div>
+    )
   }
+)
 
-  return (
-    <div>
-      {group}
-      <p className="mt-1.5 text-xs text-destructive">{errorMessage}</p>
-    </div>
-  )
-}
+RadioGroup.displayName = 'RadioGroup'

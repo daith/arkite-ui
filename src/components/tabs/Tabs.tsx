@@ -2,6 +2,7 @@ import {
   createContext,
   forwardRef,
   useContext,
+  useId,
   useState,
   type HTMLAttributes,
   type ReactNode,
@@ -17,6 +18,8 @@ interface TabsContextValue {
   onChange: (value: string) => void
   variant: TabsVariant
   size: TabsSize
+  /** Unique prefix so tab/panel ids stay unique across multiple Tabs instances */
+  idPrefix: string
 }
 
 const TabsContext = createContext<TabsContextValue | null>(null)
@@ -61,6 +64,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
     ref
   ) => {
     const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue || '')
+    const idPrefix = useId()
 
     const value = controlledValue ?? uncontrolledValue
     const handleChange = (newValue: string) => {
@@ -75,7 +79,7 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(
 
     return (
       <TabsContext.Provider
-        value={{ value, onChange: handleChange, variant, size }}
+        value={{ value, onChange: handleChange, variant, size, idPrefix }}
       >
         <div ref={ref} className={cn('w-full', className)} {...props}>
           {children}
@@ -150,7 +154,7 @@ const triggerVariantStyles: Record<TabsVariant, { base: string; active: string }
 /** Clickable tab button that activates its associated content panel. */
 export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
   ({ className, value, disabled, icon, children, ...props }, ref) => {
-    const { value: selectedValue, onChange, variant, size } = useTabsContext()
+    const { value: selectedValue, onChange, variant, size, idPrefix } = useTabsContext()
     const isActive = selectedValue === value
     const styles = triggerVariantStyles[variant]
 
@@ -159,8 +163,9 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
         ref={ref}
         type="button"
         role="tab"
+        id={`${idPrefix}tab-${value}`}
         aria-selected={isActive}
-        aria-controls={`tabpanel-${value}`}
+        aria-controls={`${idPrefix}tabpanel-${value}`}
         disabled={disabled}
         onClick={() => onChange(value)}
         className={cn(
@@ -193,7 +198,7 @@ export interface TabsContentProps extends HTMLAttributes<HTMLDivElement> {
 /** Panel that displays content for the currently active tab. */
 export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
   ({ className, value, forceMount, children, ...props }, ref) => {
-    const { value: selectedValue } = useTabsContext()
+    const { value: selectedValue, idPrefix } = useTabsContext()
     const isActive = selectedValue === value
 
     if (!forceMount && !isActive) return null
@@ -201,9 +206,9 @@ export const TabsContent = forwardRef<HTMLDivElement, TabsContentProps>(
     return (
       <div
         ref={ref}
-        id={`tabpanel-${value}`}
+        id={`${idPrefix}tabpanel-${value}`}
         role="tabpanel"
-        aria-labelledby={`tab-${value}`}
+        aria-labelledby={`${idPrefix}tab-${value}`}
         tabIndex={0}
         hidden={!isActive}
         className={cn(

@@ -77,6 +77,8 @@ export const zhTW: ArkiteLocale = {
   confirmDialog: {
     cancelLabel: '取消',
     confirmLabel: '確認',
+    confirmTitle: '確定要執行嗎？',
+    confirmDescription: '此操作無法復原。',
     deleteTitle: (itemName) => `刪除${itemName}？`,
     deleteFallbackItem: '此項目',
     deleteDescription: '此操作無法復原，所有相關資料將被永久移除。',
@@ -103,6 +105,15 @@ export const zhTW: ArkiteLocale = {
     copiedAria: '已複製',
     copyValue: '複製內容',
   },
+  modal: {
+    close: '關閉',
+  },
+  drawer: {
+    close: '關閉',
+  },
+  toast: {
+    close: '關閉',
+  },
   spinner: {
     loading: '載入中',
     loadingText: '載入中…',
@@ -127,11 +138,14 @@ export const zhTW: ArkiteLocale = {
     addImage: '新增圖片',
     upload: '上傳',
     remove: '移除',
+    replace: '更換',
+    removeImage: '移除圖片',
     preview: '預覽',
     dropzone: '拖放檔案至此，或點擊上傳',
     anyFileType: '不限檔案格式',
     acceptedTypes: (accept) => `可接受格式：${accept}`,
     maxSizeNote: (size) => `大小上限：${size}`,
+    maxSizeHint: (size) => `上限 ${size}`,
     fileTooLarge: (name, size) => `檔案「${name}」超過大小上限 ${size}`,
     fileNotAccepted: (name) => `檔案「${name}」格式不符`,
     tooManyFiles: (max) => `最多只能上傳 ${max} 個檔案`,
@@ -145,11 +159,39 @@ export const zhTW: ArkiteLocale = {
     pickColor: '選擇顏色',
     hexValue: '十六進位色碼',
     presetColors: '預設色票',
+    selectColor: (color) => `選擇顏色 ${color}`,
   },
   progress: {
     label: '進度',
   },
   breadcrumb: {
     label: '導覽路徑',
+  },
+  label: {
+    optional: '(選填)',
+  },
+  passwordInput: {
+    hide: '隱藏密碼',
+    show: '顯示密碼',
+  },
+  tagInput: {
+    remove: (tag) => `移除 ${tag}`,
+  },
+  tree: {
+    collapse: '收合',
+    expand: '展開',
+    toggle: '切換',
+  },
+  filterSelect: {
+    all: '全部',
+  },
+  pageHeader: {
+    back: '返回',
+  },
+  sidebar: {
+    toggle: '切換側欄',
+  },
+  actionButtons: {
+    label: '操作',
   },
 }

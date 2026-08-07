@@ -2,6 +2,7 @@ import { forwardRef, useState, useCallback } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { Input, type InputProps } from './Input'
+import { useLocale } from '../../locale'
 
 export interface PasswordInputProps extends Omit<InputProps, 'type' | 'rightAddon'> {
   /** Control visibility externally (uncontrolled by default) */
@@ -17,6 +18,7 @@ export interface PasswordInputProps extends Omit<InputProps, 'type' | 'rightAddo
  */
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ visible: controlledVisible, onVisibleChange, disabled, ...props }, ref) => {
+    const locale = useLocale()
     const [internalVisible, setInternalVisible] = useState(false)
     const isControlled = controlledVisible !== undefined
     const visible = isControlled ? controlledVisible : internalVisible
@@ -38,7 +40,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             tabIndex={-1}
             disabled={disabled}
             onClick={toggle}
-            aria-label={visible ? 'Hide password' : 'Show password'}
+            aria-label={visible ? locale.passwordInput.hide : locale.passwordInput.show}
             className={cn(
               'pointer-events-auto text-muted-foreground hover:text-foreground transition-colors',
               'disabled:pointer-events-none disabled:opacity-50'

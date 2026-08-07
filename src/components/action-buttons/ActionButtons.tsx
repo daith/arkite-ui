@@ -1,4 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import {
+  Fragment,
+  forwardRef,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+  type Ref,
+} from 'react'
 import { cn } from '../../utils/cn'
 import { Button, type ButtonVariant } from '../button/Button'
 import {
@@ -9,6 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '../dropdown-menu/DropdownMenu'
 import { ConfirmDialog } from '../confirm-dialog/ConfirmDialog'
+import { useLocale } from '../../locale'
 
 export interface ActionItem {
   /** Action key (for React key) */
@@ -18,7 +26,7 @@ export interface ActionItem {
   /** Icon */
   icon?: ReactNode
   /** Button variant (inline mode) / destructive styling (dropdown mode) */
-  variant?: ButtonVariant | 'destructive'
+  variant?: ButtonVariant
   /** Show confirmation dialog before executing */
   confirm?: boolean | {
     title?: string
@@ -35,7 +43,7 @@ export interface ActionItem {
   separator?: boolean
 }
 
-export interface ActionButtonsProps {
+export interface ActionButtonsProps extends HTMLAttributes<HTMLElement> {
   /** Action definitions */
   actions: ActionItem[]
   /** Display mode */
@@ -62,14 +70,19 @@ function MoreHorizontalIcon({ className }: { className?: string }) {
 }
 
 /** Renders a list of actions as inline buttons or a dropdown menu with optional confirmation dialogs. */
-export function ActionButtons({
-  actions,
-  mode = 'dropdown',
-  triggerLabel,
-  triggerIcon,
-  size = 'sm',
-  className,
-}: ActionButtonsProps) {
+export const ActionButtons = forwardRef<HTMLElement, ActionButtonsProps>(function ActionButtons(
+  {
+    actions,
+    mode = 'dropdown',
+    triggerLabel,
+    triggerIcon,
+    size = 'sm',
+    className,
+    ...rest
+  },
+  ref
+) {
+  const locale = useLocale()
   const [confirmAction, setConfirmAction] = useState<ActionItem | null>(null)
   const [confirmLoading, setConfirmLoading] = useState(false)
 
@@ -105,8 +118,8 @@ export function ActionButtons({
       open={!!confirmAction}
       onClose={() => setConfirmAction(null)}
       variant={isDestructiveAction ? 'destructive' : 'default'}
-      title={confirmTitle ?? 'Are you sure?'}
-      description={confirmDescription ?? 'This action cannot be undone.'}
+      title={confirmTitle ?? locale.confirmDialog.confirmTitle}
+      description={confirmDescription ?? locale.confirmDialog.confirmDescription}
       confirmLabel={confirmLabel}
       onConfirm={handleConfirm}
       loading={confirmLoading}
@@ -116,11 +129,15 @@ export function ActionButtons({
   if (mode === 'inline') {
     return (
       <>
-        <div className={cn('flex items-center gap-1', className)}>
+        <div
+          ref={ref as Ref<HTMLDivElement>}
+          className={cn('flex items-center gap-1', className)}
+          {...rest}
+        >
           {visibleActions.map((action, index) => (
             <Button
               key={action.key ?? index}
-              variant={(action.variant as ButtonVariant) ?? 'ghost'}
+              variant={action.variant ?? 'ghost'}
               size={size === 'sm' ? 'icon' : 'sm'}
               onClick={() => handleAction(action)}
               disabled={action.disabled}
@@ -141,18 +158,20 @@ export function ActionButtons({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
+            ref={ref as Ref<HTMLButtonElement>}
             variant="ghost"
             size="icon"
             className={cn('h-8 w-8', className)}
+            {...rest}
           >
             {triggerIcon ?? <MoreHorizontalIcon className="h-4 w-4" />}
             {triggerLabel && <span className="sr-only">{triggerLabel}</span>}
-            {!triggerLabel && <span className="sr-only">Actions</span>}
+            {!triggerLabel && <span className="sr-only">{locale.actionButtons.label}</span>}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {visibleActions.map((action, index) => (
-            <span key={action.key ?? index}>
+            <Fragment key={action.key ?? index}>
               {action.separator && index > 0 && <DropdownMenuSeparator />}
               <DropdownMenuItem
                 onClick={() => handleAction(action)}
@@ -162,11 +181,11 @@ export function ActionButtons({
                 {action.icon && <span className="mr-2 h-4 w-4 shrink-0">{action.icon}</span>}
                 {action.label}
               </DropdownMenuItem>
-            </span>
+            </Fragment>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
       {dialog}
     </>
   )
-}
+})

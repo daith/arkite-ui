@@ -1,6 +1,7 @@
 import { forwardRef, useMemo, type SelectHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 import { Select, type SelectOption, type SelectSize } from '../select'
+import { useLocale } from '../../locale'
 
 export interface FilterSelectProps
   extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'size' | 'onChange'> {
@@ -8,7 +9,7 @@ export interface FilterSelectProps
   label?: string
   /** Options list */
   options?: readonly SelectOption[]
-  /** Text for the "all" option — pass `false` to hide it. @default "全部" */
+  /** Text for the "all" option — pass `false` to hide it. Defaults to the locale's "All" label. */
   allLabel?: string | false
   /** Select size @default "sm" */
   size?: SelectSize
@@ -28,20 +29,22 @@ export const FilterSelect = forwardRef<HTMLSelectElement, FilterSelectProps>(
       className,
       label,
       options = [],
-      allLabel = '全部',
+      allLabel,
       size = 'sm',
       onChange,
       ...props
     },
     ref
   ) => {
+    const locale = useLocale()
     const mergedOptions = useMemo(() => {
       if (allLabel === false) return options
 
-      const allText = label ? `${label}: ${allLabel}` : allLabel
+      const resolvedAllLabel = allLabel ?? locale.filterSelect.all
+      const allText = label ? `${label}: ${resolvedAllLabel}` : resolvedAllLabel
       const allOption: SelectOption = { value: '', label: allText }
       return [allOption, ...options]
-    }, [options, allLabel, label])
+    }, [options, allLabel, label, locale])
 
     return (
       <Select

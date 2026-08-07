@@ -4,10 +4,13 @@ import {
   useContext,
   useState,
   type HTMLAttributes,
+  type MouseEventHandler,
   type ReactNode,
+  type Ref,
 } from 'react'
 import { cn } from '../../utils/cn'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useLocale } from '../../locale'
 
 // Sidebar Context
 interface SidebarContextValue {
@@ -194,7 +197,10 @@ export interface SidebarItemProps extends HTMLAttributes<HTMLButtonElement> {
 }
 
 /** Clickable navigation item within the sidebar, rendered as a button or link. */
-export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
+export const SidebarItem = forwardRef<
+  HTMLButtonElement | HTMLAnchorElement,
+  SidebarItemProps
+>(
   (
     {
       className,
@@ -233,7 +239,13 @@ export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
 
     if (href) {
       return (
-        <a href={href} className={itemClassName}>
+        <a
+          ref={ref as Ref<HTMLAnchorElement>}
+          href={href}
+          className={itemClassName}
+          onClick={onClick as MouseEventHandler<HTMLAnchorElement> | undefined}
+          {...(props as HTMLAttributes<HTMLAnchorElement>)}
+        >
           {content}
         </a>
       )
@@ -241,7 +253,7 @@ export const SidebarItem = forwardRef<HTMLButtonElement, SidebarItemProps>(
 
     return (
       <button
-        ref={ref}
+        ref={ref as Ref<HTMLButtonElement>}
         type="button"
         disabled={disabled}
         onClick={onClick}
@@ -262,6 +274,7 @@ export type SidebarToggleProps = HTMLAttributes<HTMLButtonElement>
 /** Button that toggles the sidebar between collapsed and expanded states. */
 export const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(
   ({ className, ...props }, ref) => {
+    const locale = useLocale()
     const { collapsed, setCollapsed, collapsible } = useSidebar()
 
     if (!collapsible) return null
@@ -284,7 +297,7 @@ export const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(
         ) : (
           <ChevronLeft className="h-4 w-4" />
         )}
-        <span className="sr-only">Toggle sidebar</span>
+        <span className="sr-only">{locale.sidebar.toggle}</span>
       </button>
     )
   }

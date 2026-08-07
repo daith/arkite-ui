@@ -8,6 +8,10 @@ export interface CheckboxCardProps
   label: string
   /** Optional description below the label */
   description?: string
+  /** Error state */
+  error?: boolean
+  /** Error message */
+  errorMessage?: string
 }
 
 /**
@@ -16,7 +20,7 @@ export interface CheckboxCardProps
  * Useful for feature toggles, permission lists, onboarding options, etc.
  */
 export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
-  ({ className, label, description, disabled, id, ...props }, ref) => {
+  ({ className, label, description, error = false, errorMessage, disabled, id, ...props }, ref) => {
     const stableId = useId()
     const inputId = id || stableId
 
@@ -24,10 +28,13 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
       <label
         htmlFor={inputId}
         className={cn(
-          'relative flex items-start gap-3 rounded-lg border border-input bg-background p-4',
+          'relative flex items-start gap-3 rounded-lg border bg-background p-4',
           'transition-colors duration-200',
-          'has-[:checked]:border-primary has-[:checked]:bg-primary/5',
+          'has-[:checked]:bg-primary/5',
           'has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring/40 has-[:focus-visible]:ring-offset-0',
+          error
+            ? 'border-destructive'
+            : 'border-input has-[:checked]:border-primary',
           disabled
             ? 'cursor-not-allowed opacity-50'
             : 'cursor-pointer hover:border-muted-foreground/50',
@@ -45,8 +52,11 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
         <div
           className={cn(
             'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border',
-            'border-input transition-colors duration-200',
-            'peer-checked:border-primary peer-checked:bg-primary peer-checked:[&>svg]:opacity-100'
+            'transition-colors duration-200',
+            'peer-checked:[&>svg]:opacity-100',
+            error
+              ? 'border-destructive'
+              : 'border-input peer-checked:border-primary peer-checked:bg-primary'
           )}
         >
           <Check className="h-3.5 w-3.5 text-primary-foreground opacity-0 transition-opacity" />
@@ -57,6 +67,9 @@ export const CheckboxCard = forwardRef<HTMLInputElement, CheckboxCardProps>(
             <p className="text-xs text-muted-foreground leading-relaxed">
               {description}
             </p>
+          )}
+          {errorMessage && (
+            <p className="text-xs text-destructive">{errorMessage}</p>
           )}
         </div>
       </label>

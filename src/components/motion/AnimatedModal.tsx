@@ -1,17 +1,25 @@
 import {
   forwardRef,
   useEffect,
+  useId,
   useRef,
+  type HTMLAttributes,
   type ReactNode,
 } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { X } from 'lucide-react'
 import { useReducedMotion } from './use-reduced-motion'
 import type { ModalSize } from '../modal/Modal'
 
-export interface AnimatedModalProps {
+// framer-motion redefines these handlers with its own signatures on motion.div,
+// so they are excluded from the passthrough props
+type MotionConflictProps = 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'
+
+export interface AnimatedModalProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | MotionConflictProps> {
   open: boolean
   onClose: () => void
   title?: ReactNode
@@ -21,8 +29,6 @@ export interface AnimatedModalProps {
   closeOnBackdropClick?: boolean
   closeOnEscape?: boolean
   footer?: ReactNode
-  children?: ReactNode
-  className?: string
 }
 
 const sizeStyles: Record<ModalSize, string> = {
@@ -51,10 +57,14 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
       footer,
       children,
       className,
+      ...rest
     },
     ref
   ) => {
     const modalRef = useRef<HTMLDivElement>(null)
+    const locale = useLocale()
+    const titleId = useId()
+    const descriptionId = useId()
     const prefersReducedMotion = useReducedMotion()
 
     useEffect(() => {
@@ -81,6 +91,8 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
       const modal = modalRef.current
       if (!modal) return
 
+      const previouslyFocused = document.activeElement as HTMLElement | null
+
       const focusableElements = modal.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       )
@@ -104,7 +116,10 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
 
       modal.addEventListener('keydown', handleTab)
       firstElement?.focus()
-      return () => modal.removeEventListener('keydown', handleTab)
+      return () => {
+        modal.removeEventListener('keydown', handleTab)
+        previouslyFocused?.focus?.()
+      }
     }, [open])
 
     const duration = prefersReducedMotion ? 0 : 0.2
@@ -116,8 +131,8 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             role="dialog"
             aria-modal="true"
-            aria-labelledby={title ? 'modal-title' : undefined}
-            aria-describedby={description ? 'modal-description' : undefined}
+            aria-labelledby={title ? titleId : undefined}
+            aria-describedby={description ? descriptionId : undefined}
           >
             {/* Backdrop */}
             <motion.div
@@ -146,17 +161,18 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
                 sizeStyles[size],
                 className
               )}
+              {...rest}
             >
               {(title || showCloseButton) && (
                 <div className="flex items-start justify-between gap-4 border-b p-4">
                   <div className="space-y-1">
                     {title && (
-                      <h2 id="modal-title" className="text-lg font-semibold leading-none">
+                      <h2 id={titleId} className="text-lg font-semibold leading-none">
                         {title}
                       </h2>
                     )}
                     {description && (
-                      <p id="modal-description" className="text-sm text-muted-foreground">
+                      <p id={descriptionId} className="text-sm text-muted-foreground">
                         {description}
                       </p>
                     )}
@@ -167,7 +183,7 @@ export const AnimatedModal = forwardRef<HTMLDivElement, AnimatedModalProps>(
                       className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                       <X className="h-5 w-5" />
-                      <span className="sr-only">Close</span>
+                      <span className="sr-only">{locale.modal.close}</span>
                     </button>
                   )}
                 </div>
