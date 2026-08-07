@@ -9,4 +9,4 @@ storybook-static
 # Internal / local-only
 .claude/
 WORKLOG.md
-docs/
+/docs/

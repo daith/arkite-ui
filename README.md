@@ -314,6 +314,8 @@ const myTheme = createTheme({
 applyTheme(myTheme)
 ```
 
+Foregrounds are picked by actual WCAG contrast (black or white, whichever contrasts more), so every generated pair meets AA (4.5:1) for any brand color — in light and dark mode alike.
+
 ### CSS Variables Override
 
 ```css

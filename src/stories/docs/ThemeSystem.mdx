@@ -51,6 +51,8 @@ const myTheme = createTheme({
 applyTheme(myTheme)
 ```
 
+Foregrounds are computed from the actual WCAG contrast ratio — black or white, whichever reads better on your brand color, in both light and dark mode. Every generated pair is guaranteed to meet AA (4.5:1), so any hex value is safe. If you override CSS variables by hand instead, validate the palette with the **Foundation / Design Tokens → Contrast Audit** page.
+
 ## SSR / Style Tag
 
 Generate a CSS string for server-side rendering:

@@ -47,6 +47,13 @@ Four statuses: `success` (green), `warning` (amber), `destructive` (red), `info`
 
 Naming rule: the "dangerous/negative" semantic is always **`destructive`** (never `error`) in variant props and tokens.
 
+### Contrast (WCAG AA)
+
+- Every built-in fg/bg pair — tokens, all four presets, light and dark, solid and soft — meets **WCAG AA (4.5:1)**, enforced by regression tests (`tokens.test.ts`, `presets.test.ts`). This is why rule 2 exists: paired tokens are guaranteed readable; hand-picked palette classes are not.
+- Foreground follows **background luminance, not semantics**: light backgrounds get dark text, dark backgrounds get light text (e.g. dark-mode `info` is black-on-blue, not white). Never re-pair a `-foreground` onto a different background.
+- `createTheme()` picks black/white foregrounds by real contrast ratio — any brand color yields AA-passing pairs automatically.
+- Custom palettes (raw CSS variable overrides): validate with the Storybook **Foundation / Design Tokens → Contrast Audit** page.
+
 ### Charts & presence
 
 `chart-1`…`chart-5` for data series (use in order). `status-online/offline/busy/away` for presence dots (use `StatusDot`).
