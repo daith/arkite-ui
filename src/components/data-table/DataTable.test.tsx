@@ -539,6 +539,99 @@ describe('DataTable', () => {
     expect(screen.getByText(/11-20 of 25/)).toBeInTheDocument()
   })
 
+  // ─── Server-Side Mode Tests (totalRows) ───
+
+  // One server page (rows 21-30 of 47) — deliberately NOT sorted the way a
+  // client-side sort of this slice would order them.
+  const serverPage: TestRow[] = Array.from({ length: 10 }, (_, i) => ({
+    id: 21 + i,
+    name: `User ${21 + i}`,
+    age: 60 - i,
+  }))
+
+  it('totalRows renders data as-is without client-side slicing', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        totalRows={47}
+      />
+    )
+    // All 10 given rows render even though page=3 (no slice(20, 30) on them)
+    expect(screen.getByText('User 21')).toBeInTheDocument()
+    expect(screen.getByText('User 30')).toBeInTheDocument()
+    // Range info and page count derive from totalRows, not data.length
+    expect(screen.getByText(/21-30 of 47/)).toBeInTheDocument()
+    expect(screen.getByText('3 / 5')).toBeInTheDocument()
+  })
+
+  it('totalRows skips client-side sorting (server already sorted)', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={() => {}}
+        sortState={{ key: 'age', direction: 'asc' }}
+        onSortChange={() => {}}
+        totalRows={47}
+      />
+    )
+    // Server order preserved: ages descend in the given slice even though
+    // sortState says asc — the table must not re-sort server data
+    const rows = screen.getAllByRole('row').slice(1) // skip header
+    expect(within(rows[0]).getByText('User 21')).toBeInTheDocument()
+    expect(within(rows[9]).getByText('User 30')).toBeInTheDocument()
+  })
+
+  it('totalRows enables paging past the fetched rows', async () => {
+    const user = userEvent.setup()
+    const onPageChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={serverPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={3}
+        onPageChange={onPageChange}
+        totalRows={47}
+      />
+    )
+    // With only 10 rows client-side, next page must still be reachable
+    await user.click(screen.getByLabelText('Next page'))
+    expect(onPageChange).toHaveBeenCalledWith(4)
+    await user.click(screen.getByLabelText('Last page'))
+    expect(onPageChange).toHaveBeenCalledWith(5)
+  })
+
+  it('totalRows shows a shorter last page correctly', () => {
+    const lastPage = Array.from({ length: 7 }, (_, i) => ({
+      id: 41 + i,
+      name: `User ${41 + i}`,
+      age: 20 + i,
+    }))
+    render(
+      <DataTable
+        columns={columns}
+        data={lastPage}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={5}
+        onPageChange={() => {}}
+        totalRows={47}
+      />
+    )
+    expect(screen.getByText(/41-47 of 47/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+  })
+
   // ─── Uncontrolled Selection Tests ───
 
   it('defaultSelectedRows sets initial uncontrolled selection', () => {

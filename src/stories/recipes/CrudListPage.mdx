@@ -1,0 +1,36 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs/blocks'
+import * as Stories from './CrudListPage.stories'
+import demoSource from './CrudListPage.demo.tsx?raw'
+
+<Meta of={Stories} />
+
+# Recipe: CRUD List Page
+
+The most common admin page, assembled end to end: search and filters above a
+sortable, selectable, paginated table; a bulk-action bar that appears on
+selection; a guarded destructive action; and a toast confirming the outcome.
+
+**Composition** — `PageHeader` → `FilterBar` (`FilterBarSearch` +
+`FilterSelect`) → `DataTable` → `BulkActionBar` → `DeleteConfirmDialog` →
+`toast` + `ToastContainer`.
+
+**Key decisions**
+
+- Search/filter state lives in the page and narrows `data` before it reaches
+  the table — the table's own sorting and pagination stay uncontrolled. When
+  the server does the filtering, switch to the controlled props instead (see
+  the *Server-Side Table* recipe).
+- Row selection is controlled (`selectedRows` + `onSelectionChange`) because
+  the page needs the selection for the bulk bar and the delete action.
+- The destructive path is always two-step: `BulkActionBar` → confirm dialog →
+  action → `toast.success`. Never delete on first click.
+- `FilterSelect` with no `allLabel` uses the locale's "All" — wrap your app in
+  `LocaleProvider` with `zhTW` and it localizes for free.
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Full source
+
+Copy-paste and replace the mock data with your API:
+
+<Source code={demoSource} language="tsx" dark />

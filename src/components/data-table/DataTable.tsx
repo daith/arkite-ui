@@ -109,6 +109,15 @@ export interface DataTableProps<T> {
   page?: number
   /** Callback when page changes (1-based) */
   onPageChange?: (page: number) => void
+  /**
+   * Total row count across all pages (server-side mode). When set, `data` is
+   * treated as the already-fetched current page: the table skips client-side
+   * filtering, sorting, and slicing, and the pagination footer derives page
+   * count and range info from this total instead of `data.length`. Combine
+   * with the controlled `page`/`sortState`/`filters` props and do the actual
+   * work on the server.
+   */
+  totalRows?: number
   /** Additional class name */
   className?: string
 }
@@ -181,6 +190,7 @@ export function DataTable<T>({
   onFilterChange,
   page: controlledPage,
   onPageChange,
+  totalRows,
   className,
 }: DataTableProps<T>) {
   const locale = useLocale()
@@ -206,6 +216,8 @@ export function DataTable<T>({
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
   const filterDropdownRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const isPageControlled = controlledPage !== undefined
+  // Server-side mode: `data` is the already-processed current page
+  const isServerMode = totalRows !== undefined
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize,
@@ -311,6 +323,7 @@ export function DataTable<T>({
 
   // Filter data
   const filteredData = useMemo(() => {
+    if (isServerMode) return data
     const activeFilters = Object.entries(filters).filter(([, values]) => values.length > 0)
     if (activeFilters.length === 0) return data
 
@@ -324,13 +337,13 @@ export function DataTable<T>({
         return filterValues.includes(cellValue)
       })
     )
-  }, [data, filters, columns])
+  }, [data, filters, columns, isServerMode])
 
   const hasActiveFilters = Object.keys(filters).length > 0
 
   // Sort data
   const sortedData = useMemo(() => {
-    if (!sortState || !sortState.direction) return filteredData
+    if (isServerMode || !sortState || !sortState.direction) return filteredData
 
     const sorted = [...filteredData].sort((a, b) => {
       const aValue = (a as Record<string, unknown>)[sortState.key]
@@ -345,19 +358,20 @@ export function DataTable<T>({
     })
 
     return sorted
-  }, [filteredData, sortState])
+  }, [filteredData, sortState, isServerMode])
 
   // Paginate data
   const paginatedData = useMemo(() => {
-    if (!pagination) return sortedData
+    if (!pagination || isServerMode) return sortedData
 
     const start = pageIndex * pageSize
     const end = start + pageSize
     return sortedData.slice(start, end)
-  }, [sortedData, pagination, pageIndex, pageSize])
+  }, [sortedData, pagination, isServerMode, pageIndex, pageSize])
 
   // Pagination info
-  const totalPages = Math.ceil(sortedData.length / pageSize)
+  const totalRowCount = totalRows ?? sortedData.length
+  const totalPages = Math.ceil(totalRowCount / pageSize)
   const canPreviousPage = pageIndex > 0
   const canNextPage = pageIndex < totalPages - 1
 
@@ -764,10 +778,10 @@ export function DataTable<T>({
       </Table>
       </div>
 
-      {pagination && sortedData.length > 0 && (
+      {pagination && totalRowCount > 0 && (
         <div className="flex items-center justify-between border-t px-6 py-4">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {hasActiveFilters && (
+            {hasActiveFilters && !isServerMode && (
               <span data-testid="filter-count">
                 {locale.dataTable.showing(filteredData.length, data.length)}
               </span>
@@ -791,8 +805,8 @@ export function DataTable<T>({
             <span className="text-sm text-muted-foreground">
               {locale.pagination.rangeInfo(
                 pageIndex * pageSize + 1,
-                Math.min((pageIndex + 1) * pageSize, sortedData.length),
-                sortedData.length
+                Math.min((pageIndex + 1) * pageSize, totalRowCount),
+                totalRowCount
               )}
             </span>
 

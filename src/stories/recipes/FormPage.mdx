@@ -1,0 +1,41 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs/blocks'
+import * as Stories from './FormPage.stories'
+import demoSource from './FormPage.demo.tsx?raw'
+
+<Meta of={Stories} />
+
+# Recipe: Form Page
+
+A complete create/edit page: grouped fields with labels, help text, and
+validation messages; a guarded submit that validates, reports errors inline,
+and confirms success with a toast before resetting the form.
+
+**Composition** — `PageHeader` → `Form` → `FormSection` → `FormField`
+(`FormLabel` + `FormControl` + `FormDescription` + `FormMessage`) →
+`Input` / `Select` / `Textarea` / `Switch` → `FormActions` → `toast` +
+`ToastContainer`.
+
+**Key decisions**
+
+- The Form family is **layout-only**: it wires ids, spacing, and error context
+  but owns no state. Values and validation live in the page (`useState` here),
+  so swapping in react-hook-form or TanStack Form later touches the handlers,
+  not the markup.
+- The error contract has two halves per field: `FormField errorMessage`
+  feeds the `FormMessage` text (and context), while the control's own
+  `error` boolean turns its border red. Drive both from the same state so
+  they can never disagree.
+- Validation runs on submit — not on every keystroke — and a field's error
+  clears the moment the user edits it, so the form never nags ahead of intent.
+- `Switch` carries its own `label`/`description`, so it skips
+  `FormLabel`/`FormControl`; the label-to-input wiring is built in.
+- `FormActions` defaults to right alignment — the primary action sits at the
+  bottom-right reading endpoint, with the safe action (`outline`) to its left.
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Full source
+
+Copy-paste and replace the mock data with your API:
+
+<Source code={demoSource} language="tsx" dark />

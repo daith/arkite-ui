@@ -6,6 +6,7 @@ import {
   isValidElement,
   useContext,
   useId,
+  type FormHTMLAttributes,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -25,7 +26,7 @@ export function useFormContext() {
 }
 
 // Form component
-export interface FormProps extends HTMLAttributes<HTMLFormElement> {
+export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   /** Disable all form fields */
   disabled?: boolean
 }

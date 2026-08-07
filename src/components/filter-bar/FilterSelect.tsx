@@ -51,6 +51,9 @@ export const FilterSelect = forwardRef<HTMLSelectElement, FilterSelectProps>(
         ref={ref}
         size={size}
         options={mergedOptions}
+        // The label prop doubles as the accessible name — filter selects
+        // render without a visible <label>, which axe rightly flags.
+        aria-label={label}
         className={cn('w-auto', className)}
         onChange={(e) => onChange?.(e.target.value)}
         {...props}

@@ -27,6 +27,12 @@ export interface CardHeaderProps extends Omit<HTMLAttributes<HTMLDivElement>, 't
   actions?: ReactNode
   /** Density override — defaults to the parent Card's `density` */
   density?: CardDensity
+  /**
+   * Heading level of the `title` element (visual style is unchanged).
+   * Defaults to 3; set to match the document outline — e.g. `2` when the
+   * card sits directly under a PageHeader's `h1`.
+   */
+  headingLevel?: 2 | 3 | 4 | 5 | 6
 }
 
 export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
@@ -95,9 +101,10 @@ Card.displayName = 'Card'
 
 /** Card header section with title, description, and optional action slots. */
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
-  ({ className, title, description, action, actions, density, children, ...props }, ref) => {
+  ({ className, title, description, action, actions, density, headingLevel = 3, children, ...props }, ref) => {
     const contextDensity = useContext(CardDensityContext)
     const compact = (density ?? contextDensity) === 'compact'
+    const Heading = `h${headingLevel}` as const
     return (
       <div
         ref={ref}
@@ -110,14 +117,14 @@ export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
       >
         <div className={compact ? 'min-w-0 space-y-1' : 'space-y-1.5'}>
           {title && (
-            <h3
+            <Heading
               className={cn(
                 'font-semibold leading-none tracking-tight',
                 compact ? 'text-sm' : 'text-lg'
               )}
             >
               {title}
-            </h3>
+            </Heading>
           )}
           {description && (
             <p className={cn('text-muted-foreground', compact ? 'text-xs' : 'text-sm')}>

@@ -79,6 +79,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Getting Started',
+          'Recipes',
           'Component Guidelines',
           'Foundation',
           'Form Patterns',

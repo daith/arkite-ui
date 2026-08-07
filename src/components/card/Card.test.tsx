@@ -81,6 +81,16 @@ describe('CardHeader', () => {
     expect(screen.getByText('Desc')).toBeInTheDocument()
   })
 
+  it('renders the title as h3 by default', () => {
+    render(<CardHeader title="Title" />)
+    expect(screen.getByRole('heading', { level: 3, name: 'Title' })).toBeInTheDocument()
+  })
+
+  it('headingLevel changes the title element', () => {
+    render(<CardHeader title="Title" headingLevel={2} />)
+    expect(screen.getByRole('heading', { level: 2, name: 'Title' })).toBeInTheDocument()
+  })
+
   it('renders action slot', () => {
     render(<CardHeader title="Title" action={<button>Action</button>} />)
     expect(screen.getByText('Action')).toBeInTheDocument()

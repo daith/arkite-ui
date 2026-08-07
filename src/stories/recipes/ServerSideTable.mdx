@@ -1,0 +1,42 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs/blocks'
+import * as Stories from './ServerSideTable.stories'
+import demoSource from './ServerSideTable.demo.tsx?raw'
+
+<Meta of={Stories} />
+
+# Recipe: Server-Side Table
+
+A table whose sorting and pagination round-trip to the server: the page owns
+the query state, the API returns one pre-sorted slice plus a total count, and
+`DataTable` only renders what it is given.
+
+**Composition** — `PageHeader` (total-count `Badge`) → `DataTable` with the
+controlled props `page`/`onPageChange` + `sortState`/`onSortChange`, plus
+`totalRows` and `loading` — fed by a mock API (`setTimeout`, 300 ms).
+
+**Key decisions**
+
+- **Uncontrolled vs controlled**: when all rows are already in memory, leave
+  sorting/pagination uncontrolled and let the table do the work (see the
+  *CRUD List Page* recipe). The moment the server does it, the table can no
+  longer know the full ordering or the total — the query state must live
+  where the fetch happens, so every one of these props becomes controlled.
+- `totalRows` tells the table "this data is already one processed page":
+  it skips client-side sorting/slicing and derives the footer's page count
+  and range (`21-30 of 47`) from the server's total instead of `data.length`.
+- Controlled `page` is **1-based** — it matches `onPageChange`, URL params,
+  and typical API contracts, with no off-by-one bookkeeping in the page.
+- A sort change resets `page` to 1: page 3 of the old ordering is a
+  different, meaningless set of rows under the new one.
+- Loading UX: the previous rows stay in state while `loading` bridges the
+  round-trip, so the footer and header keep their place instead of the page
+  collapsing; the effect's `cancelled` flag drops stale responses when the
+  user clicks faster than the server answers.
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Full source
+
+Copy-paste and replace the mock data with your API:
+
+<Source code={demoSource} language="tsx" dark />

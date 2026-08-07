@@ -1,0 +1,45 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs/blocks'
+import * as Stories from './DashboardPage.stories'
+import demoSource from './DashboardPage.demo.tsx?raw'
+
+<Meta of={Stories} />
+
+# Recipe: Dashboard
+
+An overview page assembled top-down: a KPI row for the at-a-glance numbers,
+then detail widgets — a recent-activity table and a per-service trend list —
+in compact cards.
+
+**Composition** — `PageHeader size="lg"` → `StatGroup` of `StatCard`s (trend +
+`Sparkline`) → a responsive grid of `Card density="compact"` widgets: a
+`DataTable` (recent activity, `pagination={false}`) and a `Sparkline` list.
+
+**Key decisions**
+
+- **Information hierarchy is top-down**: the KPI row answers "is everything
+  okay?" in one glance; the widgets below answer "what changed?"; anything
+  deeper links out to a full page. A dashboard summarizes — it never tries to
+  be the detail view. The document outline mirrors it: `PageHeader` is the
+  `h1`, so each widget card passes `headingLevel={2}` to keep heading order
+  sequential for screen readers.
+- **Stat + Sparkline pairing**: `Stat`'s `icon` slot is a plain ReactNode, so
+  a `Sparkline` drops in as the card's visual. Pass the same `trend` to both
+  so the arrow, the change text, and the line can never point different ways.
+- Sparklines sitting next to trend text are **decorative** — no `aria-label`,
+  so they stay `aria-hidden` and screen readers hear the trend once. In the
+  service list the sparkline is the *only* trend signal, so there it gets a
+  real `aria-label`.
+- `density="compact"` is for widgets on a crowded page — tighter header and
+  content padding, smaller title. Full-page sections keep the default
+  density; don't mix the two on the same card grid.
+- The activity table turns `pagination` off: a dashboard widget shows the
+  latest handful and links to the full, paginated page instead of paging
+  in place.
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Full source
+
+Copy-paste and replace the mock data with your API:
+
+<Source code={demoSource} language="tsx" dark />

@@ -1,0 +1,45 @@
+import { Meta, Canvas, Source } from '@storybook/addon-docs/blocks'
+import * as Stories from './DetailDrawerPage.stories'
+import demoSource from './DetailDrawerPage.demo.tsx?raw'
+
+<Meta of={Stories} />
+
+# Recipe: Detail + Drawer Edit
+
+A record's detail page with in-place editing: the read view stays on screen
+while a drawer slides in with the edit form. Closing the drawer with unsaved
+changes triggers a confirmation, and a successful save lands as a toast.
+
+**Composition** — `PageHeader` (`onBack` + Edit action) → `Card` +
+`DescriptionList` for the read view → `Drawer` holding the `Form` family →
+`ConfirmDialog` as the dirty guard → `toast.success` + `ToastContainer`.
+
+**Key decisions**
+
+- **Drawer, not Modal**: editing happens next to the detail view, so the user
+  keeps the record in sight for reference. Reach for `Modal` when the task
+  should interrupt and take over (confirmations, short one-shot forms).
+- **One close gate**: the drawer's `onClose` fires for X, Escape, *and*
+  backdrop clicks, and Cancel calls the same function — so a single
+  `requestClose` implements the dirty guard and no close path can bypass it.
+  Because the guard makes closing safe, `closeOnBackdropClick` can stay on;
+  turn it off only if accidental closes are still too disruptive (the
+  `ConfirmDialog` itself supports the same `closeOn*` props if you need to
+  lock the guard down during async saves).
+- **Dirty means draft ≠ saved**: the form edits a separate `draft` object
+  seeded on open; comparing it to the saved record is the entire dirty check.
+  Discard simply throws the draft away — the read view was never touched.
+- `DescriptionList`/`DescriptionItem` renders the read view as label–value
+  rows for free; pass `children` instead of `value` when a cell needs
+  markup (like the status `Badge`).
+- Validation follows the library convention: `FormField errorMessage` +
+  `FormMessage` for the text, `error` on the `Input` for the red border, and
+  the error clears as the user types.
+
+<Canvas of={Stories.Default} sourceState="none" />
+
+## Full source
+
+Copy-paste and replace the mock record and `save` with your API:
+
+<Source code={demoSource} language="tsx" dark />
