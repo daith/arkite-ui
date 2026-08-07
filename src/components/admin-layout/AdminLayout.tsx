@@ -287,7 +287,7 @@ export function AdminLayout({
                       'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium leading-tight transition-colors',
                       'hover:bg-muted hover:text-foreground',
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                      active ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
+                      active ? 'bg-primary/10 text-foreground' : 'text-muted-foreground',
                     )}
                   >
                     <span className="flex h-6 w-6 items-center justify-center">

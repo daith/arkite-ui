@@ -21,6 +21,15 @@ const meta: Meta = {
           'Visual review surface for `@arkite-ui/core/tokens`. Use this page to validate color choices, contrast ratios, and scale values before approving the token system.',
       },
     },
+    a11y: {
+      config: {
+        // This page IS the contrast audit: it renders every token pair —
+        // including failing ones, sorted worst-first — and reports exact
+        // WCAG ratios. Letting axe re-flag the exhibits would make the
+        // audit surface untestable; regressions are reviewed here visually.
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
   },
 }
 
@@ -53,9 +62,9 @@ function contrastRatio(fg: string, bg: string): number {
 }
 
 function wcagGrade(ratio: number): { grade: string; color: string } {
-  if (ratio >= 7) return { grade: 'AAA', color: '#16a34a' }
-  if (ratio >= 4.5) return { grade: 'AA', color: '#16a34a' }
-  if (ratio >= 3) return { grade: 'AA Large', color: '#f59e0b' }
+  if (ratio >= 7) return { grade: 'AAA', color: '#15803d' }
+  if (ratio >= 4.5) return { grade: 'AA', color: '#15803d' }
+  if (ratio >= 3) return { grade: 'AA Large', color: '#b45309' }
   return { grade: 'FAIL', color: '#dc2626' }
 }
 
@@ -138,7 +147,7 @@ function PairSwatch({ pair, scheme }: { pair: SemanticPair; scheme: ColorScheme 
         }}
       >
         <div style={{ fontWeight: 600, fontSize: 16 }}>{pair.label}</div>
-        <div style={{ fontSize: 12, opacity: 0.85 }}>The quick brown fox jumps over the lazy dog</div>
+        <div style={{ fontSize: 12 }}>The quick brown fox jumps over the lazy dog</div>
       </div>
       <div
         style={{
