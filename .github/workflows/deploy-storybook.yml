@@ -33,9 +33,16 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
 
+      # Site layout: landing page at the root, Storybook under /storybook/.
+      # site/index.html forwards legacy /?path=... links to ./storybook/.
+      - run: |
+          mkdir -p _site
+          cp -r site/. _site/
+          cp -r storybook-static _site/storybook
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: _site
 
   deploy:
     needs: build
