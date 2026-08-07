@@ -6,6 +6,7 @@ import {
   type MouseEvent,
 } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type ColorPickerSize = 'sm' | 'md' | 'lg'
 
@@ -91,6 +92,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const nativeInputRef = useRef<HTMLInputElement>(null)
     const cfg = sizeConfig[size]
 
@@ -158,7 +160,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
               cfg.swatch
             )}
             style={{ backgroundColor: isValidHex(value) ? expandHex(value) : undefined }}
-            aria-label="Pick a color"
+            aria-label={locale.colorPicker.pickColor}
           />
 
           {/* Hidden native color input */}
@@ -210,14 +212,14 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
                 cfg.input,
                 'pl-0'
               )}
-              aria-label="Hex color value"
+              aria-label={locale.colorPicker.hexValue}
             />
           </div>
         </div>
 
         {/* Preset swatches */}
         {presets && presets.length > 0 && (
-          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Preset colors">
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label={locale.colorPicker.presetColors}>
             {presets.map((color) => {
               const normalized = normalizeHex(color)
               const isActive =

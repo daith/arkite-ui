@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { Command as CommandPrimitive } from 'cmdk'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { warnDeprecated } from '../../utils/deprecate'
 
 // --- Command (root) ---
@@ -193,6 +194,7 @@ export function CommandDialog({
   className,
   children,
 }: CommandDialogProps) {
+  const locale = useLocale()
   const requestClose = useCallback(() => {
     if (onClose) {
       onClose()
@@ -227,7 +229,7 @@ export function CommandDialog({
       {/* Dialog */}
       <div
         role="dialog"
-        aria-label="Command palette"
+        aria-label={locale.commandPalette.label}
         className={cn(
           'fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 zoom-in-95',
           className

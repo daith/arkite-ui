@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo, forwardRef, type ReactNode } from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export interface ComboboxOption {
   value: string
@@ -65,13 +66,13 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
       options,
       value,
       onChange,
-      placeholder = 'Select...',
-      searchPlaceholder = 'Search...',
+      placeholder,
+      searchPlaceholder,
       multiple = false,
       disabled = false,
       error = false,
       errorMessage,
-      emptyMessage = 'No results found.',
+      emptyMessage,
       onSearch,
       loading = false,
       renderOption,
@@ -81,6 +82,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [open, setOpen] = useState(false)
     const [search, setSearch] = useState('')
     const inputRef = useRef<HTMLInputElement>(null)
@@ -166,7 +168,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                   <span>{displayLabel[0]}</span>
                 )
               ) : (
-                <span className="text-muted-foreground">{placeholder}</span>
+                <span className="text-muted-foreground">{placeholder ?? locale.combobox.placeholder}</span>
               )}
             </span>
             <svg
@@ -214,7 +216,7 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
                 ref={inputRef}
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ?? locale.combobox.searchPlaceholder}
                 className={cn('flex w-full bg-transparent py-3 outline-none placeholder:text-muted-foreground', searchSizeStyles[size])}
               />
             </div>
@@ -223,11 +225,11 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
             <div className="max-h-60 overflow-y-auto p-1">
               {loading ? (
                 <div className="py-6 text-center text-sm text-muted-foreground">
-                  Loading...
+                  {locale.combobox.loading}
                 </div>
               ) : filtered.length === 0 ? (
                 <div className="py-6 text-center text-sm text-muted-foreground">
-                  {emptyMessage}
+                  {emptyMessage ?? locale.combobox.emptyMessage}
                 </div>
               ) : (
                 filtered.map((option) => {

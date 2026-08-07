@@ -7,18 +7,13 @@ import {
   type HTMLAttributes,
 } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   X,
 } from 'lucide-react'
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-]
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate()
@@ -141,8 +136,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
       onStartChange,
       onEndChange,
       onClear,
-      startLabel = 'Start',
-      endLabel = 'End',
+      startLabel,
+      endLabel,
       format = 'yyyy-MM-dd',
       minDate,
       maxDate,
@@ -155,6 +150,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [activeField, setActiveField] = useState<ActiveField>(null)
     const [startInputValue, setStartInputValue] = useState(
       startDate ? formatDate(startDate, format) : ''
@@ -326,16 +322,18 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             <button
               type="button"
               onClick={handlePrevMonth}
+              aria-label={locale.calendar.previousMonth}
               className="p-1 rounded hover:bg-muted"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-sm font-medium">
-              {MONTHS[month]} {year}
+              {new Date(year, month).toLocaleDateString(locale.dateLocale, { month: 'long', year: 'numeric' })}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
+              aria-label={locale.calendar.nextMonth}
               className="p-1 rounded hover:bg-muted"
             >
               <ChevronRight className="h-4 w-4" />
@@ -344,7 +342,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
           {/* Day names */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((day) => (
+            {locale.calendar.weekdaysShort.map((day) => (
               <div
                 key={day}
                 className="h-8 flex items-center justify-center text-xs text-muted-foreground"
@@ -412,7 +410,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               }}
               className="w-full text-sm text-primary hover:underline"
             >
-              Today
+              {locale.datePicker.today}
             </button>
           </div>
         </div>
@@ -524,13 +522,13 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             {/* Month title (no nav arrows, arrows are in the outer header) */}
             <div className="flex items-center justify-center mb-3">
               <span className="text-sm font-medium">
-                {MONTHS[month]} {year}
+                {new Date(year, month).toLocaleDateString(locale.dateLocale, { month: 'long', year: 'numeric' })}
               </span>
             </div>
 
             {/* Day names */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {DAYS.map((day) => (
+              {locale.calendar.weekdaysShort.map((day) => (
                 <div
                   key={day}
                   className="h-8 flex items-center justify-center text-xs text-muted-foreground"
@@ -606,18 +604,18 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               type="button"
               onClick={handleCalendarPrevMonth}
               className="p-1 rounded hover:bg-muted"
-              aria-label="Previous month"
+              aria-label={locale.calendar.previousMonth}
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-sm font-medium text-muted-foreground">
-              {calendarSelectionPhase === 'start' ? 'Select start date' : 'Select end date'}
+              {calendarSelectionPhase === 'start' ? locale.dateRangePicker.selectStart : locale.dateRangePicker.selectEnd}
             </span>
             <button
               type="button"
               onClick={handleCalendarNextMonth}
               className="p-1 rounded hover:bg-muted"
-              aria-label="Next month"
+              aria-label={locale.calendar.nextMonth}
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -637,15 +635,15 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               onClick={handleCalendarToday}
               className="text-sm text-primary hover:underline"
             >
-              Today
+              {locale.datePicker.today}
             </button>
             <button
               type="button"
               onClick={handleCalendarClear}
               className="text-sm text-muted-foreground hover:text-foreground"
-              aria-label="Clear dates"
+              aria-label={locale.dateRangePicker.clearDates}
             >
-              Clear
+              {locale.dateRangePicker.clear}
             </button>
           </div>
         </div>
@@ -660,7 +658,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           ? `${formatDate(startDate, format)} ~ ${formatDate(endDate, format)}`
           : startDate
             ? `${formatDate(startDate, format)} ~ ...`
-            : 'Select date range'
+            : locale.dateRangePicker.selectRange
 
       return (
         <div
@@ -728,7 +726,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               labelSizeStyles[size]
             )}
           >
-            {startLabel}
+            {startLabel ?? locale.dateRangePicker.startLabel}
           </label>
           <div className="relative">
             <input
@@ -750,7 +748,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             />
             <button
               type="button"
-              aria-label="Open calendar"
+              aria-label={locale.datePicker.openCalendar}
               onClick={() => !disabled && setActiveField(activeField === 'start' ? null : 'start')}
               className={cn(
                 'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',
@@ -782,7 +780,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               labelSizeStyles[size]
             )}
           >
-            {endLabel}
+            {endLabel ?? locale.dateRangePicker.endLabel}
           </label>
           <div className="relative">
             <input
@@ -804,7 +802,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             />
             <button
               type="button"
-              aria-label="Open calendar"
+              aria-label={locale.datePicker.openCalendar}
               onClick={() => !disabled && setActiveField(activeField === 'end' ? null : 'end')}
               className={cn(
                 'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',
@@ -827,7 +825,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               size === 'md' && 'h-10 w-10',
               size === 'lg' && 'h-12 w-12'
             )}
-            aria-label="Clear dates"
+            aria-label={locale.dateRangePicker.clearDates}
           >
             <X className={iconSizeStyles[size]} />
           </button>

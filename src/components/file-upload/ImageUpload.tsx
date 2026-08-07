@@ -2,6 +2,7 @@ import { forwardRef, useRef, useState, type DragEvent } from 'react'
 import { cn } from '../../utils/cn'
 import { warnDeprecated } from '../../utils/deprecate'
 import { Plus, X, ImageIcon } from 'lucide-react'
+import { useLocale } from '../../locale'
 
 export interface ImageUploadProps {
   /** Already-uploaded image URLs */
@@ -60,6 +61,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const inputRef = useRef<HTMLInputElement>(null)
     const [isDragging, setIsDragging] = useState(false)
 
@@ -73,7 +75,9 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
     const isSingle = max === 1
     const isFull = max != null && value.length >= max
 
-    const defaultPlaceholder = isSingle ? 'Upload image' : 'Add image'
+    const defaultPlaceholder = isSingle
+      ? locale.fileUpload.uploadImage
+      : locale.fileUpload.addImage
 
     const handleFiles = (fileList: FileList | null) => {
       if (!fileList || disabled) return
@@ -133,7 +137,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
         multiple={!isSingle}
         disabled={disabled}
         className="sr-only"
-        aria-label="Upload image"
+        aria-label={locale.fileUpload.uploadImage}
         onChange={(e) => handleFiles(e.target.files)}
         data-testid="image-upload-input"
       />
@@ -150,7 +154,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
             <div className="group relative inline-block overflow-hidden rounded-lg border">
               <img
                 src={url}
-                alt="Preview"
+                alt={locale.fileUpload.preview}
                 className="h-32 w-32 object-cover"
               />
               {loadingUrls.includes(url) && (
@@ -225,7 +229,7 @@ export const ImageUpload = forwardRef<HTMLInputElement, ImageUploadProps>(
             >
               <img
                 src={url}
-                alt="Preview"
+                alt={locale.fileUpload.preview}
                 className="h-24 w-24 object-cover"
               />
               {loadingUrls.includes(url) && (

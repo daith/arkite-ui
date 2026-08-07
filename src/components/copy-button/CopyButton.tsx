@@ -9,6 +9,7 @@ import {
 import { Check, Copy } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import type { ButtonVariant, ButtonSize } from '../button/Button'
+import { useLocale } from '../../locale'
 
 /* -------------------------------------------------------------------------- */
 /*  Style Records (reused from Button / Input)                                */
@@ -121,6 +122,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const { copied, copy } = useCopyToClipboard(
       value,
       feedbackDuration,
@@ -134,7 +136,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         ref={ref}
         type="button"
         disabled={disabled}
-        aria-label={copied ? 'Copied' : 'Copy to clipboard'}
+        aria-label={copied ? locale.copyButton.copiedAria : locale.copyButton.copyAria}
         className={cn(
           'inline-flex items-center justify-center gap-2',
           'font-medium transition-all duration-200',
@@ -150,12 +152,12 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
         {copied ? (
           <>
             <Check size={iconSize} className="shrink-0" />
-            {size !== 'icon' && <span>{children ?? 'Copied!'}</span>}
+            {size !== 'icon' && <span>{children ?? locale.copyButton.copied}</span>}
           </>
         ) : (
           <>
             <Copy size={iconSize} className="shrink-0" />
-            {size !== 'icon' && <span>{children ?? 'Copy'}</span>}
+            {size !== 'icon' && <span>{children ?? locale.copyButton.copy}</span>}
           </>
         )}
       </button>
@@ -199,6 +201,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const { copied, copy } = useCopyToClipboard(
       value,
       feedbackDuration,
@@ -214,7 +217,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
           type="text"
           value={value}
           readOnly
-          aria-label="Copy value"
+          aria-label={locale.copyButton.copyValue}
           className={cn(
             'flex w-full rounded-md border border-input bg-muted',
             'text-muted-foreground',
@@ -227,7 +230,7 @@ export const CopyInput = forwardRef<HTMLInputElement, CopyInputProps>(
         />
         <button
           type="button"
-          aria-label={copied ? 'Copied' : 'Copy to clipboard'}
+          aria-label={copied ? locale.copyButton.copiedAria : locale.copyButton.copyAria}
           className={cn(
             'absolute inset-y-0 right-0 flex items-center px-3',
             'text-muted-foreground hover:text-foreground',

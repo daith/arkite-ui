@@ -1,6 +1,7 @@
 import { useRef, useCallback, useEffect, type ReactNode, type CSSProperties } from 'react'
 import { useVirtualizer, type VirtualItem } from '@tanstack/react-virtual'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { Spinner } from '../spinner/Spinner'
 
 export interface VirtualListProps<T> {
@@ -48,6 +49,7 @@ export function VirtualList<T>({
   className,
   innerClassName,
 }: VirtualListProps<T>) {
+  const locale = useLocale()
   const parentRef = useRef<HTMLDivElement>(null)
 
   const virtualizer = useVirtualizer({
@@ -80,7 +82,7 @@ export function VirtualList<T>({
         className={cn('flex items-center justify-center text-muted-foreground text-sm', className)}
         style={{ height }}
       >
-        {emptyContent ?? 'No items'}
+        {emptyContent ?? locale.virtualList.empty}
       </div>
     )
   }
@@ -93,7 +95,7 @@ export function VirtualList<T>({
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       role="region"
-      aria-label={ariaLabel || 'Scrollable list'}
+      aria-label={ariaLabel || locale.virtualList.label}
     >
       <div
         className={cn('relative w-full', innerClassName)}
@@ -154,9 +156,11 @@ export function InfiniteScroll<T>({
   getItemKey,
   dynamicSize = false,
   emptyContent,
+  'aria-label': ariaLabel,
   className,
   innerClassName,
 }: InfiniteScrollProps<T>) {
+  const locale = useLocale()
   const parentRef = useRef<HTMLDivElement>(null)
 
   const virtualizer = useVirtualizer({
@@ -204,7 +208,7 @@ export function InfiniteScroll<T>({
         className={cn('flex items-center justify-center text-muted-foreground text-sm', className)}
         style={{ height }}
       >
-        {emptyContent ?? 'No items'}
+        {emptyContent ?? locale.virtualList.empty}
       </div>
     )
   }
@@ -216,7 +220,7 @@ export function InfiniteScroll<T>({
       {loadingMoreContent ?? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Spinner size="sm" />
-          <span>Loading more...</span>
+          <span>{locale.virtualList.loadingMore}</span>
         </div>
       )}
     </div>
@@ -234,7 +238,7 @@ export function InfiniteScroll<T>({
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={0}
       role="region"
-      aria-label="Scrollable list"
+      aria-label={ariaLabel || locale.virtualList.label}
     >
       <div className={cn('relative w-full', innerClassName)} style={containerStyle}>
         {virtualItems.map((virtualItem) => (

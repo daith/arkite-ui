@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export interface BulkActionBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Number of selected items */
@@ -34,13 +35,14 @@ export interface BulkActionBarProps extends Omit<HTMLAttributes<HTMLDivElement>,
  */
 export const BulkActionBar = forwardRef<HTMLDivElement, BulkActionBarProps>(
   ({ className, selectedCount, left, children, right, onClose, ...props }, ref) => {
+    const locale = useLocale()
     if (selectedCount <= 0) return null
 
     return (
       <div
         ref={ref}
         role="toolbar"
-        aria-label={`${selectedCount} item${selectedCount === 1 ? '' : 's'} selected`}
+        aria-label={locale.bulkActionBar.selected(selectedCount)}
         className={cn(
           'fixed bottom-6 left-1/2 z-50 -translate-x-1/2',
           'flex items-center gap-4 rounded-lg border bg-card px-4 py-3 shadow-lg',
@@ -52,9 +54,7 @@ export const BulkActionBar = forwardRef<HTMLDivElement, BulkActionBarProps>(
         {/* Left: selection count */}
         <div className="flex items-center gap-2 text-sm font-medium whitespace-nowrap">
           {left ?? (
-            <span>
-              {selectedCount} item{selectedCount === 1 ? '' : 's'} selected
-            </span>
+            <span>{locale.bulkActionBar.selected(selectedCount)}</span>
           )}
         </div>
 
@@ -73,7 +73,7 @@ export const BulkActionBar = forwardRef<HTMLDivElement, BulkActionBarProps>(
                 type="button"
                 onClick={onClose}
                 className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Deselect all"
+                aria-label={locale.bulkActionBar.deselectAll}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

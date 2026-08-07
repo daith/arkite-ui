@@ -2,6 +2,7 @@ import { forwardRef, type ReactNode } from 'react'
 import { Modal, type ModalSize } from '../modal/Modal'
 import { Button } from '../button/Button'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export interface ConfirmDialogProps {
   /** Whether the dialog is open */
@@ -50,7 +51,7 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
       title,
       description,
       confirmLabel,
-      cancelLabel = 'Cancel',
+      cancelLabel,
       onConfirm,
       loading = false,
       size = 'sm',
@@ -59,10 +60,13 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const isDestructive = variant === 'destructive'
     const isWarning = variant === 'warning'
     const hasIcon = variant !== 'default'
-    const resolvedConfirmLabel = confirmLabel ?? (isDestructive ? 'Delete' : 'Confirm')
+    const resolvedConfirmLabel =
+      confirmLabel ??
+      (isDestructive ? locale.confirmDialog.deleteLabel : locale.confirmDialog.confirmLabel)
 
     return (
       <Modal
@@ -101,7 +105,7 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
             onClick={onClose}
             disabled={loading}
           >
-            {cancelLabel}
+            {cancelLabel ?? locale.confirmDialog.cancelLabel}
           </Button>
           <Button
             variant={isDestructive ? 'destructive' : 'primary'}
@@ -133,25 +137,19 @@ export interface DeleteConfirmDialogProps extends Omit<ConfirmDialogProps, 'vari
 
 /** Pre-configured destructive ConfirmDialog for delete operations. */
 export const DeleteConfirmDialog = forwardRef<HTMLDivElement, DeleteConfirmDialogProps>(
-  (
-    {
-      itemName,
-      title = `Delete ${itemName ?? 'this item'}?`,
-      description = 'This action cannot be undone. All associated data will be permanently removed.',
-      confirmLabel = 'Delete',
-      ...props
-    },
-    ref
-  ) => (
-    <ConfirmDialog
-      ref={ref}
-      variant="destructive"
-      title={title}
-      description={description}
-      confirmLabel={confirmLabel}
-      {...props}
-    />
-  )
+  ({ itemName, title, description, confirmLabel, ...props }, ref) => {
+    const locale = useLocale()
+    return (
+      <ConfirmDialog
+        ref={ref}
+        variant="destructive"
+        title={title ?? locale.confirmDialog.deleteTitle(itemName ?? locale.confirmDialog.deleteFallbackItem)}
+        description={description ?? locale.confirmDialog.deleteDescription}
+        confirmLabel={confirmLabel ?? locale.confirmDialog.deleteLabel}
+        {...props}
+      />
+    )
+  }
 )
 
 DeleteConfirmDialog.displayName = 'DeleteConfirmDialog'

@@ -1,5 +1,6 @@
 import { useState, forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export interface CalendarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
   /** Selected date */
@@ -21,9 +22,6 @@ export interface CalendarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onS
   /** Callback when month changes */
   onMonthChange?: (month: Date) => void
 }
-
-const WEEKDAYS_SUN = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-const WEEKDAYS_MON = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
 function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() &&
@@ -79,6 +77,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [uncontrolledMonth, setUncontrolledMonth] = useState(
       () => value ?? new Date()
     )
@@ -93,7 +92,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     const month = currentMonth.getMonth()
     const today = new Date()
 
-    const weekdays = weekStartsOn === 1 ? WEEKDAYS_MON : WEEKDAYS_SUN
+    const weekdays =
+      weekStartsOn === 1
+        ? [...locale.calendar.weekdays.slice(1), locale.calendar.weekdays[0]]
+        : locale.calendar.weekdays
     const daysInMonth = getDaysInMonth(year, month)
     let firstDayOfWeek = new Date(year, month, 1).getDay()
     if (weekStartsOn === 1) {
@@ -126,7 +128,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       setCurrentMonth(new Date(year, month + 1, 1))
     }
 
-    const monthLabel = currentMonth.toLocaleDateString('en-US', {
+    const monthLabel = currentMonth.toLocaleDateString(locale.dateLocale, {
       month: 'long',
       year: 'numeric',
     })
@@ -143,7 +145,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             type="button"
             onClick={goToPreviousMonth}
             className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Previous month"
+            aria-label={locale.calendar.previousMonth}
           >
             <ChevronLeftIcon />
           </button>
@@ -152,7 +154,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
             type="button"
             onClick={goToNextMonth}
             className="h-7 w-7 flex items-center justify-center rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Next month"
+            aria-label={locale.calendar.nextMonth}
           >
             <ChevronRightIcon />
           </button>

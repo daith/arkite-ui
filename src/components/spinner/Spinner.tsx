@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type SpinnerSize = 'sm' | 'md' | 'lg'
 
@@ -17,11 +18,12 @@ const sizeStyles: Record<SpinnerSize, string> = {
 /** Circular spinning indicator for loading states. */
 export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
   ({ className, size = 'md', ...props }, ref) => {
+    const locale = useLocale()
     return (
       <div
         ref={ref}
         role="status"
-        aria-label="Loading"
+        aria-label={locale.spinner.loading}
         className={cn(
           'animate-spin rounded-full',
           'border-current border-t-transparent',
@@ -30,7 +32,7 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
         )}
         {...props}
       >
-        <span className="sr-only">Loading...</span>
+        <span className="sr-only">{locale.spinner.loadingText}</span>
       </div>
     )
   }

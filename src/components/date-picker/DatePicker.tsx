@@ -6,13 +6,8 @@ import {
   type InputHTMLAttributes,
 } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
-
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-]
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate()
@@ -103,11 +98,12 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       errorMessage,
       disabled,
       size = 'md',
-      placeholder = 'Select date',
+      placeholder,
       ...props
     },
     ref
   ) => {
+    const locale = useLocale()
     const [isOpen, setIsOpen] = useState(false)
     const [inputValue, setInputValue] = useState(value ? formatDate(value, format) : '')
     const [viewDate, setViewDate] = useState(value || new Date())
@@ -196,16 +192,18 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             <button
               type="button"
               onClick={handlePrevMonth}
+              aria-label={locale.calendar.previousMonth}
               className="p-1 rounded hover:bg-muted"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <span className="text-sm font-medium">
-              {MONTHS[month]} {year}
+              {new Date(year, month).toLocaleDateString(locale.dateLocale, { month: 'long', year: 'numeric' })}
             </span>
             <button
               type="button"
               onClick={handleNextMonth}
+              aria-label={locale.calendar.nextMonth}
               className="p-1 rounded hover:bg-muted"
             >
               <ChevronRight className="h-4 w-4" />
@@ -214,7 +212,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
           {/* Day names */}
           <div className="grid grid-cols-7 gap-1 mb-2">
-            {DAYS.map((day) => (
+            {locale.calendar.weekdaysShort.map((day) => (
               <div
                 key={day}
                 className="h-8 flex items-center justify-center text-xs text-muted-foreground"
@@ -269,7 +267,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               }}
               className="w-full text-sm text-primary hover:underline"
             >
-              Today
+              {locale.datePicker.today}
             </button>
           </div>
         </div>
@@ -285,7 +283,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             value={inputValue}
             onChange={handleInputChange}
             onFocus={() => setIsOpen(true)}
-            placeholder={placeholder}
+            placeholder={placeholder ?? locale.datePicker.placeholder}
             disabled={disabled}
             className={cn(
               'flex w-full rounded-md border border-input bg-background',
@@ -299,7 +297,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           />
           <button
             type="button"
-            aria-label="Open calendar"
+            aria-label={locale.datePicker.openCalendar}
             onClick={() => !disabled && setIsOpen(!isOpen)}
             className={cn(
               'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',

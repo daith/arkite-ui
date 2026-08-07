@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { Button } from '../button/Button'
 
 export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onChange'> {
@@ -112,17 +113,18 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const canPrevious = currentPage > 1
     const canNext = currentPage < totalPages
 
     const info = totalItems != null && pageSize != null
-      ? `${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalItems)} of ${totalItems}`
+      ? locale.pagination.rangeInfo((currentPage - 1) * pageSize + 1, Math.min(currentPage * pageSize, totalItems), totalItems)
       : `${currentPage} / ${totalPages}`
 
     return (
       <nav
         ref={ref}
-        aria-label="Pagination"
+        aria-label={locale.pagination.label}
         className={cn('flex items-center justify-between', className)}
         {...props}
       >
@@ -130,12 +132,12 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           {showPageSize && pageSize != null && onPageSizeChange && (
             <>
-              <span>Rows per page:</span>
+              <span>{locale.pagination.rowsPerPage}</span>
               <select
                 value={pageSize}
                 onChange={(e) => onPageSizeChange(Number(e.target.value))}
                 className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
-                aria-label="Rows per page"
+                aria-label={locale.pagination.rowsPerPage}
               >
                 {pageSizeOptions.map((size) => (
                   <option key={size} value={size}>{size}</option>
@@ -155,7 +157,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className="h-8 w-8"
               onClick={() => onPageChange(1)}
               disabled={!canPrevious}
-              aria-label="First page"
+              aria-label={locale.pagination.firstPage}
             >
               <ChevronsLeftIcon />
             </Button>
@@ -166,7 +168,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             className="h-8 w-8"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={!canPrevious}
-            aria-label="Previous page"
+            aria-label={locale.pagination.previousPage}
           >
             <ChevronLeftIcon />
           </Button>
@@ -185,7 +187,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                     size="icon"
                     className="h-8 w-8"
                     onClick={() => onPageChange(page)}
-                    aria-label={`Page ${page}`}
+                    aria-label={locale.pagination.pageLabel(page)}
                     aria-current={page === currentPage ? 'page' : undefined}
                   >
                     {page}
@@ -207,7 +209,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             className="h-8 w-8"
             onClick={() => onPageChange(currentPage + 1)}
             disabled={!canNext}
-            aria-label="Next page"
+            aria-label={locale.pagination.nextPage}
           >
             <ChevronRightIcon />
           </Button>
@@ -218,7 +220,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className="h-8 w-8"
               onClick={() => onPageChange(totalPages)}
               disabled={!canNext}
-              aria-label="Last page"
+              aria-label={locale.pagination.lastPage}
             >
               <ChevronsRightIcon />
             </Button>

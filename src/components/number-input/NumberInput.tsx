@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type NumberInputSize = 'sm' | 'md' | 'lg'
 
@@ -106,6 +107,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const isControlled = controlledValue !== undefined
     const [internalValue, setInternalValue] = useState<number | null>(
       defaultValue ?? null
@@ -317,7 +319,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               <button
                 type="button"
                 tabIndex={-1}
-                aria-label="Increment"
+                aria-label={locale.numberInput.increment}
                 disabled={disabled || !canIncrement}
                 onClick={increment}
                 className={cn(
@@ -333,7 +335,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
               <button
                 type="button"
                 tabIndex={-1}
-                aria-label="Decrement"
+                aria-label={locale.numberInput.decrement}
                 disabled={disabled || !canDecrement}
                 onClick={decrement}
                 className={cn(

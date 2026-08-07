@@ -1,5 +1,6 @@
 import { Fragment, useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import {
   Table,
   TableHeader,
@@ -155,6 +156,7 @@ export function DataTable<T>({
   onFilterChange,
   className,
 }: DataTableProps<T>) {
+  const locale = useLocale()
   const [sortState, setSortState] = useState<SortState | null>(null)
   const [expandedRows, setExpandedRows] = useState<Set<string | number>>(new Set())
   const [hiddenColumnKeys, setHiddenColumnKeys] = useState<Set<string>>(new Set())
@@ -429,10 +431,10 @@ export function DataTable<T>({
               size="sm"
               onClick={() => setColumnToggleOpen((o) => !o)}
               className="h-8 gap-1.5"
-              aria-label="Toggle columns"
+              aria-label={locale.dataTable.toggleColumns}
             >
               <Columns3 className="h-4 w-4" />
-              Columns
+              {locale.dataTable.columns}
             </Button>
             {columnToggleOpen && (
               <div className="absolute right-0 top-full z-20 mt-1 min-w-[10rem] rounded-md border bg-popover p-1 shadow-md">
@@ -476,7 +478,7 @@ export function DataTable<T>({
           <TableRow>
             {expandable && (
               <TableHead style={{ width: 40 }} className="px-2">
-                <span className="sr-only">Expand</span>
+                <span className="sr-only">{locale.dataTable.expand}</span>
               </TableHead>
             )}
             {selectable && (
@@ -484,7 +486,7 @@ export function DataTable<T>({
                 <SelectionCheckbox
                   state={headerCheckState}
                   onChange={toggleAll}
-                  aria-label="Select all rows"
+                  aria-label={locale.dataTable.selectAllRows}
                 />
               </TableHead>
             )}
@@ -506,7 +508,7 @@ export function DataTable<T>({
                     <button
                       onClick={() => handleSort(column.key)}
                       className="inline-flex items-center gap-1 hover:text-foreground"
-                      aria-label={typeof column.header === 'string' ? `Sort by ${column.header}` : `Sort column`}
+                      aria-label={typeof column.header === 'string' ? locale.dataTable.sortBy(column.header) : locale.dataTable.sortColumn}
                     >
                       {column.header}
                       {getSortIcon(column.key)}
@@ -522,7 +524,7 @@ export function DataTable<T>({
                           e.stopPropagation()
                           setOpenFilterKey(isFilterOpen ? null : column.key)
                         }}
-                        aria-label={`Filter ${typeof column.header === 'string' ? column.header : column.key}`}
+                        aria-label={locale.dataTable.filterBy(typeof column.header === 'string' ? column.header : column.key)}
                         className={cn(
                           'inline-flex h-5 w-5 items-center justify-center rounded-sm hover:bg-accent',
                           isFilterActive ? 'text-primary' : 'opacity-50'
@@ -560,7 +562,7 @@ export function DataTable<T>({
                               onClick={() => clearColumnFilter(column.key)}
                               className="mt-1 flex w-full items-center justify-center rounded-sm border-t px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                             >
-                              Clear
+                              {locale.dataTable.clearFilter}
                             </button>
                           )}
                         </div>
@@ -582,7 +584,7 @@ export function DataTable<T>({
               >
                 <div className="flex items-center justify-center gap-2">
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                  <span className="text-muted-foreground">Loading...</span>
+                  <span className="text-muted-foreground">{locale.dataTable.loading}</span>
                 </div>
               </TableCell>
             </TableRow>
@@ -592,7 +594,7 @@ export function DataTable<T>({
                 colSpan={totalColSpan}
                 className="h-24 text-center text-muted-foreground"
               >
-                {emptyContent || 'No results found.'}
+                {emptyContent || locale.dataTable.emptyMessage}
               </TableCell>
             </TableRow>
           ) : (
@@ -622,7 +624,7 @@ export function DataTable<T>({
                         toggleExpand(rowKey)
                       }}
                       className="inline-flex h-6 w-6 items-center justify-center rounded-sm hover:bg-accent"
-                      aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+                      aria-label={isExpanded ? locale.dataTable.collapseRow : locale.dataTable.expandRow}
                     >
                       <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
                     </button>
@@ -633,7 +635,7 @@ export function DataTable<T>({
                     <SelectionCheckbox
                       state={isSelected ? 'checked' : 'unchecked'}
                       onChange={() => toggleRow(rowKey)}
-                      aria-label={`Select row ${rowKey}`}
+                      aria-label={locale.dataTable.selectRow(rowKey)}
                     />
                   </TableCell>
                 )}
@@ -669,14 +671,14 @@ export function DataTable<T>({
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {hasActiveFilters && (
               <span data-testid="filter-count">
-                Showing {filteredData.length} of {data.length}
+                {locale.dataTable.showing(filteredData.length, data.length)}
               </span>
             )}
-            <span>Rows per page:</span>
+            <span>{locale.pagination.rowsPerPage}</span>
             <select
               value={paginationState.pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
-              aria-label="Rows per page"
+              aria-label={locale.pagination.rowsPerPage}
               className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring/40 focus:ring-offset-0 cursor-pointer"
             >
               {pageSizeOptions.map((size) => (
@@ -689,12 +691,14 @@ export function DataTable<T>({
 
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
-              {paginationState.pageIndex * paginationState.pageSize + 1}-
-              {Math.min(
-                (paginationState.pageIndex + 1) * paginationState.pageSize,
+              {locale.pagination.rangeInfo(
+                paginationState.pageIndex * paginationState.pageSize + 1,
+                Math.min(
+                  (paginationState.pageIndex + 1) * paginationState.pageSize,
+                  sortedData.length
+                ),
                 sortedData.length
-              )}{' '}
-              of {sortedData.length}
+              )}
             </span>
 
             {totalPages > 1 && (
@@ -705,7 +709,7 @@ export function DataTable<T>({
                   onClick={() => goToPage(0)}
                   disabled={!canPreviousPage}
                   className="h-8 w-8"
-                  aria-label="First page"
+                  aria-label={locale.pagination.firstPage}
                 >
                   <ChevronsLeft className="h-4 w-4" />
                 </Button>
@@ -715,7 +719,7 @@ export function DataTable<T>({
                   onClick={() => goToPage(paginationState.pageIndex - 1)}
                   disabled={!canPreviousPage}
                   className="h-8 w-8"
-                  aria-label="Previous page"
+                  aria-label={locale.pagination.previousPage}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -728,7 +732,7 @@ export function DataTable<T>({
                   onClick={() => goToPage(paginationState.pageIndex + 1)}
                   disabled={!canNextPage}
                   className="h-8 w-8"
-                  aria-label="Next page"
+                  aria-label={locale.pagination.nextPage}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -738,7 +742,7 @@ export function DataTable<T>({
                   onClick={() => goToPage(totalPages - 1)}
                   disabled={!canNextPage}
                   className="h-8 w-8"
-                  aria-label="Last page"
+                  aria-label={locale.pagination.lastPage}
                 >
                   <ChevronsRight className="h-4 w-4" />
                 </Button>

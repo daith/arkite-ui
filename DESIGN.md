@@ -104,3 +104,11 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 ## Theming
 
 Brand retheme = override CSS variables (or `createTheme()` from a hex, `applyTheme()` at runtime). Four built-in presets: Default, Neutral, Ocean, Forest. Because components consume only tokens, a future `[data-style="…"]` preset can restyle the entire library (radius, shadows, palette, density) with zero component changes.
+
+## Localization
+
+Every built-in string (placeholders, empty states, pagination, calendar month/weekday names, and all aria-labels) resolves through `LocaleProvider`. Rules:
+
+1. **Chinese apps must mount `<LocaleProvider locale={zhTW}>` at the root** — without it, screen readers announce English aria-labels inside a Chinese UI.
+2. Per-instance text still goes through props (`placeholder`, `emptyMessage`, …) — props always win over the locale.
+3. Never hardcode UI strings that a component already provides via locale; partial locales (`{ spinner: { loading: '…' } }`) fall back to English per key.

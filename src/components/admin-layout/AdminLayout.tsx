@@ -14,6 +14,7 @@ import { Avatar } from '../avatar/Avatar'
 import { Badge, type BadgeVariant } from '../badge/Badge'
 import { ToastContainer } from '../toast/Toast'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 // --- Types ---
 
@@ -123,6 +124,7 @@ export interface AdminLayoutProps {
 // --- Internal components ---
 
 function SidebarBrand({ brand }: { brand: AdminBrandConfig }) {
+  const locale = useLocale()
   const { collapsed, setCollapsed } = useSidebar()
 
   if (collapsed) {
@@ -132,7 +134,7 @@ function SidebarBrand({ brand }: { brand: AdminBrandConfig }) {
           type="button"
           onClick={() => setCollapsed(false)}
           className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors"
-          title="Expand menu"
+          title={locale.adminLayout.expandMenu}
         >
           {brand.collapsedLogo || brand.shortName || brand.name.charAt(0)}
         </button>
@@ -189,6 +191,7 @@ export function AdminLayout({
   children,
   className,
 }: AdminLayoutProps) {
+  const locale = useLocale()
   const context: AdminLayoutContext = { currentPath, hasPermission }
 
   // Filter navigation based on permissions and visibility
@@ -263,7 +266,7 @@ export function AdminLayout({
       {sidebarVariant === 'rail' ? (
         <aside
           className="flex w-[72px] min-w-[72px] flex-col border-r bg-card"
-          aria-label="Primary"
+          aria-label={locale.adminLayout.primaryNavigation}
         >
           <div className="flex h-14 items-center justify-center border-b">
             {brand.collapsedLogo || (
@@ -308,10 +311,10 @@ export function AdminLayout({
                   <button
                     type="button"
                     onClick={onLogout}
-                    aria-label="Logout"
+                    aria-label={locale.adminLayout.logout}
                     className="flex w-full flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    Logout
+                    {locale.adminLayout.logout}
                   </button>
                 )
               )}
@@ -379,7 +382,7 @@ export function AdminLayout({
           {sidebarFooter || (
             onLogout && (
               <SidebarItem onClick={onLogout}>
-                Logout
+                {locale.adminLayout.logout}
               </SidebarItem>
             )
           )}

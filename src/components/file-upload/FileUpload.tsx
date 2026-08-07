@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { cn } from '../../utils/cn'
 import { Upload, X, File, Image, FileText, FileArchive } from 'lucide-react'
+import { useLocale } from '../../locale'
 
 export interface FileUploadProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange' | 'onError'> {
@@ -74,6 +75,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const inputRef = useRef<HTMLInputElement>(null)
     const [isDragging, setIsDragging] = useState(false)
 
@@ -87,7 +89,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       for (const file of files) {
         // Check file size
         if (maxSize && file.size > maxSize) {
-          error = `File "${file.name}" exceeds maximum size of ${formatFileSize(maxSize)}`
+          error = locale.fileUpload.fileTooLarge(file.name, formatFileSize(maxSize))
           continue
         }
 
@@ -105,7 +107,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           })
 
           if (!isAccepted) {
-            error = `File "${file.name}" is not an accepted file type`
+            error = locale.fileUpload.fileNotAccepted(file.name)
             continue
           }
         }
@@ -117,7 +119,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       if (maxFiles) {
         const totalFiles = value.length + validFiles.length
         if (totalFiles > maxFiles) {
-          error = `Maximum ${maxFiles} files allowed`
+          error = locale.fileUpload.tooManyFiles(maxFiles)
           validFiles = validFiles.slice(0, maxFiles - value.length)
         }
       }
@@ -175,7 +177,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           multiple={multiple}
           disabled={disabled}
           className="sr-only"
-          aria-label="Upload file"
+          aria-label={locale.fileUpload.uploadFile}
           onChange={(e) => handleFiles(e.target.files)}
           {...props}
         />
@@ -183,7 +185,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         {/* Dropzone */}
         <div
           role="button"
-          aria-label="Upload files"
+          aria-label={locale.fileUpload.uploadFiles}
           tabIndex={0}
           onClick={handleClick}
           onKeyDown={(e) => {
@@ -208,13 +210,13 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             <>
               <Upload className="mb-4 h-10 w-10 text-muted-foreground" />
               <p className="mb-1 text-sm font-medium">
-                Drop files here or click to upload
+                {locale.fileUpload.dropzone}
               </p>
               <p className="text-xs text-muted-foreground">
                 {accept
-                  ? `Accepted: ${accept}`
-                  : 'Any file type accepted'}
-                {maxSize && ` \u2022 Max size: ${formatFileSize(maxSize)}`}
+                  ? locale.fileUpload.acceptedTypes(accept)
+                  : locale.fileUpload.anyFileType}
+                {maxSize && ` \u2022 ${locale.fileUpload.maxSizeNote(formatFileSize(maxSize))}`}
               </p>
             </>
           )}
@@ -246,7 +248,7 @@ export const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" />
-                    <span className="sr-only">Remove</span>
+                    <span className="sr-only">{locale.fileUpload.remove}</span>
                   </button>
                 </li>
               )
@@ -287,6 +289,7 @@ export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonPr
     },
     ref
   ) => {
+    const locale = useLocale()
     const inputRef = useRef<HTMLInputElement>(null)
 
     const handleClick = () => {
@@ -309,7 +312,7 @@ export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonPr
           multiple={multiple}
           disabled={disabled}
           className="sr-only"
-          aria-label="Upload file"
+          aria-label={locale.fileUpload.uploadFile}
           onChange={handleChange}
         />
         <button
@@ -326,7 +329,7 @@ export const FileUploadButton = forwardRef<HTMLButtonElement, FileUploadButtonPr
           {...props}
         >
           <Upload className="h-4 w-4" />
-          {children || 'Upload'}
+          {children || locale.fileUpload.upload}
         </button>
       </>
     )

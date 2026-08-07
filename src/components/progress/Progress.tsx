@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 import { warnDeprecated } from '../../utils/deprecate'
+import { useLocale } from '../../locale'
 
 export type ProgressSize = 'sm' | 'md' | 'lg'
 export type ProgressVariant =
@@ -60,11 +61,12 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       indeterminate = false,
       striped = false,
       animated = false,
-      'aria-label': ariaLabel = 'Progress',
+      'aria-label': ariaLabel,
       ...props
     },
     ref
   ) => {
+    const locale = useLocale()
     if (variant === 'error') {
       warnDeprecated('Progress', 'variant="error"', 'variant="destructive"')
     }
@@ -76,7 +78,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       <div className={cn('w-full', className)}>
         {showLabel && (
           <div className="mb-1 flex justify-between text-sm">
-            <span className="text-muted-foreground">Progress</span>
+            <span className="text-muted-foreground">{locale.progress.label}</span>
             <span className="font-medium">{Math.round(percentage)}%</span>
           </div>
         )}
@@ -86,7 +88,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           aria-valuenow={indeterminate ? undefined : value}
           aria-valuemin={0}
           aria-valuemax={max}
-          aria-label={ariaLabel}
+          aria-label={ariaLabel ?? locale.progress.label}
           className={cn(
             'w-full overflow-hidden rounded-full bg-muted',
             sizeStyles[size]
@@ -148,11 +150,12 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
       variant = 'default',
       showLabel = false,
       indeterminate = false,
-      'aria-label': ariaLabel = 'Progress',
+      'aria-label': ariaLabel,
       ...props
     },
     ref
   ) => {
+    const locale = useLocale()
     if (variant === 'error') {
       warnDeprecated('CircularProgress', 'variant="error"', 'variant="destructive"')
     }
@@ -181,7 +184,7 @@ export const CircularProgress = forwardRef<HTMLDivElement, CircularProgressProps
         aria-valuenow={indeterminate ? undefined : value}
         aria-valuemin={0}
         aria-valuemax={max}
-        aria-label={ariaLabel}
+        aria-label={ariaLabel ?? locale.progress.label}
         className={cn('relative inline-flex items-center justify-center', className)}
         style={{ width: resolvedDiameter, height: resolvedDiameter }}
         {...props}

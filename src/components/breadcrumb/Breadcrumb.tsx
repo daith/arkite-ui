@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 import { ChevronRight, Home } from 'lucide-react'
 
 export interface BreadcrumbItem {
@@ -38,6 +39,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const separatorElement = separator || (
       <ChevronRight className="h-4 w-4 text-muted-foreground" />
     )
@@ -93,7 +95,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     }
 
     return (
-      <nav ref={ref} aria-label="Breadcrumb" className={className} {...props}>
+      <nav ref={ref} aria-label={locale.breadcrumb.label} className={className} {...props}>
         <ol className="flex items-center gap-2 text-sm">
           {displayItems.map((item, index) => {
             const isLast = index === displayItems.length - 1
@@ -127,9 +129,12 @@ export type BreadcrumbRootProps = HTMLAttributes<HTMLElement>
 
 /** Root nav wrapper for composing breadcrumb parts individually. */
 export const BreadcrumbRoot = forwardRef<HTMLElement, BreadcrumbRootProps>(
-  ({ className, ...props }, ref) => (
-    <nav ref={ref} aria-label="Breadcrumb" className={className} {...props} />
-  )
+  ({ className, ...props }, ref) => {
+    const locale = useLocale()
+    return (
+      <nav ref={ref} aria-label={locale.breadcrumb.label} className={className} {...props} />
+    )
+  }
 )
 
 BreadcrumbRoot.displayName = 'BreadcrumbRoot'

@@ -8,6 +8,7 @@ import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { Badge, type BadgeVariant } from '../badge/Badge'
 import { Spinner } from '../spinner/Spinner'
+import { useLocale } from '../../locale'
 
 // --- Types ---
 
@@ -155,13 +156,15 @@ export function TenantSwitcher({
   onSearch,
   loading = false,
   showAllOption = true,
-  allLabel = 'All Tenants',
-  allDescription = 'Platform-wide view',
-  emptyMessage = 'No tenants found',
-  searchPlaceholder = 'Search tenants...',
+  allLabel,
+  allDescription,
+  emptyMessage,
+  searchPlaceholder,
   renderTenant,
   className,
 }: TenantSwitcherProps) {
+  const locale = useLocale()
+  const resolvedAllLabel = allLabel ?? locale.tenantSwitcher.allLabel
   const [isOpen, setIsOpen] = useState(false)
   const [search, setSearch] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -232,7 +235,7 @@ export function TenantSwitcher({
           ) : (
             <>
               <GlobeIcon className="h-4 w-4 text-primary shrink-0" />
-              <span className="text-primary">{allLabel}</span>
+              <span className="text-primary">{resolvedAllLabel}</span>
             </>
           )}
         </div>
@@ -261,7 +264,7 @@ export function TenantSwitcher({
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder={searchPlaceholder}
+                placeholder={searchPlaceholder ?? locale.tenantSwitcher.searchPlaceholder}
                 value={search}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className={cn(
@@ -298,8 +301,8 @@ export function TenantSwitcher({
                         <GlobeIcon className="h-4 w-4 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-primary">{allLabel}</p>
-                        <p className="text-xs text-muted-foreground">{allDescription}</p>
+                        <p className="text-sm font-medium text-primary">{resolvedAllLabel}</p>
+                        <p className="text-xs text-muted-foreground">{allDescription ?? locale.tenantSwitcher.allDescription}</p>
                       </div>
                       {!currentTenant && (
                         <CheckIcon className="h-4 w-4 text-primary shrink-0" />
@@ -312,7 +315,7 @@ export function TenantSwitcher({
                 {/* Tenant list */}
                 {filteredTenants.length === 0 ? (
                   <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                    {emptyMessage}
+                    {emptyMessage ?? locale.tenantSwitcher.emptyMessage}
                   </div>
                 ) : (
                   filteredTenants.map((tenant) => {

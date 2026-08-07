@@ -7,6 +7,7 @@ import {
 import { cn } from '../../utils/cn'
 import { Check, ChevronDown } from 'lucide-react'
 import { Drawer } from '../drawer'
+import { useLocale } from '../../locale'
 
 export type SheetSelectSize = 'sm' | 'md' | 'lg'
 
@@ -65,7 +66,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
       options,
       value,
       onChange,
-      placeholder = 'Select…',
+      placeholder,
       title,
       disabled = false,
       error = false,
@@ -76,6 +77,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [open, setOpen] = useState(false)
     const selected = options.find((option) => option.value === value)
 
@@ -108,7 +110,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
           {...props}
         >
           <span className={cn('truncate', !selected && 'text-muted-foreground')}>
-            {selected ? selected.label : placeholder}
+            {selected ? selected.label : placeholder ?? locale.sheetSelect.placeholder}
           </span>
           <ChevronDown
             className={cn('shrink-0 text-muted-foreground', iconSizeStyles[size])}

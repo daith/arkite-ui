@@ -1,6 +1,7 @@
 import { forwardRef, useState, useRef, useEffect, type InputHTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 import { Search, X, Loader2 } from 'lucide-react'
+import { useLocale } from '../../locale'
 
 export interface SearchInputProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -60,6 +61,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     },
     ref
   ) => {
+    const locale = useLocale()
     const [internalValue, setInternalValue] = useState(defaultValue || '')
     const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -150,7 +152,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
               className="text-muted-foreground hover:text-foreground focus:outline-none"
             >
               <X className={iconSizeStyles[size]} />
-              <span className="sr-only">Clear search</span>
+              <span className="sr-only">{locale.searchInput.clear}</span>
             </button>
           ) : null}
         </div>

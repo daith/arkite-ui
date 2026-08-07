@@ -2,6 +2,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { Button } from '../button/Button'
 import { Inbox, Search, FileX, AlertCircle, Plus } from 'lucide-react'
+import { useLocale } from '../../locale'
 
 export type EmptyStateVariant = 'default' | 'search' | 'error' | 'no-data'
 
@@ -97,29 +98,37 @@ export interface EmptyStatePresetProps extends Omit<
 
 /** Preset empty state for search queries that returned no results. */
 export const NoResults = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
-  (
-    { title = 'No results found', description = 'Try adjusting your search or filters.', ...props },
-    ref
-  ) => <EmptyState ref={ref} variant="search" title={title} description={description} {...props} />
+  ({ title, description, ...props }, ref) => {
+    const locale = useLocale()
+    return (
+      <EmptyState
+        ref={ref}
+        variant="search"
+        title={title ?? locale.emptyState.noResultsTitle}
+        description={description ?? locale.emptyState.noResultsDescription}
+        {...props}
+      />
+    )
+  }
 )
 
 NoResults.displayName = 'NoResults'
 
 /** Preset empty state prompting the user to create their first item. */
 export const NoData = forwardRef<HTMLDivElement, EmptyStatePresetProps>(
-  (
-    { title = 'No data yet', description = 'Get started by creating your first item.', ...props },
-    ref
-  ) => (
-    <EmptyState
-      ref={ref}
-      variant="no-data"
-      title={title}
-      description={description}
-      icon={<Plus className="h-12 w-12" />}
-      {...props}
-    />
-  )
+  ({ title, description, ...props }, ref) => {
+    const locale = useLocale()
+    return (
+      <EmptyState
+        ref={ref}
+        variant="no-data"
+        title={title ?? locale.emptyState.noDataTitle}
+        description={description ?? locale.emptyState.noDataDescription}
+        icon={<Plus className="h-12 w-12" />}
+        {...props}
+      />
+    )
+  }
 )
 
 NoData.displayName = 'NoData'
@@ -133,33 +142,26 @@ export interface ErrorStateProps extends EmptyStatePresetProps {
 
 /** Preset empty state indicating a data loading error occurred. */
 export const ErrorState = forwardRef<HTMLDivElement, ErrorStateProps>(
-  (
-    {
-      title = 'Something went wrong',
-      description = 'An error occurred while loading the data.',
-      onRetry,
-      retryLabel = 'Try again',
-      action,
-      ...props
-    },
-    ref
-  ) => (
-    <EmptyState
-      ref={ref}
-      variant="error"
-      title={title}
-      description={description}
-      action={
-        action ??
-        (onRetry ? (
-          <Button variant="outline" size="sm" onClick={onRetry}>
-            {retryLabel}
-          </Button>
-        ) : undefined)
-      }
-      {...props}
-    />
-  )
+  ({ title, description, onRetry, retryLabel, action, ...props }, ref) => {
+    const locale = useLocale()
+    return (
+      <EmptyState
+        ref={ref}
+        variant="error"
+        title={title ?? locale.emptyState.errorTitle}
+        description={description ?? locale.emptyState.errorDescription}
+        action={
+          action ??
+          (onRetry ? (
+            <Button variant="outline" size="sm" onClick={onRetry}>
+              {retryLabel ?? locale.emptyState.retryLabel}
+            </Button>
+          ) : undefined)
+        }
+        {...props}
+      />
+    )
+  }
 )
 
 ErrorState.displayName = 'ErrorState'

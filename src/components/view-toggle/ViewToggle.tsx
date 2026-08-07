@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { LayoutGrid, LayoutList } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
 
 export type ViewMode = 'table' | 'card'
 
@@ -33,17 +34,18 @@ export function ViewToggle({
   size = 'md',
   className,
 }: ViewToggleProps) {
+  const locale = useLocale()
   const styles = sizeStyles[size]
 
   const options: ViewOption[] = [
-    { mode: 'table', icon: <LayoutList className={styles.icon} />, label: 'Table view' },
-    { mode: 'card', icon: <LayoutGrid className={styles.icon} />, label: 'Card view' },
+    { mode: 'table', icon: <LayoutList className={styles.icon} />, label: locale.viewToggle.tableView },
+    { mode: 'card', icon: <LayoutGrid className={styles.icon} />, label: locale.viewToggle.cardView },
   ]
 
   return (
     <div
       role="radiogroup"
-      aria-label="View mode"
+      aria-label={locale.viewToggle.label}
       className={cn(
         'inline-flex items-center gap-1 rounded-md border border-input bg-background p-1',
         styles.wrapper,

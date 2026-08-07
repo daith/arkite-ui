@@ -93,3 +93,6 @@ export * from './components/collapsible-section'
 
 // Theme
 export * from './theme'
+
+// Locale
+export * from './locale'

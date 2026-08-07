@@ -73,6 +73,6 @@ describe('Pagination', () => {
         onPageSizeChange={vi.fn()}
       />
     )
-    expect(screen.getByLabelText('Rows per page')).toBeInTheDocument()
+    expect(screen.getByLabelText('Rows per page:')).toBeInTheDocument()
   })
 })

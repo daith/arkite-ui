@@ -316,6 +316,20 @@ applyTheme(myTheme)
 
 Foregrounds are picked by actual WCAG contrast (black or white, whichever contrasts more), so every generated pair meets AA (4.5:1) for any brand color — in light and dark mode alike.
 
+## Localization
+
+All built-in strings — placeholders, empty states, pagination, calendar month/weekday names, and every aria-label — resolve through `LocaleProvider`. Ships with `enUS` (default) and `zhTW`:
+
+```tsx
+import { LocaleProvider, zhTW } from '@arkite-ui/core'
+
+<LocaleProvider locale={zhTW}>
+  <App />
+</LocaleProvider>
+```
+
+Partial locales fall back to English per key, and explicit component props always win over locale values.
+
 ### CSS Variables Override
 
 ```css
