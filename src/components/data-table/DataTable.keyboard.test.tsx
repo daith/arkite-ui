@@ -53,9 +53,7 @@ describe('DataTable keyboard interaction', () => {
     expect(firstColumnCells()).toEqual(['Charlie', 'Bob', 'Alice'])
   })
 
-  // FINDING: sorted state is visual-only — the <th> never exposes
-  // aria-sort, so screen readers cannot tell which column is sorted.
-  it.fails('exposes the sort state via aria-sort on the header cell', async () => {
+  it('exposes the sort state via aria-sort on the header cell', async () => {
     const user = userEvent.setup()
     render(<DataTable columns={columns} data={data} getRowKey={(r) => r.id} pagination={false} />)
 
@@ -106,9 +104,7 @@ describe('DataTable keyboard interaction', () => {
     expect(firstColumnCells()).toEqual(['Alice'])
   })
 
-  // FINDING: the filter dropdown ignores Escape — keyboard users can
-  // only dismiss it by tabbing away and clicking elsewhere.
-  it.fails('closes the filter dropdown with Escape', async () => {
+  it('closes the filter dropdown with Escape', async () => {
     const user = userEvent.setup()
     render(<DataTable columns={filterColumns} data={data} getRowKey={(r) => r.id} pagination={false} />)
 
@@ -121,8 +117,7 @@ describe('DataTable keyboard interaction', () => {
     expect(screen.queryByRole('checkbox', { name: 'Alice' })).not.toBeInTheDocument()
   })
 
-  // FINDING: the column visibility dropdown ignores Escape as well.
-  it.fails('closes the column toggle dropdown with Escape', async () => {
+  it('closes the column toggle dropdown with Escape', async () => {
     const user = userEvent.setup()
     render(
       <DataTable columns={columns} data={data} getRowKey={(r) => r.id} columnToggle pagination={false} />
@@ -137,10 +132,7 @@ describe('DataTable keyboard interaction', () => {
     expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument()
   })
 
-  // FINDING: clickable rows (onRowClick) are mouse-only — the <tr> is
-  // not focusable and has no key handler, so keyboard users cannot
-  // activate a row at all.
-  it.fails('activates a clickable row with Enter', async () => {
+  it('activates a clickable row with Enter', async () => {
     const user = userEvent.setup()
     const onRowClick = vi.fn()
     render(

@@ -96,6 +96,8 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       const modal = modalRef.current
       if (!modal) return
 
+      const previouslyFocused = document.activeElement as HTMLElement | null
+
       const focusableElements = modal.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       )
@@ -121,7 +123,10 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       modal.addEventListener('keydown', handleTab)
       firstElement?.focus()
 
-      return () => modal.removeEventListener('keydown', handleTab)
+      return () => {
+        modal.removeEventListener('keydown', handleTab)
+        previouslyFocused?.focus?.()
+      }
     }, [open])
 
     if (!open) return null

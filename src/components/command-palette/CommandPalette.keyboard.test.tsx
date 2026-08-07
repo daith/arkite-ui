@@ -48,9 +48,7 @@ function renderPalette() {
 }
 
 describe('CommandPalette keyboard interaction (APG combobox/listbox)', () => {
-  // FINDING: CommandDialog 開啟後不會自動把焦點移到搜尋輸入框——CommandInput
-  // 沒有 autoFocus,CommandDialog 也沒有任何 focus 管理,焦點停留在 <body>
-  it.fails('focuses the search input when the dialog opens', () => {
+  it('focuses the search input when the dialog opens', () => {
     renderPalette()
     expect(screen.getByPlaceholderText('Search...')).toHaveFocus()
   })

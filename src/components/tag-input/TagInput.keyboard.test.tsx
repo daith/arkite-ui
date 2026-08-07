@@ -78,8 +78,7 @@ describe('TagInput keyboard interaction', () => {
   })
 
   describe('tag remove buttons', () => {
-    // FINDING: 移除按鈕設了 tabIndex={-1},鍵盤使用者無法 Tab 聚焦到任何 tag 的移除鈕——tag 只能靠 Backspace 從尾端逐一刪除
-    it.fails('remove button is reachable via Tab', async () => {
+    it('remove button is reachable via Tab', async () => {
       const user = userEvent.setup()
       render(<TagInput value={['React']} onChange={vi.fn()} />)
 

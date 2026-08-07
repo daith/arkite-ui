@@ -178,7 +178,6 @@ export const TagInput = forwardRef<HTMLInputElement, TagInputProps>(
                   e.stopPropagation()
                   removeTag(index)
                 }}
-                tabIndex={-1}
               >
                 <X className={removeBtnSizeStyles[size]} />
               </button>

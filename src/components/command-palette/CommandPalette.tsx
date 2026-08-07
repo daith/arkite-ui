@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useRef,
   useState,
   type ComponentPropsWithoutRef,
   type ReactNode,
@@ -195,6 +196,7 @@ export function CommandDialog({
   children,
 }: CommandDialogProps) {
   const locale = useLocale()
+  const dialogRef = useRef<HTMLDivElement>(null)
   const requestClose = useCallback(() => {
     if (onClose) {
       onClose()
@@ -216,6 +218,12 @@ export function CommandDialog({
     return () => document.removeEventListener('keydown', handler)
   }, [open, requestClose])
 
+  // Focus the search input on open — cmdk's Input doesn't autofocus
+  useEffect(() => {
+    if (!open) return
+    dialogRef.current?.querySelector<HTMLInputElement>('[cmdk-input]')?.focus()
+  }, [open])
+
   if (!open) return null
 
   return (
@@ -228,6 +236,7 @@ export function CommandDialog({
       />
       {/* Dialog */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-label={locale.commandPalette.label}
         className={cn(

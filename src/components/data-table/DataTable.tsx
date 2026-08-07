@@ -425,7 +425,13 @@ export function DataTable<T>({
     <div className={cn('rounded-md border', fillHeight && 'flex h-full flex-col', className)}>
       {columnToggle && (
         <div className="flex items-center justify-end border-b px-4 py-2">
-          <div ref={columnToggleRef} className="relative">
+          <div
+            ref={columnToggleRef}
+            className="relative"
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') setColumnToggleOpen(false)
+            }}
+          >
             <Button
               variant="outline"
               size="sm"
@@ -496,6 +502,13 @@ export function DataTable<T>({
               return (
               <TableHead
                 key={column.key}
+                aria-sort={
+                  column.sortable && sortState?.key === column.key && sortState.direction
+                    ? sortState.direction === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : undefined
+                }
                 style={{ width: column.width }}
                 className={cn(
                   'relative',
@@ -517,7 +530,13 @@ export function DataTable<T>({
                     column.header
                   )}
                   {column.filterable && (
-                    <div ref={(el) => { filterDropdownRefs.current[column.key] = el }} className="relative inline-block">
+                    <div
+                      ref={(el) => { filterDropdownRefs.current[column.key] = el }}
+                      className="relative inline-block"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Escape') setOpenFilterKey(null)
+                      }}
+                    >
                       <button
                         type="button"
                         onClick={(e) => {
@@ -609,6 +628,20 @@ export function DataTable<T>({
               <Fragment key={rowKey}>
               <TableRow
                 onClick={onRowClick ? () => onRowClick(row, globalIndex) : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        // Only when the row itself is focused — Enter/Space on
+                        // inner buttons must not double as row activation.
+                        if (e.target !== e.currentTarget) return
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          onRowClick(row, globalIndex)
+                        }
+                      }
+                    : undefined
+                }
                 className={cn(
                   onRowClick && 'cursor-pointer',
                   isSelected && 'bg-primary/5'

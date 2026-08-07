@@ -99,9 +99,7 @@ describe('Modal keyboard interaction (APG dialog pattern)', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
-  // FINDING: Modal 關閉後不會把焦點還給開啟前的觸發元素——元件沒有任何 focus
-  // restore 邏輯,關閉後 activeElement 掉回 <body>(APG 要求焦點回到 invoker)
-  it.fails('returns focus to the trigger element after closing', async () => {
+  it('returns focus to the trigger element after closing', async () => {
     const user = userEvent.setup()
     render(<Harness />)
     const trigger = screen.getByRole('button', { name: 'Open modal' })
