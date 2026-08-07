@@ -116,6 +116,8 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <input
           ref={ref}
           type="search"
+          name="search"
+          autoComplete="off"
           value={currentValue}
           onChange={handleChange}
           className={cn(

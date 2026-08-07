@@ -27,6 +27,17 @@ describe('SearchInput', () => {
     expect(handleChange).toHaveBeenCalledTimes(5)
   })
 
+  it('guards against password manager autofill, overridable via props', () => {
+    const { rerender } = render(<SearchInput />)
+    const input = screen.getByRole('searchbox')
+    expect(input).toHaveAttribute('name', 'search')
+    expect(input).toHaveAttribute('autocomplete', 'off')
+
+    rerender(<SearchInput name="q" autoComplete="on" />)
+    expect(input).toHaveAttribute('name', 'q')
+    expect(input).toHaveAttribute('autocomplete', 'on')
+  })
+
   it('shows clear button when value is non-empty', () => {
     render(<SearchInput value="test" onChange={() => {}} />)
     expect(screen.getByRole('button', { name: /clear search/i })).toBeInTheDocument()

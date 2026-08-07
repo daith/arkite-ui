@@ -38,7 +38,7 @@ describe('FilterBarSearch', () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
     render(<FilterBarSearch value="" onChange={onChange} />)
-    await user.type(screen.getByRole('textbox'), 'hello')
+    await user.type(screen.getByRole('searchbox'), 'hello')
     expect(onChange).toHaveBeenCalled()
     expect(onChange).toHaveBeenLastCalledWith('o')
   })
@@ -46,6 +46,14 @@ describe('FilterBarSearch', () => {
   it('uses default placeholder', () => {
     render(<FilterBarSearch />)
     expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
+  })
+
+  it('guards against password manager autofill', () => {
+    render(<FilterBarSearch />)
+    const input = screen.getByRole('searchbox')
+    expect(input).toHaveAttribute('type', 'search')
+    expect(input).toHaveAttribute('name', 'search')
+    expect(input).toHaveAttribute('autocomplete', 'off')
   })
 })
 

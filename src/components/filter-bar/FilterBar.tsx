@@ -76,7 +76,9 @@ export const FilterBarSearch = forwardRef<HTMLDivElement, FilterBarSearchProps>(
         />
       </svg>
       <input
-        type="text"
+        type="search"
+        name="search"
+        autoComplete="off"
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
@@ -84,7 +86,8 @@ export const FilterBarSearch = forwardRef<HTMLDivElement, FilterBarSearchProps>(
         className={cn(
           'flex h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm',
           'placeholder:text-muted-foreground',
-          'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0'
+          'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0',
+          '[&::-webkit-search-cancel-button]:hidden'
         )}
       />
     </div>
