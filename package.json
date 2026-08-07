@@ -85,7 +85,8 @@
     "publish-package": "./scripts/publish.sh",
     "release:cut": "./scripts/release.sh",
     "chromatic": "chromatic --exit-zero-on-changes",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "smoke:next": "pnpm build && pnpm --dir smoke/next install && pnpm --dir smoke/next run build && node scripts/smoke-next-e2e.mjs"
   },
   "size-limit": [
     {
