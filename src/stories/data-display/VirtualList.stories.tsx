@@ -4,6 +4,8 @@ import { VirtualList, InfiniteScroll } from '../../components/virtual-list'
 import { Badge } from '../../components/badge'
 
 const meta: Meta = {
+  component: VirtualList,
+  subcomponents: { InfiniteScroll },
   title: 'Data Display/VirtualList',
 }
 

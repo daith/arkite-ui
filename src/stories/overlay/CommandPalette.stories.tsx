@@ -15,6 +15,8 @@ import { Button } from '../../components/button'
 import { Kbd } from '../../components/kbd'
 
 const meta: Meta = {
+  component: CommandDialog,
+  subcomponents: { Command, CommandInput, CommandList, CommandItem },
   title: 'Overlay/CommandPalette',
   parameters: {
     a11y: {

@@ -5,6 +5,7 @@ import { Button } from '../../components/button'
 import type { ToastPosition } from '../../components/toast'
 
 const meta: Meta = {
+  component: AnimatedToastContainer,
   title: 'Feedback/AnimatedToast',
 }
 

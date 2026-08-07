@@ -9,6 +9,8 @@ import {
 import { Button } from '../../components/button'
 
 const meta: Meta = {
+  component: SimpleTooltip,
+  subcomponents: { TooltipTrigger, TooltipContent },
   title: 'Overlay/Tooltip',
   decorators: [
     (Story) => (

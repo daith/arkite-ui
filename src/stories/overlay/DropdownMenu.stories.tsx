@@ -16,6 +16,8 @@ import {
 import { Button } from '../../components/button'
 
 const meta: Meta = {
+  component: DropdownMenuContent,
+  subcomponents: { DropdownMenuTrigger, DropdownMenuItem },
   title: 'Overlay/DropdownMenu',
 }
 

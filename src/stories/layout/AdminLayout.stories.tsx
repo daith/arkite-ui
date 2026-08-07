@@ -48,6 +48,7 @@ const navigation: AdminNavGroup[] = [
 ]
 
 const meta: Meta = {
+  component: AdminLayout,
   title: 'Layout/AdminLayout',
   parameters: { layout: 'fullscreen' },
 }
