@@ -1,6 +1,8 @@
 /**
- * WCAG 2.1 relative-luminance contrast math, shared by the token/preset
- * contrast regression tests. Same formula as the Storybook
+ * WCAG 2.1 relative-luminance contrast math.
+ *
+ * Used by createTheme() to pick guaranteed-AA foregrounds, and by the
+ * token/preset contrast regression tests. Same formula as the Storybook
  * "Foundation / Design Tokens" audit page.
  */
 
@@ -50,3 +52,13 @@ export function contrastRatio(lum1: number, lum2: number): number {
 
 /** WCAG AA threshold for normal-size text. */
 export const WCAG_AA = 4.5
+
+/**
+ * Pick black or white foreground for an `"H S% L%"` background, whichever
+ * contrasts more. Because contrast(white, bg) × contrast(black, bg) ≡ 21,
+ * the winning side is always ≥ √21 ≈ 4.58 — WCAG AA holds for any color.
+ */
+export function pickForeground(hsl: string): string {
+  const bg = hslLuminance(hsl)
+  return contrastRatio(0, bg) >= contrastRatio(1, bg) ? '0 0% 0%' : '0 0% 100%'
+}

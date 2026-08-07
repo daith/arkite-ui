@@ -1,5 +1,6 @@
 import type { ThemeTokens, ThemePreset } from './presets'
 import { defaultTheme } from './presets'
+import { pickForeground } from './contrast'
 
 /**
  * Parse a hex color to HSL components.
@@ -54,15 +55,6 @@ function adjustLightness(hsl: string, delta: number): string {
   return `${h} ${s}% ${l}%`
 }
 
-/**
- * Determine if a color is light (for choosing foreground).
- */
-function isLightColor(hsl: string): boolean {
-  const parts = hsl.match(/(\d+)\s+(\d+)%\s+(\d+)%/)
-  if (!parts) return true
-  return parseInt(parts[3]) > 55
-}
-
 export interface CreateThemeOptions {
   /** Theme name */
   name?: string
@@ -93,26 +85,26 @@ export function createTheme(options: CreateThemeOptions): ThemePreset {
   const primaryHsl = hexToHsl(options.primary)
   const accentHsl = options.accent ? hexToHsl(options.accent) : adjustLightness(primaryHsl, 10)
   const radius = options.radius ?? '0.5rem'
-  const primaryFg = isLightColor(primaryHsl) ? '0 0% 0%' : '0 0% 100%'
-  const accentFg = isLightColor(accentHsl) ? '0 0% 0%' : '0 0% 100%'
+  const darkPrimaryHsl = adjustLightness(primaryHsl, 8)
+  const darkAccentHsl = adjustLightness(accentHsl, 8)
 
   const light: ThemeTokens = {
     ...defaultTheme.light,
     primary: primaryHsl,
-    'primary-foreground': primaryFg,
+    'primary-foreground': pickForeground(primaryHsl),
     accent: accentHsl,
-    'accent-foreground': accentFg,
+    'accent-foreground': pickForeground(accentHsl),
     ring: primaryHsl,
     radius,
   }
 
   const dark: ThemeTokens = {
     ...defaultTheme.dark,
-    primary: adjustLightness(primaryHsl, 8),
-    'primary-foreground': '0 0% 100%',
-    accent: adjustLightness(accentHsl, 8),
-    'accent-foreground': '0 0% 100%',
-    ring: adjustLightness(primaryHsl, 8),
+    primary: darkPrimaryHsl,
+    'primary-foreground': pickForeground(darkPrimaryHsl),
+    accent: darkAccentHsl,
+    'accent-foreground': pickForeground(darkAccentHsl),
+    ring: darkPrimaryHsl,
     radius,
   }
 

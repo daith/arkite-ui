@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { themePresets } from './presets'
-import { contrastRatio, hslLuminance, WCAG_AA } from '../test-utils/contrast'
+import { contrastRatio, hslLuminance, WCAG_AA } from './contrast'
 
 describe('theme presets contrast (WCAG AA regression guard)', () => {
   // Every background/foreground pair the presets promise. If a palette

@@ -8,7 +8,7 @@ import {
   radius,
   spacing,
 } from './index'
-import { contrastRatio, hexLuminance, WCAG_AA } from '../test-utils/contrast'
+import { contrastRatio, hexLuminance, WCAG_AA } from '../theme/contrast'
 
 describe('primitives', () => {
   it('exposes white and black', () => {
