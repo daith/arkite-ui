@@ -1,5 +1,63 @@
 # Changelog
 
+## 0.12.0
+### Minor Changes
+
+- fe65fe2: 1.0 Phase 2 — navigation group API unification. **BREAKING** (type-level and `Breadcrumb.renderLink`); runtime-renamed props keep deprecated aliases that warn in dev and are removed in v1.0.
+  
+  - **BREAKING — `Breadcrumb.renderLink` signature.** Now the same object shape as `AdminLayout`: `renderLink({ href, children, className, active })`. It is only called for items with an `href` (`active` is true for the last item); items without one keep the default non-interactive rendering. No runtime alias is possible for a function signature — migrate directly:
+  
+    ```tsx
+    // before
+    <Breadcrumb items={items} renderLink={(item, isLast) => (
+      <Link to={item.href ?? '#'}>{item.label}</Link>
+    )} />
+  
+    // after
+    <Breadcrumb items={items} renderLink={({ href, children, className, active }) => (
+      <Link to={href} className={className} aria-current={active ? 'page' : undefined}>
+        {children}
+      </Link>
+    )} />
+    ```
+  
+  - **BREAKING — Breadcrumb type/component rename.** The `BreadcrumbItem` name now refers to the compound `<li>` component (formerly `BreadcrumbItemComponent`); the item data shape is `BreadcrumbItemData` (formerly the `BreadcrumbItem` interface). `BreadcrumbItemComponent` remains as a deprecated alias component that warns in dev. Migration: `import type { BreadcrumbItem }` (data) → `BreadcrumbItemData`; `<BreadcrumbItemComponent>` → `<BreadcrumbItem>`.
+  
+  - **TenantSwitcher — bare-value contract.** `currentTenant` → `value`, `onSelect` → `onChange`. Old names still work as deprecated aliases (dev warning; new name wins when both are provided). `tenants` is unchanged.
+  
+  - **NavbarBrand / NavbarLink — new `renderLink` prop** with the same `{ href, children, className, active }` shape, for router links (React Router, Next.js). Only used when `href` is set; without it the native `<a>` rendering is unchanged.
+  
+  - **AdminLayout rail variant — `renderLink` support.** Groups with a `path` now render through `renderLink` (real links for the icon rail); groups without a `path`, or layouts without `renderLink`, keep the button + `onNavigate` behavior. The classic variant is unchanged.
+- fe65fe2: 1.0 audit phase 2 — API convergence. Renamed APIs keep the old name as a deprecated alias (dev-only warning, removed in v1.0) unless noted:
+  
+  - **Toast unified**: one store, one container, one shape. `useToast()` and the imperative `toast.*` are now identical — `success(title, options?)`, `dismiss(id)`, `dismissAll()`, default position `top-right` everywhere, `MAX_TOASTS` applies to every path, and `toast.loading()` actually shows a spinner and persists until dismissed. Old forms (`success(title, description)`, `clear()`, `ImperativeToastContainer`) still work with warnings.
+  - **DataTable**: `renderExpandedRow(row, i)` replaces function-valued `expandable` (deprecated); fully controllable now — `sortState`/`onSortChange`, `filters`, `page` (1-based)/`onPageChange`, `defaultSelectedRows` — enabling server-side sorting, filtering, and pagination.
+  - **Tree**: `onSelectionChange` replaces `onCheckChange` (deprecated alias); `defaultSelectedKey` added.
+  - **Pagination**: `variant` replaces `mode` (deprecated alias). **Timeline**: gray `default` renamed `muted` (alias kept), new `info` variant.
+  - **TenantSwitcher**: `value`/`onChange` replace `currentTenant`/`onSelect` (deprecated aliases).
+  - **Pickers**: `DatePicker.clearable` finally works (clear button, was a dead prop); DatePicker/DateRangePicker/Combobox/SheetSelect gain controlled `open`/`defaultOpen`/`onOpenChange`; `defaultValue` added across ColorPicker, Combobox, DatePicker, DateRangePicker, SegmentedControl, SheetSelect, ViewToggle, Calendar (+`defaultMonth`); DateRangePicker gains the standard `value`/`onChange(range)` contract alongside the per-field callbacks.
+  - **DESIGN.md**: conventions updated to match reality — Radix passthrough and trigger-anchored `open/onOpenChange` exceptions, size baseline wording, collection-prop rules (`data` vs `items`), `path`/`href` layering, def-object short names.
+  
+  **Breaking without alias** (see the nav changeset for migration): `Breadcrumb.renderLink` now takes `({ href, children, className, active })` and only runs for items with `href`; the `BreadcrumbItem` name moved from the data type (now `BreadcrumbItemData`) to the component.
+
+### Patch Changes
+
+- b64119e: `init` CLI: the install list now includes `zustand` (a required peer that was missing — store-backed components like toast broke on fresh setups), and a `--dry-run` flag skips the install step while still writing files, used by the new CI smoke test that keeps the CLI from silently breaking again.
+- 85e81bf: Keyboard accessibility fixes (wave 1 of the APG audit): Modal restores focus to its opener on close; CommandDialog focuses the search input on open; TagInput remove buttons are Tab-reachable (dropped `tabIndex={-1}`); DataTable exposes `aria-sort` on sorted headers, its filter and column-toggle dropdowns close on Escape, and rows with `onRowClick` are now focusable and activate with Enter/Space.
+- 4effec8: Keyboard accessibility wave 2 — the remaining 22 APG audit gaps are closed:
+  
+  - **Calendar / DatePicker**: full grid keyboard navigation (arrows move by day/week, Home/End to week edges, PageUp/PageDown by month with end-of-month clamping, month boundaries cross seamlessly), proper `grid`/`row`/`gridcell` semantics, and DatePicker now moves focus into the calendar on open, closes on Escape without selecting, and returns focus to its input.
+  - **Combobox**: real combobox semantics (`role="combobox"` trigger, `listbox`/`option` structure, `aria-activedescendant`) with the full keyboard selection model — ArrowDown opens, arrows move the highlight while focus stays in the search input, Enter selects, Tab closes.
+  
+  Note for consumer tests: the Combobox trigger now carries `role="combobox"`, so testing-library queries must use `getByRole('combobox')` instead of `getByRole('button')` to find it.
+- 8e623bd: 1.0 audit phase 1 — bug fixes and consistency polish across 25+ components:
+  
+  - **Fixed: checked indicators never rendered.** Checkbox/CheckboxCard check marks and the Radio dot used `peer-checked` styles on nested children the peer selector can't reach — a checked box changed color but never showed its mark. Dedicated Checkbox/Radio stories now pin the checked states in Chromatic.
+  - **i18n completed for real**: 16 new locale keys cover every remaining hardcoded string (Modal/Drawer/motion "Close", Sidebar toggle, PageHeader back, Tree/TagInput/ColorPicker/ImageUpload aria-labels, Label "(optional)", PasswordInput show/hide, ErrorBoundary fallback) — including `FilterSelect`'s reverse case, a hardcoded Chinese `'全部'` that now defaults to English and localizes via `zhTW`.
+  - **Overlay hardening**: Drawer and AnimatedDrawer gain the focus trap, dialog semantics, and focus restore Modal already had; AnimatedModal restores focus and accepts HTML attributes; Modal/AnimatedModal use `useId` so multiple dialogs on one page no longer collide; CommandDialog and ConfirmDialog expose `closeOnEscape`/`closeOnBackdropClick`.
+  - **Refs & escape hatches**: forwardRef added to RadioGroup, Tree, VirtualList/InfiniteScroll, ViewToggle, AvatarGroup, TenantSwitcher, CommandDialog, ActionButtons; TagInput's broken callback-ref handling fixed; SidebarItem's anchor branch no longer drops ref/props; StatCard's ref now points at the card element; CopyInput and SimpleTooltip accept standard attributes.
+  - **Semantics**: CheckboxCard gains `error`/`errorMessage`; CollapsibleSection no longer nests interactive content inside a button; Tabs aria wiring (trigger ids + panel labelling) works with multiple instances per page.
+
 ## 0.11.0
 ### Minor Changes
 
