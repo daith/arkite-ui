@@ -289,5 +289,54 @@ describe('AdminLayout', () => {
       })
       expect(screen.getByTestId('rail-sub-nav')).toBeInTheDocument()
     })
+
+    it('uses renderLink for groups with a path', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+        renderLink: ({ href, children, className, active }) => (
+          <a
+            href={href}
+            className={className}
+            data-testid={`rail-link-${href}`}
+            data-active={active ? 'true' : 'false'}
+          >
+            {children}
+          </a>
+        ),
+      })
+      // Group with path renders through renderLink
+      const marketLink = screen.getByTestId('rail-link-/market')
+      expect(marketLink).toHaveAttribute('href', '/market')
+      expect(marketLink).toHaveAttribute('data-active', 'true')
+      expect(marketLink).toHaveTextContent('Market')
+      // Group without path falls back to the onNavigate button
+      expect(screen.getByRole('button', { name: 'Research' })).toBeInTheDocument()
+      expect(screen.queryByTestId('rail-link-/research/reports')).not.toBeInTheDocument()
+    })
+
+    it('prepends basePath to renderLink href in rail', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/app/market',
+        basePath: '/app',
+        renderLink: ({ href, children }) => (
+          <a href={href} data-testid={`rail-link-${href}`}>{children}</a>
+        ),
+      })
+      expect(screen.getByTestId('rail-link-/app/market')).toHaveAttribute('href', '/app/market')
+    })
+
+    it('keeps rail buttons when renderLink is not provided', () => {
+      renderLayout({
+        sidebarVariant: 'rail',
+        navigation: railNavigation,
+        currentPath: '/market/tw',
+      })
+      expect(screen.getByRole('button', { name: 'Market' })).toBeInTheDocument()
+      expect(screen.queryByRole('link')).not.toBeInTheDocument()
+    })
   })
 })

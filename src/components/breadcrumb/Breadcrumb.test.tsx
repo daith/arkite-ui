@@ -1,6 +1,7 @@
+import { type ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
-import { Breadcrumb } from './Breadcrumb'
+import { describe, it, expect, vi } from 'vitest'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbItemComponent } from './Breadcrumb'
 
 describe('Breadcrumb', () => {
   const defaultItems = [
@@ -88,5 +89,76 @@ describe('Breadcrumb', () => {
     // Middle items should be collapsed
     expect(screen.queryByText('Category')).not.toBeInTheDocument()
     expect(screen.queryByText('Sub')).not.toBeInTheDocument()
+  })
+
+  describe('renderLink', () => {
+    it('calls renderLink with { href, children, className, active } for items with href', () => {
+      const renderLink = vi.fn(
+        ({ href, children, className, active }: {
+          href: string
+          children: ReactNode
+          className?: string
+          active?: boolean
+        }) => (
+          <a href={href} className={className} data-active={active ? 'true' : 'false'}>
+            {children}
+          </a>
+        )
+      )
+      render(
+        <Breadcrumb
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Current', href: '/current' },
+          ]}
+          renderLink={renderLink}
+        />
+      )
+      expect(renderLink).toHaveBeenCalledTimes(2)
+      const links = screen.getAllByRole('link')
+      expect(links[0]).toHaveAttribute('href', '/')
+      expect(links[0]).toHaveAttribute('data-active', 'false')
+      expect(links[1]).toHaveAttribute('href', '/current')
+      expect(links[1]).toHaveAttribute('data-active', 'true')
+    })
+
+    it('keeps default rendering for items without href', () => {
+      const renderLink = vi.fn(({ href, children }: { href: string; children: ReactNode }) => (
+        <a href={href}>{children}</a>
+      ))
+      render(<Breadcrumb items={defaultItems} renderLink={renderLink} />)
+      // Only items with href go through renderLink
+      expect(renderLink).toHaveBeenCalledTimes(2)
+      // Last item (no href) keeps the default span with aria-current
+      const current = screen.getByText('Current Page').closest('span[aria-current="page"]')
+      expect(current).toBeInTheDocument()
+    })
+  })
+})
+
+describe('BreadcrumbItem (compound component)', () => {
+  it('renders a list item', () => {
+    render(
+      <ol>
+        <BreadcrumbItem data-testid="item">Content</BreadcrumbItem>
+      </ol>
+    )
+    const item = screen.getByTestId('item')
+    expect(item.tagName).toBe('LI')
+    expect(item).toHaveTextContent('Content')
+  })
+
+  it('deprecated BreadcrumbItemComponent still renders and warns', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    render(
+      <ol>
+        <BreadcrumbItemComponent data-testid="legacy">Legacy</BreadcrumbItemComponent>
+      </ol>
+    )
+    expect(screen.getByTestId('legacy').tagName).toBe('LI')
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('`BreadcrumbItemComponent` is deprecated')
+    )
+    warnSpy.mockRestore()
   })
 })

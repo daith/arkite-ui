@@ -1,8 +1,16 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  forwardRef,
+  isValidElement,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
 import { cn } from '../../utils/cn'
 import { warnDeprecated } from '../../utils/deprecate'
-import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react'
-import { create } from 'zustand'
+import { X, CheckCircle2, AlertCircle, AlertTriangle, Info, Loader2 } from 'lucide-react'
+import { useToastStore } from './toast-store'
+import { toast as toastApi, type ToastOptions } from './toast-api'
 
 export type ToastVariant =
   | 'default'
@@ -32,30 +40,11 @@ export interface ToastData {
     label: string
     onClick: () => void
   }
+  /** Show a loading spinner instead of the variant icon. */
+  isLoading?: boolean
 }
 
-interface ToastStore {
-  toasts: ToastData[]
-  addToast: (toast: Omit<ToastData, 'id'>) => string
-  removeToast: (id: string) => void
-  clearToasts: () => void
-}
-
-export const useToastStore = create<ToastStore>((set) => ({
-  toasts: [],
-  addToast: (toast) => {
-    const id = Math.random().toString(36).slice(2)
-    set((state) => ({
-      toasts: [...state.toasts, { ...toast, id }],
-    }))
-    return id
-  },
-  removeToast: (id) =>
-    set((state) => ({
-      toasts: state.toasts.filter((t) => t.id !== id),
-    })),
-  clearToasts: () => set({ toasts: [] }),
-}))
+export { useToastStore }
 
 const variantStyles: Record<ResolvedToastVariant, string> = {
   default: 'bg-card border-border',
@@ -92,6 +81,7 @@ const positionStyles: Record<ToastPosition, string> = {
 
 export interface ToastProps extends ToastData {
   onClose: () => void
+  className?: string
 }
 
 /** Individual toast notification with auto-dismiss and variant styling. */
@@ -102,7 +92,9 @@ export function Toast({
   variant = 'default',
   duration = 5000,
   action,
+  isLoading,
   onClose,
+  className,
 }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false)
   if (variant === 'error') {
@@ -110,7 +102,7 @@ export function Toast({
   }
   const resolvedVariant: ResolvedToastVariant =
     variant === 'error' ? 'destructive' : variant
-  const IconComponent = iconMap[resolvedVariant]
+  const IconComponent = isLoading ? null : iconMap[resolvedVariant]
 
   useEffect(() => {
     if (duration > 0) {
@@ -134,9 +126,15 @@ export function Toast({
         'pointer-events-auto flex w-full max-w-sm gap-3 rounded-lg border p-4 shadow-lg transition-all duration-200',
         variantStyles[resolvedVariant],
         variantTextStyles[resolvedVariant],
-        isExiting ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0'
+        isExiting ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0',
+        className
       )}
     >
+      {isLoading && (
+        <div className="shrink-0">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+      )}
       {IconComponent && (
         <div className="shrink-0">
           <IconComponent className="h-5 w-5" />
@@ -173,53 +171,87 @@ export interface ToastContainerProps {
 }
 
 /** Fixed-position container that renders active toasts from the toast store. */
-export function ToastContainer({
-  position = 'top-right',
-  className,
-}: ToastContainerProps) {
-  const { toasts, removeToast } = useToastStore()
+export const ToastContainer = forwardRef<HTMLDivElement, ToastContainerProps>(
+  function ToastContainer({ position = 'top-right', className }, ref) {
+    const { toasts, dismissToast } = useToastStore()
 
-  return (
-    <div
-      className={cn(
-        'fixed z-50 flex flex-col gap-2 pointer-events-none',
-        positionStyles[position],
-        className
-      )}
-    >
-      {toasts.map((toast) => (
-        <Toast
-          key={toast.id}
-          {...toast}
-          onClose={() => removeToast(toast.id)}
-        />
-      ))}
-    </div>
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'fixed z-50 flex flex-col gap-2 pointer-events-none',
+          positionStyles[position],
+          className
+        )}
+      >
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            {...toast}
+            onClose={() => dismissToast(toast.id)}
+          />
+        ))}
+      </div>
+    )
+  }
+)
+
+type ShorthandOptions = ToastOptions | ReactNode
+
+/**
+ * Back-compat: `useToast().success(title, description)` (legacy) is treated as
+ * `success(title, { description })` with a dev-only deprecation warning.
+ */
+function resolveShorthandOptions(
+  method: string,
+  options?: ShorthandOptions
+): ToastOptions | undefined {
+  if (options == null) return undefined
+  if (
+    typeof options === 'object' &&
+    !isValidElement(options) &&
+    !Array.isArray(options)
+  ) {
+    return options as ToastOptions
+  }
+  warnDeprecated(
+    'useToast',
+    `${method}(title, description)`,
+    `${method}(title, options)`
   )
+  return { description: options as ReactNode }
 }
 
-// Hook for using toasts
+// Hook for using toasts — thin wrapper over the imperative `toast` API (same store)
 export function useToast() {
-  const { addToast, removeToast, clearToasts } = useToastStore()
-
   const toast = useMemo(() => {
     const t = Object.assign(
-      (options: Omit<ToastData, 'id'>) => addToast(options),
+      (options: Omit<ToastData, 'id'>) =>
+        useToastStore.getState().addToast(options),
       {
-        success: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'success' as const }),
-        error: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'destructive' as const }),
-        warning: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'warning' as const }),
-        info: (title: ReactNode, description?: ReactNode) =>
-          addToast({ title, description, variant: 'info' as const }),
-        dismiss: removeToast,
-        clear: clearToasts,
+        show: (title: ReactNode, options?: ShorthandOptions) =>
+          toastApi.show(title, resolveShorthandOptions('show', options)),
+        success: (title: ReactNode, options?: ShorthandOptions) =>
+          toastApi.success(title, resolveShorthandOptions('success', options)),
+        error: (title: ReactNode, options?: ShorthandOptions) =>
+          toastApi.error(title, resolveShorthandOptions('error', options)),
+        warning: (title: ReactNode, options?: ShorthandOptions) =>
+          toastApi.warning(title, resolveShorthandOptions('warning', options)),
+        info: (title: ReactNode, options?: ShorthandOptions) =>
+          toastApi.info(title, resolveShorthandOptions('info', options)),
+        loading: (title: ReactNode, options?: ToastOptions) =>
+          toastApi.loading(title, options),
+        dismiss: (id: string) => toastApi.dismiss(id),
+        dismissAll: () => toastApi.dismissAll(),
+        /** @deprecated Use `dismissAll()` instead — removed in v1.0. */
+        clear: () => {
+          warnDeprecated('useToast', 'clear()', 'dismissAll()')
+          toastApi.dismissAll()
+        },
       }
     )
     return t
-  }, [addToast, removeToast, clearToasts])
+  }, [])
 
   return toast
 }

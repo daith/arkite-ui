@@ -20,13 +20,24 @@ export interface SheetSelectOption {
 }
 
 export interface SheetSelectProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'value' | 'title'> {
+  extends Omit<
+    ButtonHTMLAttributes<HTMLButtonElement>,
+    'onChange' | 'value' | 'defaultValue' | 'title'
+  > {
   /** Options list */
   options: readonly SheetSelectOption[]
   /** Selected value */
   value?: string
+  /** Initial value for uncontrolled usage */
+  defaultValue?: string
   /** Callback when an option is selected */
   onChange?: (value: string) => void
+  /** Controlled open state of the sheet */
+  open?: boolean
+  /** Initial open state of the sheet for uncontrolled usage */
+  defaultOpen?: boolean
+  /** Called when the sheet opens or closes */
+  onOpenChange?: (open: boolean) => void
   /** Placeholder text shown when nothing is selected */
   placeholder?: string
   /** Sheet header title */
@@ -65,7 +76,11 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
       className,
       options,
       value,
+      defaultValue,
       onChange,
+      open: openProp,
+      defaultOpen,
+      onOpenChange,
       placeholder,
       title,
       disabled = false,
@@ -78,13 +93,23 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
     ref
   ) => {
     const locale = useLocale()
-    const [open, setOpen] = useState(false)
-    const selected = options.find((option) => option.value === value)
+    const isValueControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue)
+    const currentValue = isValueControlled ? value : internalValue
+    const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false)
+    const open = openProp ?? internalOpen
+    const selected = options.find((option) => option.value === currentValue)
+
+    const setOpenState = (next: boolean) => {
+      setInternalOpen(next)
+      if (next !== open) onOpenChange?.(next)
+    }
 
     const handleSelect = (option: SheetSelectOption) => {
       if (option.disabled) return
+      if (!isValueControlled) setInternalValue(option.value)
       onChange?.(option.value)
-      setOpen(false)
+      setOpenState(false)
     }
 
     return (
@@ -93,7 +118,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
           ref={ref}
           type="button"
           disabled={disabled}
-          onClick={() => setOpen(true)}
+          onClick={() => setOpenState(true)}
           aria-haspopup="listbox"
           aria-expanded={open}
           className={cn(
@@ -122,7 +147,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
 
         <Drawer
           open={open}
-          onClose={() => setOpen(false)}
+          onClose={() => setOpenState(false)}
           position="bottom"
           showCloseButton={false}
           className="h-auto max-h-[85dvh] rounded-t-2xl pb-[env(safe-area-inset-bottom)]"
@@ -139,7 +164,7 @@ export const SheetSelect = forwardRef<HTMLButtonElement, SheetSelectProps>(
           )}
           <div role="listbox" aria-label={typeof title === 'string' ? title : undefined} className="space-y-1">
             {options.map((option) => {
-              const isSelected = option.value === value
+              const isSelected = option.value === currentValue
               return (
                 <button
                   key={option.value}

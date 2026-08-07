@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { Timeline } from './Timeline'
 
 describe('Timeline', () => {
@@ -47,11 +47,37 @@ describe('Timeline', () => {
     expect(container.querySelector('.bg-success')).toBeInTheDocument()
   })
 
-  it('applies default variant when none specified', () => {
+  it('applies muted variant when none specified', () => {
     const { container } = render(
       <Timeline items={[{ title: 'Default' }]} />
     )
     expect(container.querySelector('.bg-muted-foreground')).toBeInTheDocument()
+  })
+
+  it('applies muted variant', () => {
+    const { container } = render(
+      <Timeline items={[{ title: 'Muted', variant: 'muted' }]} />
+    )
+    expect(container.querySelector('.bg-muted-foreground')).toBeInTheDocument()
+  })
+
+  it('applies info variant', () => {
+    const { container } = render(
+      <Timeline items={[{ title: 'Info', variant: 'info' }]} />
+    )
+    expect(container.querySelector('.bg-info')).toBeInTheDocument()
+  })
+
+  it('still supports the deprecated default variant as alias for muted and warns', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { container } = render(
+      <Timeline items={[{ title: 'Old default', variant: 'default' }]} />
+    )
+    expect(container.querySelector('.bg-muted-foreground')).toBeInTheDocument()
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('`variant="default"` is deprecated')
+    )
+    warnSpy.mockRestore()
   })
 
   it('renders custom icon instead of dot', () => {

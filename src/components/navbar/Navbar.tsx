@@ -50,11 +50,13 @@ export interface NavbarBrandProps extends HTMLAttributes<HTMLDivElement> {
   name?: ReactNode
   /** Link href */
   href?: string
+  /** Custom link renderer for framework integration (React Router, Next.js). Only used when `href` is set; defaults to a native `<a>`. */
+  renderLink?: (props: { href: string; children: ReactNode; className?: string; active?: boolean }) => ReactNode
 }
 
 /** Brand section of the navbar displaying a logo and/or name. */
 export const NavbarBrand = forwardRef<HTMLDivElement, NavbarBrandProps>(
-  ({ className, logo, name, href, children, ...props }, ref) => {
+  ({ className, logo, name, href, renderLink, children, ...props }, ref) => {
     const content = (
       <>
         {logo && <span className="shrink-0">{logo}</span>}
@@ -66,9 +68,17 @@ export const NavbarBrand = forwardRef<HTMLDivElement, NavbarBrandProps>(
     if (href) {
       return (
         <div ref={ref} className={cn('flex items-center gap-2', className)} {...props}>
-          <a href={href} className="flex items-center gap-2 hover:opacity-80">
-            {content}
-          </a>
+          {renderLink ? (
+            renderLink({
+              href,
+              children: content,
+              className: 'flex items-center gap-2 hover:opacity-80',
+            })
+          ) : (
+            <a href={href} className="flex items-center gap-2 hover:opacity-80">
+              {content}
+            </a>
+          )}
         </div>
       )
     }
@@ -141,24 +151,29 @@ export interface NavbarLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   href?: string
   /** Active state */
   active?: boolean
+  /** Custom link renderer for framework integration (React Router, Next.js). Only used when `href` is set; defaults to a native `<a>` (ref and extra DOM props are not forwarded to a custom link). */
+  renderLink?: (props: { href: string; children: ReactNode; className?: string; active?: boolean }) => ReactNode
 }
 
 /** Styled anchor link for use within the navbar. */
 export const NavbarLink = forwardRef<HTMLAnchorElement, NavbarLinkProps>(
-  ({ className, href, active, children, ...props }, ref) => (
-    <a
-      ref={ref}
-      href={href}
-      className={cn(
-        'text-sm font-medium transition-colors hover:text-foreground',
-        active ? 'text-foreground' : 'text-muted-foreground',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </a>
-  )
+  ({ className, href, active, renderLink, children, ...props }, ref) => {
+    const linkClassName = cn(
+      'text-sm font-medium transition-colors hover:text-foreground',
+      active ? 'text-foreground' : 'text-muted-foreground',
+      className
+    )
+
+    if (renderLink && href != null) {
+      return <>{renderLink({ href, children, className: linkClassName, active })}</>
+    }
+
+    return (
+      <a ref={ref} href={href} className={linkClassName} {...props}>
+        {children}
+      </a>
+    )
+  }
 )
 
 NavbarLink.displayName = 'NavbarLink'

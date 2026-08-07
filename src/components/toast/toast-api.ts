@@ -1,12 +1,14 @@
-import { useImperativeToastStore, type ToastItem } from './toast-store'
+import type { ReactNode } from 'react'
+import { useToastStore } from './toast-store'
+import type { ToastData } from './Toast'
 
-type ToastOptions = Partial<Omit<ToastItem, 'id' | 'title' | 'variant'>>
+export type ToastOptions = Partial<Omit<ToastData, 'id' | 'title' | 'variant'>>
 
 function show(
-  title: string,
-  options?: Partial<Omit<ToastItem, 'id' | 'title'>>
+  title: ReactNode,
+  options?: Partial<Omit<ToastData, 'id' | 'title'>>
 ): string {
-  return useImperativeToastStore.getState().addToast({
+  return useToastStore.getState().addToast({
     variant: 'default',
     title,
     duration: 5000,
@@ -14,32 +16,33 @@ function show(
   })
 }
 
-function success(title: string, options?: ToastOptions): string {
+function success(title: ReactNode, options?: ToastOptions): string {
   return show(title, { ...options, variant: 'success' })
 }
 
-function error(title: string, options?: ToastOptions): string {
+function error(title: ReactNode, options?: ToastOptions): string {
   return show(title, { ...options, variant: 'destructive' })
 }
 
-function warning(title: string, options?: ToastOptions): string {
+function warning(title: ReactNode, options?: ToastOptions): string {
   return show(title, { ...options, variant: 'warning' })
 }
 
-function info(title: string, options?: ToastOptions): string {
+function info(title: ReactNode, options?: ToastOptions): string {
   return show(title, { ...options, variant: 'info' })
 }
 
-function loading(title: string, options?: ToastOptions): string {
-  return show(title, { ...options, variant: 'default' })
+function loading(title: ReactNode, options?: ToastOptions): string {
+  // Loading toasts show a spinner and stay until dismissed (duration can be overridden).
+  return show(title, { duration: 0, ...options, isLoading: true })
 }
 
 function dismiss(id: string): void {
-  useImperativeToastStore.getState().dismissToast(id)
+  useToastStore.getState().dismissToast(id)
 }
 
 function dismissAll(): void {
-  useImperativeToastStore.getState().dismissAllToasts()
+  useToastStore.getState().dismissAllToasts()
 }
 
 export const toast = {

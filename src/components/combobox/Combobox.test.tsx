@@ -259,3 +259,77 @@ describe('Combobox', () => {
     expect(message.className).toContain('text-destructive')
   })
 })
+
+describe('Combobox uncontrolled value', () => {
+  it('shows defaultValue label on the trigger', () => {
+    render(<Combobox options={options} defaultValue="banana" />)
+    expect(screen.getByText('Banana')).toBeInTheDocument()
+    expect(screen.queryByText('Select...')).not.toBeInTheDocument()
+  })
+
+  it('updates the trigger after selecting and still calls onChange', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(<Combobox options={options} onChange={onChange} />)
+
+    await user.click(screen.getByRole('combobox'))
+    await user.click(screen.getByText('Apple'))
+
+    expect(onChange).toHaveBeenCalledWith('apple')
+    expect(screen.getByText('Apple')).toBeInTheDocument()
+    expect(screen.queryByText('Select...')).not.toBeInTheDocument()
+  })
+
+  it('tracks multiple selections uncontrolled', async () => {
+    const onChange = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <Combobox options={options} multiple defaultValue={['apple']} onChange={onChange} />
+    )
+
+    await user.click(screen.getByRole('combobox'))
+    const dialog = screen.getByRole('dialog')
+    await user.click(within(dialog).getByText('Banana'))
+
+    expect(onChange).toHaveBeenCalledWith(['apple', 'banana'])
+    // Both labels now render as badges on the trigger
+    const trigger = screen.getByRole('combobox')
+    expect(within(trigger).getByText('Apple')).toBeInTheDocument()
+    expect(within(trigger).getByText('Banana')).toBeInTheDocument()
+  })
+})
+
+describe('Combobox controlled open', () => {
+  it('renders the dropdown when open is true', () => {
+    render(<Combobox options={options} open />)
+    expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
+  })
+
+  it('opens initially with defaultOpen', () => {
+    render(<Combobox options={options} defaultOpen />)
+    expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
+  })
+
+  it('stays closed when open is false even after clicking the trigger', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(<Combobox options={options} open={false} onOpenChange={onOpenChange} />)
+
+    await user.click(screen.getByRole('combobox'))
+
+    expect(screen.queryByPlaceholderText('Search...')).not.toBeInTheDocument()
+    expect(onOpenChange).toHaveBeenCalledWith(true)
+  })
+
+  it('calls onOpenChange when the dropdown opens and closes', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(<Combobox options={options} onOpenChange={onOpenChange} />)
+
+    await user.click(screen.getByRole('combobox'))
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
+
+    await user.click(screen.getByText('Apple'))
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+  })
+})

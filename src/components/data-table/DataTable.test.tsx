@@ -252,13 +252,13 @@ describe('DataTable', () => {
 
   // ─── Expandable Row Tests ───
 
-  it('renders expand buttons when expandable is provided', () => {
+  it('renders expand buttons when renderExpandedRow is provided', () => {
     render(
       <DataTable
         columns={columns}
         data={data}
         getRowKey={(r) => r.id}
-        expandable={(row) => <div>Details for {row.name}</div>}
+        renderExpandedRow={(row) => <div>Details for {row.name}</div>}
         pagination={false}
       />
     )
@@ -273,7 +273,8 @@ describe('DataTable', () => {
         columns={columns}
         data={data}
         getRowKey={(r) => r.id}
-        expandable={(row) => <div>Details for {row.name}</div>}
+        expandable
+        renderExpandedRow={(row) => <div>Details for {row.name}</div>}
         pagination={false}
       />
     )
@@ -297,7 +298,7 @@ describe('DataTable', () => {
         columns={columns}
         data={data}
         getRowKey={(r) => r.id}
-        expandable={(row) => <div>Details for {row.name}</div>}
+        renderExpandedRow={(row) => <div>Details for {row.name}</div>}
         pagination={false}
       />
     )
@@ -316,6 +317,283 @@ describe('DataTable', () => {
       <DataTable columns={columns} data={data} getRowKey={(r) => r.id} pagination={false} />
     )
     expect(screen.queryByLabelText('Expand row')).not.toBeInTheDocument()
+  })
+
+  it('expandable={false} disables expansion even with renderExpandedRow', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        expandable={false}
+        renderExpandedRow={(row) => <div>Details for {row.name}</div>}
+        pagination={false}
+      />
+    )
+    expect(screen.queryByLabelText('Expand row')).not.toBeInTheDocument()
+  })
+
+  it('still supports the deprecated expandable(fn) form and warns', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        expandable={(row) => <div>Details for {row.name}</div>}
+        pagination={false}
+      />
+    )
+
+    await user.click(screen.getAllByLabelText('Expand row')[0])
+    expect(screen.getByText('Details for Alice')).toBeInTheDocument()
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('`expandable(fn)` is deprecated')
+    )
+    warnSpy.mockRestore()
+  })
+
+  it('prefers renderExpandedRow over deprecated expandable(fn) when both provided', async () => {
+    const user = userEvent.setup()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        expandable={(row) => <div>Old details for {row.name}</div>}
+        renderExpandedRow={(row) => <div>New details for {row.name}</div>}
+        pagination={false}
+      />
+    )
+
+    await user.click(screen.getAllByLabelText('Expand row')[0])
+    expect(screen.getByText('New details for Alice')).toBeInTheDocument()
+    expect(screen.queryByText('Old details for Alice')).not.toBeInTheDocument()
+  })
+
+  // ─── Controlled Sort Tests ───
+
+  it('notifies onSortChange when sorting uncontrolled', async () => {
+    const onSortChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        onSortChange={onSortChange}
+        pagination={false}
+      />
+    )
+    await userEvent.click(screen.getByText('Age'))
+    expect(onSortChange).toHaveBeenCalledWith({ key: 'age', direction: 'asc' })
+  })
+
+  it('renders sorted by controlled sortState', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        sortState={{ key: 'age', direction: 'desc' }}
+        pagination={false}
+      />
+    )
+    const cells = screen.getAllByRole('cell')
+    const ageValues = cells.filter((_, i) => i % 2 === 1).map((c) => c.textContent)
+    expect(ageValues).toEqual(['35', '30', '25'])
+  })
+
+  it('controlled sortState does not change on click, only fires onSortChange', async () => {
+    const onSortChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        sortState={{ key: 'age', direction: 'desc' }}
+        onSortChange={onSortChange}
+        pagination={false}
+      />
+    )
+    await userEvent.click(screen.getByText('Age'))
+    // desc → next step is "no sort"
+    expect(onSortChange).toHaveBeenCalledWith(null)
+    // Display unchanged (still controlled desc)
+    const cells = screen.getAllByRole('cell')
+    const ageValues = cells.filter((_, i) => i % 2 === 1).map((c) => c.textContent)
+    expect(ageValues).toEqual(['35', '30', '25'])
+  })
+
+  it('sortState={null} renders unsorted', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        sortState={null}
+        pagination={false}
+      />
+    )
+    const cells = screen.getAllByRole('cell')
+    const ageValues = cells.filter((_, i) => i % 2 === 1).map((c) => c.textContent)
+    expect(ageValues).toEqual(['30', '25', '35'])
+  })
+
+  // ─── Controlled Filter Tests ───
+
+  it('renders filtered by controlled filters', () => {
+    render(
+      <DataTable
+        columns={filterColumns}
+        data={filterData}
+        getRowKey={(r) => r.id}
+        filters={{ role: ['Admin'] }}
+        pagination={false}
+      />
+    )
+    expect(screen.getByText('Alice')).toBeInTheDocument()
+    expect(screen.getByText('Eve')).toBeInTheDocument()
+    expect(screen.queryByText('Bob')).not.toBeInTheDocument()
+  })
+
+  it('controlled filters do not change on toggle, only fire onFilterChange', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+    render(
+      <DataTable
+        columns={filterColumns}
+        data={filterData}
+        getRowKey={(r) => r.id}
+        filters={{ role: ['Admin'] }}
+        onFilterChange={onFilterChange}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Filter Role'))
+    await user.click(within(screen.getByTestId('filter-dropdown-role')).getByText('Editor'))
+
+    expect(onFilterChange).toHaveBeenCalledWith({ role: ['Admin', 'Editor'] })
+    // Display unchanged — still only Admin rows
+    expect(screen.queryByText('Bob')).not.toBeInTheDocument()
+  })
+
+  // ─── Controlled Page Tests ───
+
+  const pagedData = Array.from({ length: 25 }, (_, i) => ({
+    id: i + 1,
+    name: `User ${i + 1}`,
+    age: 20 + i,
+  }))
+
+  it('notifies onPageChange (1-based) when paging uncontrolled', async () => {
+    const user = userEvent.setup()
+    const onPageChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        onPageChange={onPageChange}
+      />
+    )
+    await user.click(screen.getByLabelText('Next page'))
+    expect(onPageChange).toHaveBeenCalledWith(2)
+    // Uncontrolled — page advanced
+    expect(screen.getByText(/11-20 of 25/)).toBeInTheDocument()
+  })
+
+  it('renders controlled page (1-based)', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={2}
+        onPageChange={() => {}}
+      />
+    )
+    expect(screen.getByText(/11-20 of 25/)).toBeInTheDocument()
+    expect(screen.getByText('User 11')).toBeInTheDocument()
+    expect(screen.queryByText('User 1')).not.toBeInTheDocument()
+  })
+
+  it('controlled page does not change on click, only fires onPageChange', async () => {
+    const user = userEvent.setup()
+    const onPageChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={pagedData}
+        getRowKey={(r) => r.id}
+        defaultPageSize={10}
+        page={2}
+        onPageChange={onPageChange}
+      />
+    )
+    await user.click(screen.getByLabelText('Next page'))
+    expect(onPageChange).toHaveBeenCalledWith(3)
+    // Display unchanged (still controlled page 2)
+    expect(screen.getByText(/11-20 of 25/)).toBeInTheDocument()
+  })
+
+  // ─── Uncontrolled Selection Tests ───
+
+  it('defaultSelectedRows sets initial uncontrolled selection', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        defaultSelectedRows={new Set([2])}
+        pagination={false}
+      />
+    )
+    const rows = screen.getAllByRole('row')
+    // rows[0] = header, rows[2] = Bob (id:2)
+    expect(rows[2]).toHaveAttribute('data-selected', 'true')
+  })
+
+  it('updates uncontrolled selection on click and fires onSelectionChange', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        defaultSelectedRows={new Set([2])}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Select row 1'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set([2, 1]))
+    // Internal state updated without a controlled selectedRows prop
+    const rows = screen.getAllByRole('row')
+    expect(rows[1]).toHaveAttribute('data-selected', 'true')
+    expect(rows[2]).toHaveAttribute('data-selected', 'true')
+  })
+
+  it('controlled selectedRows overrides defaultSelectedRows', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set()}
+        defaultSelectedRows={new Set([2])}
+        onSelectionChange={() => {}}
+        pagination={false}
+      />
+    )
+    const rows = screen.getAllByRole('row')
+    expect(rows[2]).not.toHaveAttribute('data-selected')
   })
 
   // ─── Column Toggle Tests ───

@@ -5,6 +5,7 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
+  NavbarLink,
   NavbarDivider,
   NavbarSpacer,
 } from './Navbar'
@@ -65,6 +66,90 @@ describe('NavbarBrand', () => {
   it('does not render link when href is not provided', () => {
     render(<NavbarBrand name="App" />)
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
+  })
+
+  it('uses renderLink when provided with href', () => {
+    render(
+      <NavbarBrand
+        name="App"
+        href="/home"
+        renderLink={({ href, children, className }) => (
+          <a href={href} className={className} data-testid="custom-link">
+            {children}
+          </a>
+        )}
+      />
+    )
+    const link = screen.getByTestId('custom-link')
+    expect(link).toHaveAttribute('href', '/home')
+    expect(link.className).toContain('flex items-center gap-2')
+    expect(screen.getByText('App')).toBeInTheDocument()
+  })
+
+  it('does not use renderLink without href', () => {
+    render(
+      <NavbarBrand
+        name="App"
+        renderLink={({ href, children }) => (
+          <a href={href} data-testid="custom-link">{children}</a>
+        )}
+      />
+    )
+    expect(screen.queryByTestId('custom-link')).not.toBeInTheDocument()
+  })
+})
+
+describe('NavbarLink', () => {
+  it('renders a native anchor by default', () => {
+    render(<NavbarLink href="/docs">Docs</NavbarLink>)
+    const link = screen.getByRole('link')
+    expect(link).toHaveAttribute('href', '/docs')
+    expect(link).toHaveTextContent('Docs')
+  })
+
+  it('applies active state class', () => {
+    render(<NavbarLink href="/docs" active>Docs</NavbarLink>)
+    expect(screen.getByRole('link').className).toContain('text-foreground')
+  })
+
+  it('uses renderLink when provided with href', () => {
+    render(
+      <NavbarLink
+        href="/docs"
+        active
+        renderLink={({ href, children, className, active }) => (
+          <a
+            href={href}
+            className={className}
+            data-testid="custom-link"
+            data-active={active ? 'true' : 'false'}
+          >
+            {children}
+          </a>
+        )}
+      >
+        Docs
+      </NavbarLink>
+    )
+    const link = screen.getByTestId('custom-link')
+    expect(link).toHaveAttribute('href', '/docs')
+    expect(link).toHaveAttribute('data-active', 'true')
+    expect(link.className).toContain('text-foreground')
+    expect(link).toHaveTextContent('Docs')
+  })
+
+  it('does not use renderLink without href', () => {
+    render(
+      <NavbarLink
+        renderLink={({ href, children }) => (
+          <a href={href} data-testid="custom-link">{children}</a>
+        )}
+      >
+        Docs
+      </NavbarLink>
+    )
+    expect(screen.queryByTestId('custom-link')).not.toBeInTheDocument()
+    expect(screen.getByText('Docs')).toBeInTheDocument()
   })
 })
 

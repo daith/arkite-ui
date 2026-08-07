@@ -14,6 +14,7 @@ export const zhTW: ArkiteLocale = {
     placeholder: '選擇日期',
     openCalendar: '開啟日曆',
     today: '今天',
+    clearDate: '清除日期',
   },
   dateRangePicker: {
     startLabel: '開始',

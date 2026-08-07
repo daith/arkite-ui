@@ -2,6 +2,7 @@ import {
   forwardRef,
   useCallback,
   useRef,
+  useState,
   type ChangeEvent,
   type MouseEvent,
 } from 'react'
@@ -11,10 +12,16 @@ import { useLocale } from '../../locale'
 export type ColorPickerSize = 'sm' | 'md' | 'lg'
 
 export interface ColorPickerProps {
-  /** Current hex color value (e.g. "#ff0000") */
-  value: string
+  /**
+   * Current hex color value (e.g. "#ff0000") for controlled usage.
+   * Provide either `value` (controlled) or `defaultValue` (uncontrolled);
+   * when neither is given the picker starts at `#000000`.
+   */
+  value?: string
+  /** Initial hex color value for uncontrolled usage */
+  defaultValue?: string
   /** Callback fired when the color changes */
-  onChange: (color: string) => void
+  onChange?: (color: string) => void
   /** Whether the picker is disabled */
   disabled?: boolean
   /** Size variant */
@@ -82,6 +89,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
   (
     {
       value,
+      defaultValue,
       onChange,
       disabled = false,
       size = 'md',
@@ -96,6 +104,18 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
     const nativeInputRef = useRef<HTMLInputElement>(null)
     const cfg = sizeConfig[size]
 
+    const isControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState(defaultValue ?? '#000000')
+    const currentValue = isControlled ? value : internalValue
+
+    const setValue = useCallback(
+      (color: string) => {
+        if (!isControlled) setInternalValue(color)
+        onChange?.(color)
+      },
+      [isControlled, onChange]
+    )
+
     const openNativePicker = useCallback(
       (e: MouseEvent) => {
         e.preventDefault()
@@ -107,9 +127,9 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
 
     const handleNativeChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
-        onChange(e.target.value.toLowerCase())
+        setValue(e.target.value.toLowerCase())
       },
-      [onChange]
+      [setValue]
     )
 
     const handleHexInput = useCallback(
@@ -119,30 +139,30 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
 
         // Always reflect what the user typed (normalized)
         if (isValidHex(normalized)) {
-          onChange(normalized)
+          setValue(normalized)
         }
       },
-      [onChange]
+      [setValue]
     )
 
     const handleHexBlur = useCallback(() => {
       // On blur, ensure we have a valid value; if current text is invalid, reset
-      const normalized = normalizeHex(value)
-      if (isValidHex(normalized) && normalized !== value) {
-        onChange(normalized)
+      const normalized = normalizeHex(currentValue)
+      if (isValidHex(normalized) && normalized !== currentValue) {
+        setValue(normalized)
       }
-    }, [value, onChange])
+    }, [currentValue, setValue])
 
     const handlePresetClick = useCallback(
       (color: string) => {
         if (disabled) return
-        onChange(normalizeHex(color))
+        setValue(normalizeHex(color))
       },
-      [disabled, onChange]
+      [disabled, setValue]
     )
 
     // Display value without # in the text input
-    const displayHex = value.startsWith('#') ? value.slice(1) : value
+    const displayHex = currentValue.startsWith('#') ? currentValue.slice(1) : currentValue
 
     return (
       <div ref={ref} className={cn('inline-flex flex-col gap-2', className)}>
@@ -159,7 +179,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
               error ? 'border-destructive' : 'border-input',
               cfg.swatch
             )}
-            style={{ backgroundColor: isValidHex(value) ? expandHex(value) : undefined }}
+            style={{ backgroundColor: isValidHex(currentValue) ? expandHex(currentValue) : undefined }}
             aria-label={locale.colorPicker.pickColor}
           />
 
@@ -167,7 +187,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
           <input
             ref={nativeInputRef}
             type="color"
-            value={isValidHex(value) ? expandHex(value) : '#000000'}
+            value={isValidHex(currentValue) ? expandHex(currentValue) : '#000000'}
             onChange={handleNativeChange}
             disabled={disabled}
             className="sr-only"
@@ -223,8 +243,8 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(
             {presets.map((color) => {
               const normalized = normalizeHex(color)
               const isActive =
-                normalizeHex(value) === normalized ||
-                expandHex(normalizeHex(value)) === expandHex(normalized)
+                normalizeHex(currentValue) === normalized ||
+                expandHex(normalizeHex(currentValue)) === expandHex(normalized)
 
               return (
                 <button

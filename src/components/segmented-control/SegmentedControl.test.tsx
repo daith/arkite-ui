@@ -89,3 +89,58 @@ describe('SegmentedControl', () => {
     expect(screen.getByRole('radiogroup')).toBeInTheDocument()
   })
 })
+
+describe('SegmentedControl uncontrolled', () => {
+  it('marks defaultValue as checked', () => {
+    render(<SegmentedControl options={options} defaultValue="tenant" />)
+    expect(screen.getByText('Tenant').closest('button')).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+  })
+
+  it('updates the checked segment on click and still calls onChange', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <SegmentedControl options={options} defaultValue="platform" onChange={onChange} />
+    )
+    await user.click(screen.getByText('Tenant'))
+
+    expect(onChange).toHaveBeenCalledWith('tenant')
+    expect(screen.getByText('Tenant').closest('button')).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+    expect(screen.getByText('Platform').closest('button')).toHaveAttribute(
+      'aria-checked',
+      'false'
+    )
+  })
+
+  it('works without value and onChange', async () => {
+    const user = userEvent.setup()
+    render(<SegmentedControl options={options} />)
+    await user.click(screen.getByText('Custom'))
+    expect(screen.getByText('Custom').closest('button')).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+  })
+
+  it('remains controlled when value is provided', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(
+      <SegmentedControl options={options} value="platform" onChange={onChange} />
+    )
+    await user.click(screen.getByText('Tenant'))
+
+    expect(onChange).toHaveBeenCalledWith('tenant')
+    // Display does not change without the parent updating value
+    expect(screen.getByText('Platform').closest('button')).toHaveAttribute(
+      'aria-checked',
+      'true'
+    )
+  })
+})

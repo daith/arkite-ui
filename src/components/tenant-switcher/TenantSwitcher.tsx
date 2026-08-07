@@ -17,6 +17,7 @@ import { cn } from '../../utils/cn'
 import { Badge, type BadgeVariant } from '../badge/Badge'
 import { Spinner } from '../spinner/Spinner'
 import { useLocale } from '../../locale'
+import { warnDeprecated } from '../../utils/deprecate'
 
 // --- Types ---
 
@@ -38,12 +39,16 @@ export interface TenantItem {
 }
 
 export interface TenantSwitcherProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect' | 'onChange'> {
   /** List of available tenants */
   tenants: TenantItem[]
   /** Currently selected tenant (null = all tenants / platform view) */
+  value?: TenantItem | null
+  /** Selection callback (null = all tenants / platform view) */
+  onChange?: (tenant: TenantItem | null) => void
+  /** @deprecated Use `value` instead — will be removed in v1.0. Ignored when `value` is provided. */
   currentTenant?: TenantItem | null
-  /** Selection callback */
+  /** @deprecated Use `onChange` instead — will be removed in v1.0. Ignored when `onChange` is provided. */
   onSelect?: (tenant: TenantItem | null) => void
   /** Async search callback (overrides local filtering) */
   onSearch?: (query: string) => void
@@ -162,7 +167,9 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
   (
     {
       tenants = [],
-      currentTenant = null,
+      value,
+      onChange,
+      currentTenant,
       onSelect,
       onSearch,
       loading = false,
@@ -177,6 +184,15 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
     },
     ref
   ) => {
+    if (currentTenant !== undefined) {
+      warnDeprecated('TenantSwitcher', 'currentTenant', 'value')
+    }
+    if (onSelect) {
+      warnDeprecated('TenantSwitcher', 'onSelect', 'onChange')
+    }
+    const selectedTenant = (value !== undefined ? value : currentTenant) ?? null
+    const handleChange = onChange ?? onSelect
+
     const locale = useLocale()
     const resolvedAllLabel = allLabel ?? locale.tenantSwitcher.allLabel
     const [isOpen, setIsOpen] = useState(false)
@@ -232,7 +248,7 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
     }
 
     const handleSelect = (tenant: TenantItem | null) => {
-      onSelect?.(tenant)
+      handleChange?.(tenant)
       setIsOpen(false)
       setSearch('')
     }
@@ -255,10 +271,10 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
           )}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            {currentTenant ? (
+            {selectedTenant ? (
               <>
                 <BuildingIcon className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="truncate">{currentTenant.name}</span>
+                <span className="truncate">{selectedTenant.name}</span>
               </>
             ) : (
               <>
@@ -322,7 +338,7 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
                           'w-full flex items-center gap-3 px-3 py-2.5',
                           'hover:bg-muted transition-colors',
                           'text-left',
-                          !currentTenant && 'bg-secondary'
+                          !selectedTenant && 'bg-secondary'
                         )}
                       >
                         <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/10">
@@ -332,7 +348,7 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
                           <p className="text-sm font-medium text-primary">{resolvedAllLabel}</p>
                           <p className="text-xs text-muted-foreground">{allDescription ?? locale.tenantSwitcher.allDescription}</p>
                         </div>
-                        {!currentTenant && (
+                        {!selectedTenant && (
                           <CheckIcon className="h-4 w-4 text-primary shrink-0" />
                         )}
                       </button>
@@ -347,7 +363,7 @@ export const TenantSwitcher = forwardRef<HTMLDivElement, TenantSwitcherProps>(
                     </div>
                   ) : (
                     filteredTenants.map((tenant) => {
-                      const selected = currentTenant?.id === tenant.id
+                      const selected = selectedTenant?.id === tenant.id
                       if (renderTenant) {
                         return (
                           <button

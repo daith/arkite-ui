@@ -343,3 +343,118 @@ describe('DateRangePicker variant="calendar"', () => {
     expect(message.className).toContain('text-destructive')
   })
 })
+
+describe('DateRangePicker range value API', () => {
+  it('displays a controlled range from value', () => {
+    render(
+      <DateRangePicker
+        value={{ start: new Date(2024, 0, 15), end: new Date(2024, 0, 20) }}
+      />
+    )
+    const inputs = screen.getAllByRole('textbox')
+    expect(inputs[0]).toHaveValue('2024-01-15')
+    expect(inputs[1]).toHaveValue('2024-01-20')
+  })
+
+  it('value takes precedence over startDate/endDate', () => {
+    render(
+      <DateRangePicker
+        value={{ start: new Date(2024, 0, 15), end: null }}
+        startDate={new Date(2023, 5, 1)}
+        endDate={new Date(2023, 5, 2)}
+      />
+    )
+    const inputs = screen.getAllByRole('textbox')
+    expect(inputs[0]).toHaveValue('2024-01-15')
+    expect(inputs[1]).toHaveValue('')
+  })
+
+  it('fires onChange alongside the legacy callbacks', async () => {
+    const onChange = vi.fn()
+    const onStartChange = vi.fn()
+    render(
+      <DateRangePicker
+        value={{ start: null, end: null }}
+        onChange={onChange}
+        onStartChange={onStartChange}
+      />
+    )
+    const inputs = screen.getAllByRole('textbox')
+    await userEvent.click(inputs[0])
+    await userEvent.click(screen.getByRole('button', { name: '15' }))
+
+    expect(onStartChange).toHaveBeenCalledTimes(1)
+    expect(onChange).toHaveBeenCalledTimes(1)
+    const range = onChange.mock.calls[0][0] as { start: Date | null; end: Date | null }
+    expect(range.start?.getDate()).toBe(15)
+    expect(range.end).toBeNull()
+  })
+
+  it('supports defaultValue for uncontrolled usage', async () => {
+    render(
+      <DateRangePicker
+        defaultValue={{ start: new Date(2024, 0, 15), end: new Date(2024, 0, 20) }}
+      />
+    )
+    const inputs = screen.getAllByRole('textbox')
+    expect(inputs[0]).toHaveValue('2024-01-15')
+    expect(inputs[1]).toHaveValue('2024-01-20')
+
+    await userEvent.click(screen.getByLabelText('Clear dates'))
+    expect(inputs[0]).toHaveValue('')
+    expect(inputs[1]).toHaveValue('')
+  })
+})
+
+describe('DateRangePicker controlled open', () => {
+  it('defaultOpen shows the calendar dropdown initially (input variant)', () => {
+    render(<DateRangePicker defaultOpen />)
+    expect(screen.getByText('Today')).toBeInTheDocument()
+  })
+
+  it('open keeps the dropdown visible (input variant)', () => {
+    render(<DateRangePicker open />)
+    expect(screen.getByText('Today')).toBeInTheDocument()
+  })
+
+  it('open=false keeps the dropdown closed and reports open intent', async () => {
+    const onOpenChange = vi.fn()
+    render(<DateRangePicker open={false} onOpenChange={onOpenChange} />)
+    const inputs = screen.getAllByRole('textbox')
+    await userEvent.click(inputs[0])
+
+    expect(screen.queryByText('Today')).not.toBeInTheDocument()
+    expect(onOpenChange).toHaveBeenCalledWith(true)
+  })
+
+  it('calls onOpenChange when the dropdown opens and closes (input variant)', async () => {
+    const onOpenChange = vi.fn()
+    render(<DateRangePicker onOpenChange={onOpenChange} />)
+    const inputs = screen.getAllByRole('textbox')
+    await userEvent.click(inputs[0])
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
+
+    await userEvent.click(document.body)
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it('open shows the popover (calendar variant)', () => {
+    render(<DateRangePicker variant="calendar" open />)
+    expect(screen.getByTestId('calendar-popover')).toBeInTheDocument()
+  })
+
+  it('defaultOpen shows the popover initially (calendar variant)', () => {
+    render(<DateRangePicker variant="calendar" defaultOpen />)
+    expect(screen.getByTestId('calendar-popover')).toBeInTheDocument()
+  })
+
+  it('calls onOpenChange on trigger click (calendar variant)', async () => {
+    const onOpenChange = vi.fn()
+    render(<DateRangePicker variant="calendar" onOpenChange={onOpenChange} />)
+    await userEvent.click(screen.getByTestId('calendar-trigger'))
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
+
+    await userEvent.click(screen.getByTestId('calendar-trigger'))
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+  })
+})

@@ -1,31 +1,24 @@
 import { create } from 'zustand'
+import type { ToastData } from './Toast'
 
-export interface ToastItem {
-  id: string
-  variant:
-    | 'default'
-    | 'success'
-    | 'warning'
-    | 'info'
-    | 'destructive'
-    /** @deprecated use `'destructive'` instead — removed in v1.0 */
-    | 'error'
-  title: string
-  description?: string
-  duration?: number
-  action?: { label: string; onClick: () => void }
-}
+/** @deprecated Use `ToastData` instead — removed in v1.0. */
+export type ToastItem = ToastData
 
 interface ToastStoreState {
-  toasts: ToastItem[]
-  addToast: (toast: Omit<ToastItem, 'id'>) => string
+  toasts: ToastData[]
+  addToast: (toast: Omit<ToastData, 'id'>) => string
   dismissToast: (id: string) => void
   dismissAllToasts: () => void
+  /** @deprecated Use `dismissToast` instead — removed in v1.0. */
+  removeToast: (id: string) => void
+  /** @deprecated Use `dismissAllToasts` instead — removed in v1.0. */
+  clearToasts: () => void
 }
 
 const MAX_TOASTS = 5
 
-export const useImperativeToastStore = create<ToastStoreState>((set) => ({
+/** Single shared store behind both `useToast()` and the imperative `toast` API. */
+export const useToastStore = create<ToastStoreState>((set, get) => ({
   toasts: [],
   addToast: (toast) => {
     const id = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
@@ -44,4 +37,9 @@ export const useImperativeToastStore = create<ToastStoreState>((set) => ({
       toasts: state.toasts.filter((t) => t.id !== id),
     })),
   dismissAllToasts: () => set({ toasts: [] }),
+  removeToast: (id) => get().dismissToast(id),
+  clearToasts: () => get().dismissAllToasts(),
 }))
+
+/** @deprecated Use `useToastStore` instead — removed in v1.0. */
+export const useImperativeToastStore = useToastStore

@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, useState, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
 
 export type SegmentedControlSize = 'sm' | 'md' | 'lg'
@@ -10,13 +10,15 @@ export interface SegmentedControlOption<T extends string = string> {
 }
 
 export interface SegmentedControlProps<T extends string = string>
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   /** Options to display */
   options: SegmentedControlOption<T>[]
-  /** Currently selected value */
-  value: T
+  /** Currently selected value (controlled) */
+  value?: T
+  /** Initial value for uncontrolled usage */
+  defaultValue?: T
   /** Change handler */
-  onChange: (value: T) => void
+  onChange?: (value: T) => void
   /** Size variant @default "md" */
   size?: SegmentedControlSize
   /** Full width — segments share space equally */
@@ -41,6 +43,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
     {
       options,
       value,
+      defaultValue,
       onChange,
       size = 'md',
       fullWidth = false,
@@ -51,6 +54,9 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
     ref
   ) => {
     const styles = sizeStyles[size]
+    const isControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState(defaultValue)
+    const currentValue = isControlled ? value : internalValue
 
     return (
       <div
@@ -66,7 +72,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
         {...props}
       >
         {options.map((option) => {
-          const isActive = value === option.value
+          const isActive = currentValue === option.value
           return (
             <button
               key={option.value}
@@ -74,7 +80,10 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
               role="radio"
               aria-checked={isActive}
               disabled={disabled || option.disabled}
-              onClick={() => onChange(option.value as typeof value)}
+              onClick={() => {
+                if (!isControlled) setInternalValue(option.value)
+                onChange?.(option.value)
+              }}
               className={cn(
                 'inline-flex items-center justify-center rounded-sm font-medium transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',

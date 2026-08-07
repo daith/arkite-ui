@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { toast } from './toast-api'
-import { useImperativeToastStore } from './toast-store'
+import { useToastStore } from './toast-store'
 
 function getToasts() {
-  return useImperativeToastStore.getState().toasts
+  return useToastStore.getState().toasts
 }
 
 describe('toast imperative API', () => {
@@ -44,9 +44,18 @@ describe('toast imperative API', () => {
     expect(getToasts()[0].variant).toBe('default')
   })
 
-  it('toast.loading() sets default variant', () => {
+  it('toast.loading() shows spinner and stays until dismissed', () => {
     toast.loading('Loading...')
-    expect(getToasts()[0].variant).toBe('default')
+    const toasts = getToasts()
+    expect(toasts[0].variant).toBe('default')
+    expect(toasts[0].isLoading).toBe(true)
+    expect(toasts[0].duration).toBe(0)
+  })
+
+  it('toast.loading() allows overriding duration', () => {
+    toast.loading('Quick load', { duration: 3000 })
+    expect(getToasts()[0].duration).toBe(3000)
+    expect(getToasts()[0].isLoading).toBe(true)
   })
 
   it('toast.dismiss() removes a specific toast from the store', () => {

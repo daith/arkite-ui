@@ -279,6 +279,36 @@ export function AdminLayout({
             <div className="flex flex-col items-stretch gap-1 px-2">
               {visibleGroups.map((group) => {
                 const active = isGroupActive(group)
+                const itemClassName = cn(
+                  'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium leading-tight transition-colors',
+                  'hover:bg-muted hover:text-foreground',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  active ? 'bg-primary/10 text-foreground' : 'text-muted-foreground',
+                )
+                const itemContent = (
+                  <>
+                    <span className="flex h-6 w-6 items-center justify-center">
+                      {group.icon || (
+                        <span className="text-sm font-semibold">{group.label.charAt(0)}</span>
+                      )}
+                    </span>
+                    <span className="w-full truncate text-center">{group.label}</span>
+                  </>
+                )
+
+                if (renderLink && group.path) {
+                  return (
+                    <div key={group.label}>
+                      {renderLink({
+                        href: resolvePath(group.path),
+                        active,
+                        className: itemClassName,
+                        children: itemContent,
+                      })}
+                    </div>
+                  )
+                }
+
                 return (
                   <button
                     key={group.label}
@@ -286,19 +316,9 @@ export function AdminLayout({
                     onClick={() => handleGroupClick(group)}
                     aria-label={group.label}
                     aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      'flex flex-col items-center gap-1 rounded-md px-1 py-2 text-xs font-medium leading-tight transition-colors',
-                      'hover:bg-muted hover:text-foreground',
-                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                      active ? 'bg-primary/10 text-foreground' : 'text-muted-foreground',
-                    )}
+                    className={itemClassName}
                   >
-                    <span className="flex h-6 w-6 items-center justify-center">
-                      {group.icon || (
-                        <span className="text-sm font-semibold">{group.label.charAt(0)}</span>
-                      )}
-                    </span>
-                    <span className="w-full truncate text-center">{group.label}</span>
+                    {itemContent}
                   </button>
                 )
               })}

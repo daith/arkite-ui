@@ -3,9 +3,12 @@ import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
 import { useGridKeyboard, toDayKey } from './use-grid-keyboard'
 
-export interface CalendarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
+export interface CalendarProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect' | 'defaultValue'> {
   /** Selected date */
   value?: Date | null
+  /** Initial selected date for uncontrolled usage */
+  defaultValue?: Date
   /** Callback when date is selected */
   onSelect?: (date: Date) => void
   /** Minimum selectable date */
@@ -20,6 +23,8 @@ export interface CalendarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onS
   weekStartsOn?: 0 | 1
   /** Month to display (controlled) */
   month?: Date
+  /** Initial month to display for uncontrolled usage */
+  defaultMonth?: Date
   /** Callback when month changes */
   onMonthChange?: (month: Date) => void
 }
@@ -65,6 +70,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
   (
     {
       value,
+      defaultValue,
       onSelect,
       minDate,
       maxDate,
@@ -72,6 +78,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
       disabledDates = [],
       weekStartsOn = 0,
       month: controlledMonth,
+      defaultMonth,
       onMonthChange,
       className,
       ...props
@@ -81,8 +88,13 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
     const locale = useLocale()
     const gridRef = useRef<HTMLDivElement>(null)
     const monthLabelId = useId()
+    const isValueControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState<Date | null>(
+      defaultValue ?? null
+    )
+    const currentValue = isValueControlled ? (value ?? null) : internalValue
     const [uncontrolledMonth, setUncontrolledMonth] = useState(
-      () => value ?? new Date()
+      () => defaultMonth ?? currentValue ?? new Date()
     )
 
     const currentMonth = controlledMonth ?? uncontrolledMonth
@@ -201,7 +213,7 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                   return <div key={`empty-${dayIndex}`} role="gridcell" />
                 }
 
-                const isSelected = value ? isSameDay(date, value) : false
+                const isSelected = currentValue ? isSameDay(date, currentValue) : false
                 const isToday = isSameDay(date, today)
                 const disabled = isDisabled(date)
                 const highlighted = isHighlighted(date)
@@ -216,7 +228,10 @@ export const Calendar = forwardRef<HTMLDivElement, CalendarProps>(
                       type="button"
                       disabled={disabled}
                       data-day={toDayKey(date)}
-                      onClick={() => onSelect?.(date)}
+                      onClick={() => {
+                        if (!isValueControlled) setInternalValue(date)
+                        onSelect?.(date)
+                      }}
                       onKeyDown={(event) => handleDayKeyDown(event, date)}
                       className={cn(
                         'h-8 w-8 mx-auto flex items-center justify-center rounded-md text-sm transition-colors',

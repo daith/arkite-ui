@@ -18,6 +18,7 @@ export const enUS: ArkiteLocale = {
     placeholder: 'Select date',
     openCalendar: 'Open calendar',
     today: 'Today',
+    clearDate: 'Clear date',
   },
   dateRangePicker: {
     startLabel: 'Start',

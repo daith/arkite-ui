@@ -28,6 +28,17 @@ const ToastDemo = () => {
         <Button variant="secondary" onClick={() => toast.info('New version available')}>
           Info
         </Button>
+        <Button
+          variant="outline"
+          onClick={() =>
+            toast.loading('Uploading...', { description: 'This stays until dismissed' })
+          }
+        >
+          Loading
+        </Button>
+        <Button variant="ghost" onClick={() => toast.dismissAll()}>
+          Dismiss all
+        </Button>
       </div>
       <ToastContainer position="top-right" />
     </div>

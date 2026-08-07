@@ -57,8 +57,19 @@ function stripTime(date: Date): Date {
 export type DateRangePickerSize = 'sm' | 'md' | 'lg'
 export type DateRangePickerVariant = 'input' | 'calendar'
 
+export interface DateRangeValue {
+  start: Date | null
+  end: Date | null
+}
+
 export interface DateRangePickerProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /** Selected range (controlled). Takes precedence over `startDate`/`endDate`. */
+  value?: DateRangeValue
+  /** Initial range for uncontrolled usage */
+  defaultValue?: DateRangeValue
+  /** Called with the full range whenever either date changes */
+  onChange?: (range: DateRangeValue) => void
   /** Selected start date */
   startDate?: Date | null
   /** Selected end date */
@@ -69,6 +80,12 @@ export interface DateRangePickerProps
   onEndChange?: (date: Date | null) => void
   /** Called when the clear button is clicked, resetting both dates */
   onClear?: () => void
+  /** Controlled open state of the calendar dropdown */
+  open?: boolean
+  /** Initial open state of the calendar dropdown for uncontrolled usage */
+  defaultOpen?: boolean
+  /** Called when the calendar dropdown opens or closes */
+  onOpenChange?: (open: boolean) => void
   /** Label for the start date input */
   startLabel?: string
   /** Label for the end date input */
@@ -131,11 +148,17 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
   (
     {
       className,
+      value,
+      defaultValue,
+      onChange,
       startDate,
       endDate,
       onStartChange,
       onEndChange,
       onClear,
+      open: openProp,
+      defaultOpen,
+      onOpenChange,
       startLabel,
       endLabel,
       format = 'yyyy-MM-dd',
@@ -151,53 +174,98 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     ref
   ) => {
     const locale = useLocale()
-    const [activeField, setActiveField] = useState<ActiveField>(null)
+    const [internalRange, setInternalRange] = useState<DateRangeValue>(
+      () => defaultValue ?? { start: null, end: null }
+    )
+    // `value` (range object) wins over the legacy startDate/endDate pair,
+    // which in turn wins over the internal uncontrolled state.
+    const currentStart =
+      value !== undefined
+        ? value.start
+        : startDate !== undefined
+          ? startDate
+          : internalRange.start
+    const currentEnd =
+      value !== undefined
+        ? value.end
+        : endDate !== undefined
+          ? endDate
+          : internalRange.end
+
+    const [activeField, setActiveFieldRaw] = useState<ActiveField>(
+      defaultOpen && variant !== 'calendar' ? 'start' : null
+    )
     const [startInputValue, setStartInputValue] = useState(
-      startDate ? formatDate(startDate, format) : ''
+      currentStart ? formatDate(currentStart, format) : ''
     )
     const [endInputValue, setEndInputValue] = useState(
-      endDate ? formatDate(endDate, format) : ''
+      currentEnd ? formatDate(currentEnd, format) : ''
     )
     const [viewDate, setViewDate] = useState(
-      startDate || endDate || new Date()
+      currentStart || currentEnd || new Date()
     )
     const containerRef = useRef<HTMLDivElement>(null)
 
+    // Which field the input-variant dropdown targets; a controlled `open`
+    // prop overrides whether the dropdown shows at all.
+    const effectiveActiveField: ActiveField =
+      openProp === undefined ? activeField : openProp ? (activeField ?? 'start') : null
+
+    const setActiveField = useCallback(
+      (field: ActiveField) => {
+        setActiveFieldRaw(field)
+        const wasOpen = effectiveActiveField !== null
+        const willOpen = field !== null
+        if (wasOpen !== willOpen) onOpenChange?.(willOpen)
+      },
+      [effectiveActiveField, onOpenChange]
+    )
+
     // Calendar variant state
-    const [calendarOpen, setCalendarOpen] = useState(false)
+    const [internalCalendarOpen, setInternalCalendarOpen] = useState(
+      defaultOpen ?? false
+    )
+    const calendarOpen = openProp ?? internalCalendarOpen
+    const setCalendarOpen = useCallback(
+      (next: boolean) => {
+        setInternalCalendarOpen(next)
+        if (next !== calendarOpen) onOpenChange?.(next)
+      },
+      [calendarOpen, onOpenChange]
+    )
     const [calendarViewDate, setCalendarViewDate] = useState(
-      startDate || new Date()
+      currentStart || new Date()
     )
     const [calendarSelectionPhase, setCalendarSelectionPhase] = useState<'start' | 'end'>('start')
     const [calendarPendingStart, setCalendarPendingStart] = useState<Date | null>(null)
     const [calendarHoverDate, setCalendarHoverDate] = useState<Date | null>(null)
 
-    // Sync start input value with prop
+    // Sync start input value with the current value
     useEffect(() => {
-      if (startDate) {
-        setStartInputValue(formatDate(startDate, format)) // eslint-disable-line react-hooks/set-state-in-effect -- syncing derived state from props
+      if (currentStart) {
+        setStartInputValue(formatDate(currentStart, format))
       } else {
         setStartInputValue('')
       }
-    }, [startDate, format])
+    }, [currentStart, format])
 
-    // Sync end input value with prop
+    // Sync end input value with the current value
     useEffect(() => {
-      if (endDate) {
-        setEndInputValue(formatDate(endDate, format)) // eslint-disable-line react-hooks/set-state-in-effect -- syncing derived state from props
+      if (currentEnd) {
+        setEndInputValue(formatDate(currentEnd, format))
       } else {
         setEndInputValue('')
       }
-    }, [endDate, format])
+    }, [currentEnd, format])
 
     // Update viewDate when the active field or dates change (input variant)
     useEffect(() => {
-      if (activeField === 'start' && startDate) {
-        setViewDate(startDate) // eslint-disable-line react-hooks/set-state-in-effect -- syncing view to active field
-      } else if (activeField === 'end' && endDate) {
-        setViewDate(endDate)
+      if (effectiveActiveField === 'start' && currentStart) {
+        setViewDate(currentStart)
+      } else if (effectiveActiveField === 'end' && currentEnd) {
+        setViewDate(currentEnd)
       }
-    }, [activeField, startDate, endDate])
+    }, [effectiveActiveField, currentStart, currentEnd])
 
     // Close on click outside
     useEffect(() => {
@@ -206,23 +274,39 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
           containerRef.current &&
           !containerRef.current.contains(e.target as Node)
         ) {
-          setActiveField(null)
-          setCalendarOpen(false)
+          if (effectiveActiveField !== null) setActiveField(null)
+          if (calendarOpen) setCalendarOpen(false)
         }
       }
 
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
+    }, [effectiveActiveField, setActiveField, calendarOpen, setCalendarOpen])
+
+    /**
+     * Apply a partial range update: keeps the internal state in sync for
+     * uncontrolled usage and fires the legacy per-field callbacks alongside
+     * the range-level `onChange`.
+     */
+    const updateRange = (next: { start?: Date | null; end?: Date | null }) => {
+      const nextRange: DateRangeValue = {
+        start: next.start !== undefined ? next.start : currentStart ?? null,
+        end: next.end !== undefined ? next.end : currentEnd ?? null,
+      }
+      setInternalRange(nextRange)
+      if (next.start !== undefined) onStartChange?.(nextRange.start)
+      if (next.end !== undefined) onEndChange?.(nextRange.end)
+      onChange?.(nextRange)
+    }
 
     const isDateDisabled = useCallback((date: Date, field: ActiveField): boolean => {
       const d = stripTime(date)
       if (minDate && d < stripTime(minDate)) return true
       if (maxDate && d > stripTime(maxDate)) return true
       // End date cannot be before start date
-      if (field === 'end' && startDate && d < stripTime(startDate)) return true
+      if (field === 'end' && currentStart && d < stripTime(currentStart)) return true
       return false
-    }, [minDate, maxDate, startDate])
+    }, [minDate, maxDate, currentStart])
 
     // --- Input variant handlers ---
 
@@ -234,12 +318,10 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
       const parsed = parseDate(val, format)
       if (parsed && !isNaN(parsed.getTime()) && !isDateDisabled(parsed, 'start')) {
-        onStartChange?.(parsed)
-        setViewDate(parsed)
         // If end date is now before start, clear it
-        if (endDate && stripTime(endDate) < stripTime(parsed)) {
-          onEndChange?.(null)
-        }
+        const clearEnd = currentEnd && stripTime(currentEnd) < stripTime(parsed)
+        updateRange(clearEnd ? { start: parsed, end: null } : { start: parsed })
+        setViewDate(parsed)
       }
     }
 
@@ -249,7 +331,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
       const parsed = parseDate(val, format)
       if (parsed && !isNaN(parsed.getTime()) && !isDateDisabled(parsed, 'end')) {
-        onEndChange?.(parsed)
+        updateRange({ end: parsed })
         setViewDate(parsed)
       }
     }
@@ -261,18 +343,16 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         day
       )
 
-      if (activeField === 'start') {
+      if (effectiveActiveField === 'start') {
         if (!isDateDisabled(newDate, 'start')) {
-          onStartChange?.(newDate)
           // If end date is now before the new start, clear it
-          if (endDate && stripTime(endDate) < stripTime(newDate)) {
-            onEndChange?.(null)
-          }
+          const clearEnd = currentEnd && stripTime(currentEnd) < stripTime(newDate)
+          updateRange(clearEnd ? { start: newDate, end: null } : { start: newDate })
           setActiveField('end')
         }
-      } else if (activeField === 'end') {
+      } else if (effectiveActiveField === 'end') {
         if (!isDateDisabled(newDate, 'end')) {
-          onEndChange?.(newDate)
+          updateRange({ end: newDate })
           setActiveField(null)
         }
       }
@@ -291,12 +371,11 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     }
 
     const handleClear = () => {
-      onStartChange?.(null)
-      onEndChange?.(null)
+      updateRange({ start: null, end: null })
       onClear?.()
     }
 
-    const hasDates = startDate || endDate
+    const hasDates = currentStart || currentEnd
 
     const renderCalendar = () => {
       const year = viewDate.getFullYear()
@@ -361,17 +440,17 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
               const date = new Date(year, month, day)
               const dateStr = date.toDateString()
-              const isDisabledDay = isDateDisabled(date, activeField)
+              const isDisabledDay = isDateDisabled(date, effectiveActiveField)
               const isStartSelected =
-                startDate?.toDateString() === dateStr
+                currentStart?.toDateString() === dateStr
               const isEndSelected =
-                endDate?.toDateString() === dateStr
+                currentEnd?.toDateString() === dateStr
               const isSelected = isStartSelected || isEndSelected
               const isInRange =
-                startDate &&
-                endDate &&
-                stripTime(date) > stripTime(startDate) &&
-                stripTime(date) < stripTime(endDate)
+                currentStart &&
+                currentEnd &&
+                stripTime(date) > stripTime(currentStart) &&
+                stripTime(date) < stripTime(currentEnd)
               const isToday = today.toDateString() === dateStr
 
               return (
@@ -403,7 +482,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               type="button"
               onClick={() => {
                 const today = new Date()
-                if (!isDateDisabled(today, activeField)) {
+                if (!isDateDisabled(today, effectiveActiveField)) {
                   handleDateSelect(today.getDate())
                   setViewDate(today)
                 }
@@ -435,7 +514,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         setCalendarSelectionPhase('start')
         setCalendarPendingStart(null)
         setCalendarHoverDate(null)
-        setCalendarViewDate(startDate || new Date())
+        setCalendarViewDate(currentStart || new Date())
       }
       setCalendarOpen(!calendarOpen)
     }
@@ -445,15 +524,13 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
       if (calendarSelectionPhase === 'start') {
         setCalendarPendingStart(date)
-        onStartChange?.(date)
         // If existing end date is before new start, clear it
-        if (endDate && stripTime(endDate) < stripTime(date)) {
-          onEndChange?.(null)
-        }
+        const clearEnd = currentEnd && stripTime(currentEnd) < stripTime(date)
+        updateRange(clearEnd ? { start: date, end: null } : { start: date })
         setCalendarSelectionPhase('end')
       } else {
         // End date selection
-        onEndChange?.(date)
+        updateRange({ end: date })
         setCalendarPendingStart(null)
         setCalendarHoverDate(null)
         setCalendarSelectionPhase('start')
@@ -474,8 +551,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     }
 
     const handleCalendarClear = () => {
-      onStartChange?.(null)
-      onEndChange?.(null)
+      updateRange({ start: null, end: null })
       onClear?.()
       setCalendarPendingStart(null)
       setCalendarHoverDate(null)
@@ -512,10 +588,10 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         }
 
         // Determine effective start/end for highlight
-        const effectiveStart = calendarPendingStart || startDate
+        const effectiveStart = calendarPendingStart || currentStart
         const effectiveEnd = calendarSelectionPhase === 'end' && calendarHoverDate
           ? calendarHoverDate
-          : endDate
+          : currentEnd
 
         return (
           <div className="p-3 w-64">
@@ -548,8 +624,8 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
                 const date = new Date(year, month, day)
                 const dateStr = date.toDateString()
                 const isDisabledDay = isCalendarDateDisabled(date)
-                const isStartSelected = startDate?.toDateString() === dateStr
-                const isEndSelected = endDate?.toDateString() === dateStr
+                const isStartSelected = currentStart?.toDateString() === dateStr
+                const isEndSelected = currentEnd?.toDateString() === dateStr
                 const isPendingStart = calendarPendingStart?.toDateString() === dateStr
                 const isSelected = isStartSelected || isEndSelected || isPendingStart
                 const isToday = today.toDateString() === dateStr
@@ -654,10 +730,10 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
 
     if (variant === 'calendar') {
       const triggerText =
-        startDate && endDate
-          ? `${formatDate(startDate, format)} ~ ${formatDate(endDate, format)}`
-          : startDate
-            ? `${formatDate(startDate, format)} ~ ...`
+        currentStart && currentEnd
+          ? `${formatDate(currentStart, format)} ~ ${formatDate(currentEnd, format)}`
+          : currentStart
+            ? `${formatDate(currentStart, format)} ~ ...`
             : locale.dateRangePicker.selectRange
 
       return (
@@ -686,7 +762,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
               'disabled:cursor-not-allowed disabled:opacity-50',
               error && 'border-destructive',
               calendarOpen && 'ring-1 ring-ring/40 ring-offset-0',
-              !(startDate && endDate) && 'text-muted-foreground'
+              !(currentStart && currentEnd) && 'text-muted-foreground'
             )}
           >
             <CalendarIcon className={iconSizeStyles[size]} />
@@ -743,13 +819,13 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
                 'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 error && 'border-destructive focus-visible:ring-destructive',
-                activeField === 'start' && 'ring-1 ring-ring/40 ring-offset-0'
+                effectiveActiveField === 'start' && 'ring-1 ring-ring/40 ring-offset-0'
               )}
             />
             <button
               type="button"
               aria-label={locale.datePicker.openCalendar}
-              onClick={() => !disabled && setActiveField(activeField === 'start' ? null : 'start')}
+              onClick={() => !disabled && setActiveField(effectiveActiveField === 'start' ? null : 'start')}
               className={cn(
                 'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',
                 disabled && 'cursor-not-allowed'
@@ -797,13 +873,13 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
                 'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0',
                 'disabled:cursor-not-allowed disabled:opacity-50',
                 error && 'border-destructive focus-visible:ring-destructive',
-                activeField === 'end' && 'ring-1 ring-ring/40 ring-offset-0'
+                effectiveActiveField === 'end' && 'ring-1 ring-ring/40 ring-offset-0'
               )}
             />
             <button
               type="button"
               aria-label={locale.datePicker.openCalendar}
-              onClick={() => !disabled && setActiveField(activeField === 'end' ? null : 'end')}
+              onClick={() => !disabled && setActiveField(effectiveActiveField === 'end' ? null : 'end')}
               className={cn(
                 'absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground',
                 disabled && 'cursor-not-allowed'
@@ -832,7 +908,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
         )}
 
         {/* Calendar dropdown */}
-        {activeField && (
+        {effectiveActiveField && (
           <div className="absolute top-full left-0 z-50 mt-1 rounded-md border bg-card shadow-lg">
             {renderCalendar()}
           </div>

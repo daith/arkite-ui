@@ -8,6 +8,7 @@ import {
 } from 'react'
 import { Check, ChevronRight, Minus } from 'lucide-react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { useLocale } from '../../locale'
 
 /* ─── Types ─── */
@@ -41,12 +42,16 @@ export interface TreeProps
   defaultCheckedKeys?: string[]
   /** Checked keys (controlled) */
   checkedKeys?: string[]
-  /** On check change */
+  /** On checked keys change */
+  onSelectionChange?: (keys: string[]) => void
+  /** @deprecated use `onSelectionChange` instead — removed in v1.0 */
   onCheckChange?: (keys: string[]) => void
   /** On node click */
   onSelect?: (key: string, node: TreeNode) => void
-  /** Selected key */
+  /** Selected key (controlled) */
   selectedKey?: string
+  /** Default selected key (uncontrolled) */
+  defaultSelectedKey?: string
   /** Show connecting lines */
   showLines?: boolean
   /** Additional class name */
@@ -259,9 +264,11 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
     checkable = false,
     defaultCheckedKeys = [],
     checkedKeys: controlledCheckedKeys,
+    onSelectionChange,
     onCheckChange,
     onSelect,
-    selectedKey,
+    selectedKey: controlledSelectedKey,
+    defaultSelectedKey,
     showLines = false,
     className,
     ...rest
@@ -355,9 +362,30 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
       }
 
       if (!isCheckControlled) setUncontrolledChecked(next)
-      onCheckChange?.(Array.from(next))
+      const nextKeys = Array.from(next)
+      if (onSelectionChange) {
+        onSelectionChange(nextKeys)
+      } else if (onCheckChange) {
+        warnDeprecated('Tree', 'onCheckChange', 'onSelectionChange')
+        onCheckChange(nextKeys)
+      }
     },
-    [checkedSet, getCheckState, isCheckControlled, nodeMap, parentMap, onCheckChange]
+    [checkedSet, getCheckState, isCheckControlled, nodeMap, parentMap, onSelectionChange, onCheckChange]
+  )
+
+  /* ── Selected state ── */
+  const isSelectControlled = controlledSelectedKey !== undefined
+  const [uncontrolledSelectedKey, setUncontrolledSelectedKey] = useState<string | undefined>(
+    defaultSelectedKey
+  )
+  const selectedKey = isSelectControlled ? controlledSelectedKey : uncontrolledSelectedKey
+
+  const handleSelect = useCallback(
+    (key: string, node: TreeNode) => {
+      if (!isSelectControlled) setUncontrolledSelectedKey(key)
+      onSelect?.(key, node)
+    },
+    [isSelectControlled, onSelect]
   )
 
   /* ── Render ── */
@@ -375,7 +403,7 @@ export const Tree = forwardRef<HTMLDivElement, TreeProps>(function Tree(
           checkState={checkable ? getCheckState(node) : 'unchecked'}
           onCheck={handleCheck}
           selectedKey={selectedKey}
-          onSelect={onSelect}
+          onSelect={handleSelect}
           showLines={showLines}
         />,
       ]

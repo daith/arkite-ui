@@ -100,7 +100,7 @@ export const Checkable: StoryFn = () => {
         data={permissionTree}
         checkable
         checkedKeys={checked}
-        onCheckChange={setChecked}
+        onSelectionChange={setChecked}
         defaultExpandedKeys={['admin', 'users', 'settings']}
       />
       <p className="mt-3 text-xs text-muted-foreground">

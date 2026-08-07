@@ -1,5 +1,6 @@
 import { Fragment, useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { useLocale } from '../../locale'
 import {
   Table,
@@ -66,14 +67,23 @@ export interface DataTableProps<T> {
   emptyContent?: ReactNode
   /** On row click */
   onRowClick?: (row: T, index: number) => void
-  /** Selected rows */
+  /** Selected rows (controlled) */
   selectedRows?: Set<string | number>
+  /** Default selected rows (uncontrolled) */
+  defaultSelectedRows?: Set<string | number>
   /** On selection change */
   onSelectionChange?: (selected: Set<string | number>) => void
   /** Enable row selection */
   selectable?: boolean
-  /** Expandable row content renderer */
-  expandable?: (row: T, index: number) => ReactNode
+  /**
+   * Enable expandable rows; provide the row content via `renderExpandedRow`.
+   *
+   * Passing a function `(row, index) => ReactNode` here is deprecated and will
+   * be removed in v1.0 — move the renderer to `renderExpandedRow` instead.
+   */
+  expandable?: boolean | ((row: T, index: number) => ReactNode)
+  /** Expanded row content renderer (enables expandable rows unless `expandable` is `false`) */
+  renderExpandedRow?: (row: T, index: number) => ReactNode
   /** Show column visibility toggle */
   columnToggle?: boolean
   /** Stick table header to top when scrolling */
@@ -87,8 +97,18 @@ export interface DataTableProps<T> {
    * are few rows. The parent must provide a determinate height.
    */
   fillHeight?: boolean
+  /** Sort state (controlled). Pass `null` for "no sort". */
+  sortState?: SortState | null
+  /** Callback when sort changes (for controlled usage) */
+  onSortChange?: (sort: SortState | null) => void
+  /** Column filters (controlled) */
+  filters?: Record<string, string[]>
   /** Callback when filters change (for controlled usage) */
   onFilterChange?: (filters: Record<string, string[]>) => void
+  /** Current page, 1-based (controlled) */
+  page?: number
+  /** Callback when page changes (1-based) */
+  onPageChange?: (page: number) => void
   /** Additional class name */
   className?: string
 }
@@ -147,28 +167,51 @@ export function DataTable<T>({
   onRowClick,
   selectable = false,
   selectedRows,
+  defaultSelectedRows,
   onSelectionChange,
   expandable,
+  renderExpandedRow,
   columnToggle = false,
   stickyHeader = false,
   maxHeight,
   fillHeight = false,
+  sortState: controlledSortState,
+  onSortChange,
+  filters: controlledFilters,
   onFilterChange,
+  page: controlledPage,
+  onPageChange,
   className,
 }: DataTableProps<T>) {
   const locale = useLocale()
-  const [sortState, setSortState] = useState<SortState | null>(null)
+
+  // Deprecated `expandable={(row, index) => ...}` — treated as `renderExpandedRow`
+  if (typeof expandable === 'function' && renderExpandedRow == null) {
+    warnDeprecated('DataTable', 'expandable(fn)', 'renderExpandedRow')
+  }
+  const expandedRowRenderer =
+    renderExpandedRow ?? (typeof expandable === 'function' ? expandable : undefined)
+  const isExpandable = expandable !== false && expandedRowRenderer != null
+
+  const isSortControlled = controlledSortState !== undefined
+  const [uncontrolledSortState, setUncontrolledSortState] = useState<SortState | null>(null)
+  const sortState = isSortControlled ? controlledSortState : uncontrolledSortState
   const [expandedRows, setExpandedRows] = useState<Set<string | number>>(new Set())
   const [hiddenColumnKeys, setHiddenColumnKeys] = useState<Set<string>>(new Set())
   const [columnToggleOpen, setColumnToggleOpen] = useState(false)
   const columnToggleRef = useRef<HTMLDivElement>(null)
-  const [filters, setFilters] = useState<Record<string, string[]>>({})
+  const isFiltersControlled = controlledFilters !== undefined
+  const [uncontrolledFilters, setUncontrolledFilters] = useState<Record<string, string[]>>({})
+  const filters = isFiltersControlled ? controlledFilters : uncontrolledFilters
   const [openFilterKey, setOpenFilterKey] = useState<string | null>(null)
   const filterDropdownRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const isPageControlled = controlledPage !== undefined
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: defaultPageSize,
   })
+  const pageIndex = isPageControlled ? Math.max(0, controlledPage - 1) : paginationState.pageIndex
+  const pageSize = paginationState.pageSize
 
   // Close column toggle dropdown on outside click
   useEffect(() => {
@@ -223,38 +266,47 @@ export function DataTable<T>({
     [data]
   )
 
+  const resetToFirstPage = useCallback(() => {
+    if (!isPageControlled) {
+      setPaginationState((prev) => ({ ...prev, pageIndex: 0 }))
+    } else if (pageIndex !== 0) {
+      onPageChange?.(1)
+    }
+  }, [isPageControlled, pageIndex, onPageChange])
+
+  const applyFilters = useCallback(
+    (updated: Record<string, string[]>) => {
+      if (!isFiltersControlled) setUncontrolledFilters(updated)
+      onFilterChange?.(updated)
+      resetToFirstPage()
+    },
+    [isFiltersControlled, onFilterChange, resetToFirstPage]
+  )
+
   const toggleFilterValue = useCallback(
     (columnKey: string, value: string) => {
-      setFilters((prev) => {
-        const current = prev[columnKey] ?? []
-        const next = current.includes(value)
-          ? current.filter((v) => v !== value)
-          : [...current, value]
-        const updated = { ...prev }
-        if (next.length === 0) {
-          delete updated[columnKey]
-        } else {
-          updated[columnKey] = next
-        }
-        onFilterChange?.(updated)
-        return updated
-      })
-      setPaginationState((prev) => ({ ...prev, pageIndex: 0 }))
+      const current = filters[columnKey] ?? []
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value]
+      const updated = { ...filters }
+      if (next.length === 0) {
+        delete updated[columnKey]
+      } else {
+        updated[columnKey] = next
+      }
+      applyFilters(updated)
     },
-    [onFilterChange]
+    [filters, applyFilters]
   )
 
   const clearColumnFilter = useCallback(
     (columnKey: string) => {
-      setFilters((prev) => {
-        const updated = { ...prev }
-        delete updated[columnKey]
-        onFilterChange?.(updated)
-        return updated
-      })
-      setPaginationState((prev) => ({ ...prev, pageIndex: 0 }))
+      const updated = { ...filters }
+      delete updated[columnKey]
+      applyFilters(updated)
     },
-    [onFilterChange]
+    [filters, applyFilters]
   )
 
   // Filter data
@@ -299,45 +351,60 @@ export function DataTable<T>({
   const paginatedData = useMemo(() => {
     if (!pagination) return sortedData
 
-    const start = paginationState.pageIndex * paginationState.pageSize
-    const end = start + paginationState.pageSize
+    const start = pageIndex * pageSize
+    const end = start + pageSize
     return sortedData.slice(start, end)
-  }, [sortedData, pagination, paginationState])
+  }, [sortedData, pagination, pageIndex, pageSize])
 
   // Pagination info
-  const totalPages = Math.ceil(sortedData.length / paginationState.pageSize)
-  const canPreviousPage = paginationState.pageIndex > 0
-  const canNextPage = paginationState.pageIndex < totalPages - 1
+  const totalPages = Math.ceil(sortedData.length / pageSize)
+  const canPreviousPage = pageIndex > 0
+  const canNextPage = pageIndex < totalPages - 1
 
   const handleSort = (key: string) => {
-    setSortState((prev) => {
-      if (prev?.key !== key) {
-        return { key, direction: 'asc' }
-      }
-      if (prev.direction === 'asc') {
-        return { key, direction: 'desc' }
-      }
-      return null
-    })
+    let next: SortState | null
+    if (sortState?.key !== key) {
+      next = { key, direction: 'asc' }
+    } else if (sortState.direction === 'asc') {
+      next = { key, direction: 'desc' }
+    } else {
+      next = null
+    }
+    if (!isSortControlled) setUncontrolledSortState(next)
+    onSortChange?.(next)
   }
 
-  const goToPage = (pageIndex: number) => {
-    setPaginationState((prev) => ({
-      ...prev,
-      pageIndex: Math.max(0, Math.min(pageIndex, totalPages - 1)),
-    }))
+  const goToPage = (nextPageIndex: number) => {
+    const clamped = Math.max(0, Math.min(nextPageIndex, totalPages - 1))
+    if (!isPageControlled) {
+      setPaginationState((prev) => ({ ...prev, pageIndex: clamped }))
+    }
+    onPageChange?.(clamped + 1)
   }
 
-  const setPageSize = (pageSize: number) => {
-    setPaginationState({ pageIndex: 0, pageSize })
+  const setPageSize = (nextPageSize: number) => {
+    setPaginationState({ pageIndex: 0, pageSize: nextPageSize })
+    resetToFirstPage()
   }
 
   // ─── Selection helpers ───
-  const selection = selectedRows ?? new Set<string | number>()
+  const isSelectionControlled = selectedRows !== undefined
+  const [uncontrolledSelectedRows, setUncontrolledSelectedRows] = useState<Set<string | number>>(
+    () => new Set(defaultSelectedRows)
+  )
+  const selection = isSelectionControlled ? selectedRows : uncontrolledSelectedRows
+
+  const updateSelection = useCallback(
+    (next: Set<string | number>) => {
+      if (!isSelectionControlled) setUncontrolledSelectedRows(next)
+      onSelectionChange?.(next)
+    },
+    [isSelectionControlled, onSelectionChange]
+  )
 
   const allPageKeys = useMemo(
-    () => paginatedData.map((row, i) => getRowKey(row, paginationState.pageIndex * paginationState.pageSize + i)),
-    [paginatedData, getRowKey, paginationState]
+    () => paginatedData.map((row, i) => getRowKey(row, pageIndex * pageSize + i)),
+    [paginatedData, getRowKey, pageIndex, pageSize]
   )
 
   const headerCheckState: CheckState = useMemo(() => {
@@ -349,28 +416,26 @@ export function DataTable<T>({
   }, [selectable, allPageKeys, selection])
 
   const toggleAll = useCallback(() => {
-    if (!onSelectionChange) return
     const next = new Set(selection)
     if (headerCheckState === 'checked') {
       allPageKeys.forEach((k) => next.delete(k))
     } else {
       allPageKeys.forEach((k) => next.add(k))
     }
-    onSelectionChange(next)
-  }, [onSelectionChange, selection, headerCheckState, allPageKeys])
+    updateSelection(next)
+  }, [updateSelection, selection, headerCheckState, allPageKeys])
 
   const toggleRow = useCallback(
     (key: string | number) => {
-      if (!onSelectionChange) return
       const next = new Set(selection)
       if (next.has(key)) {
         next.delete(key)
       } else {
         next.add(key)
       }
-      onSelectionChange(next)
+      updateSelection(next)
     },
-    [onSelectionChange, selection]
+    [updateSelection, selection]
   )
 
   // ─── Expand helpers ───
@@ -400,7 +465,7 @@ export function DataTable<T>({
   }, [])
 
   // Total colSpan for full-width rows
-  const totalColSpan = visibleColumns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0)
+  const totalColSpan = visibleColumns.length + (selectable ? 1 : 0) + (isExpandable ? 1 : 0)
 
   const getSortIcon = (key: string) => {
     if (sortState?.key !== key) {
@@ -482,7 +547,7 @@ export function DataTable<T>({
       <Table stickyHeader={stickyHeader} fillHeight={fillHeight}>
         <TableHeader>
           <TableRow>
-            {expandable && (
+            {isExpandable && (
               <TableHead style={{ width: 40 }} className="px-2">
                 <span className="sr-only">{locale.dataTable.expand}</span>
               </TableHead>
@@ -619,11 +684,11 @@ export function DataTable<T>({
           ) : (
             paginatedData.map((row, pageLocalIndex) => {
               const globalIndex = pagination
-                ? paginationState.pageIndex * paginationState.pageSize + pageLocalIndex
+                ? pageIndex * pageSize + pageLocalIndex
                 : pageLocalIndex
               const rowKey = getRowKey(row, globalIndex)
               const isSelected = selectable && selection.has(rowKey)
-              const isExpanded = expandable && expandedRows.has(rowKey)
+              const isExpanded = isExpandable && expandedRows.has(rowKey)
               return (
               <Fragment key={rowKey}>
               <TableRow
@@ -648,7 +713,7 @@ export function DataTable<T>({
                 )}
                 data-selected={isSelected || undefined}
               >
-                {expandable && (
+                {isExpandable && (
                   <TableCell className="px-2">
                     <button
                       type="button"
@@ -687,7 +752,7 @@ export function DataTable<T>({
               {isExpanded && (
                 <TableRow>
                   <TableCell colSpan={totalColSpan} className="bg-muted/30 p-4">
-                    {expandable(row, globalIndex)}
+                    {expandedRowRenderer?.(row, globalIndex)}
                   </TableCell>
                 </TableRow>
               )}
@@ -709,7 +774,7 @@ export function DataTable<T>({
             )}
             <span>{locale.pagination.rowsPerPage}</span>
             <select
-              value={paginationState.pageSize}
+              value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
               aria-label={locale.pagination.rowsPerPage}
               className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm ring-offset-background focus:outline-none focus:ring-1 focus:ring-ring/40 focus:ring-offset-0 cursor-pointer"
@@ -725,11 +790,8 @@ export function DataTable<T>({
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
               {locale.pagination.rangeInfo(
-                paginationState.pageIndex * paginationState.pageSize + 1,
-                Math.min(
-                  (paginationState.pageIndex + 1) * paginationState.pageSize,
-                  sortedData.length
-                ),
+                pageIndex * pageSize + 1,
+                Math.min((pageIndex + 1) * pageSize, sortedData.length),
                 sortedData.length
               )}
             </span>
@@ -749,7 +811,7 @@ export function DataTable<T>({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(paginationState.pageIndex - 1)}
+                  onClick={() => goToPage(pageIndex - 1)}
                   disabled={!canPreviousPage}
                   className="h-8 w-8"
                   aria-label={locale.pagination.previousPage}
@@ -757,12 +819,12 @@ export function DataTable<T>({
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="flex h-8 min-w-[4rem] items-center justify-center text-sm">
-                  {paginationState.pageIndex + 1} / {totalPages}
+                  {pageIndex + 1} / {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(paginationState.pageIndex + 1)}
+                  onClick={() => goToPage(pageIndex + 1)}
                   disabled={!canNextPage}
                   className="h-8 w-8"
                   aria-label={locale.pagination.nextPage}

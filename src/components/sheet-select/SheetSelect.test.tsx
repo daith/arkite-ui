@@ -134,3 +134,62 @@ describe('SheetSelect', () => {
     )
   })
 })
+
+describe('SheetSelect uncontrolled value', () => {
+  it('shows defaultValue label in the trigger', () => {
+    render(<SheetSelect options={options} defaultValue="banana" />)
+    expect(screen.getByText('Banana')).toBeInTheDocument()
+  })
+
+  it('updates the trigger after selecting and still calls onChange', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<SheetSelect options={options} onChange={onChange} />)
+
+    await user.click(screen.getByRole('button', { name: 'Select…' }))
+    await user.click(screen.getByRole('option', { name: /Banana/ }))
+
+    expect(onChange).toHaveBeenCalledWith('banana')
+    fireEvent.transitionEnd(screen.getByRole('listbox'))
+    expect(
+      screen.getByRole('button', { name: /Banana/ })
+    ).toBeInTheDocument()
+  })
+})
+
+describe('SheetSelect controlled open', () => {
+  it('shows the sheet when open is true', () => {
+    render(<SheetSelect options={options} open />)
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+  })
+
+  it('shows the sheet initially with defaultOpen', () => {
+    render(<SheetSelect options={options} defaultOpen />)
+    expect(screen.getByRole('listbox')).toBeInTheDocument()
+  })
+
+  it('stays closed when open is false even after clicking the trigger', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(
+      <SheetSelect options={options} open={false} onOpenChange={onOpenChange} />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Select…' }))
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(onOpenChange).toHaveBeenCalledWith(true)
+  })
+
+  it('calls onOpenChange when the sheet opens and closes', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+    render(<SheetSelect options={options} onOpenChange={onOpenChange} />)
+
+    await user.click(screen.getByRole('button', { name: 'Select…' }))
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
+
+    await user.click(screen.getByRole('option', { name: /Banana/ }))
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+  })
+})

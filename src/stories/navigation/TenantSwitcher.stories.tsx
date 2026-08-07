@@ -22,8 +22,8 @@ const DefaultDemo = () => {
   return (
     <TenantSwitcher
       tenants={sampleTenants}
-      currentTenant={current}
-      onSelect={setCurrent}
+      value={current}
+      onChange={setCurrent}
     />
   )
 }
@@ -35,8 +35,8 @@ const WithSelectedDemo = () => {
   return (
     <TenantSwitcher
       tenants={sampleTenants}
-      currentTenant={current}
-      onSelect={setCurrent}
+      value={current}
+      onChange={setCurrent}
     />
   )
 }
@@ -48,8 +48,8 @@ const NoAllOptionDemo = () => {
   return (
     <TenantSwitcher
       tenants={sampleTenants}
-      currentTenant={current}
-      onSelect={setCurrent}
+      value={current}
+      onChange={setCurrent}
       showAllOption={false}
     />
   )
@@ -67,8 +67,8 @@ export const Loading: StoryFn = () => (
 export const EmptyList: StoryFn = () => (
   <TenantSwitcher
     tenants={[]}
-    currentTenant={null}
-    onSelect={() => {}}
+    value={null}
+    onChange={() => {}}
   />
 )
 
@@ -77,8 +77,8 @@ const SearchNoResultsDemo = () => {
   return (
     <TenantSwitcher
       tenants={sampleTenants}
-      currentTenant={current}
-      onSelect={setCurrent}
+      value={current}
+      onChange={setCurrent}
       onSearch={() => {}}
       searchPlaceholder="Try searching 'xyz'..."
     />
@@ -92,8 +92,8 @@ const CustomRenderDemo = () => {
   return (
     <TenantSwitcher
       tenants={sampleTenants}
-      currentTenant={current}
-      onSelect={setCurrent}
+      value={current}
+      onChange={setCurrent}
       renderTenant={(tenant, selected) => (
         <div className="flex items-center gap-2 px-3 py-2">
           <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">

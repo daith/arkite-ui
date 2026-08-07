@@ -142,7 +142,7 @@ export const ExpandableRows: StoryFn = () => (
     data={sampleData}
     columns={columns}
     getRowKey={(row) => row.id}
-    expandable={(row) => (
+    renderExpandedRow={(row) => (
       <div className="space-y-2 text-sm">
         <p>
           <strong>Full details for {row.name}</strong>
@@ -192,7 +192,7 @@ export const ExpandableWithColumnToggle: StoryFn = () => (
     data={sampleData}
     columns={columns}
     getRowKey={(row) => row.id}
-    expandable={(row) => (
+    renderExpandedRow={(row) => (
       <div className="text-muted-foreground text-sm">
         Additional details for <strong>{row.name}</strong> — {row.email}
       </div>

@@ -1,9 +1,16 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
+import { warnDeprecated } from '../../utils/deprecate'
 import { ChevronRight, Home } from 'lucide-react'
 
-export interface BreadcrumbItem {
+/**
+ * Data shape for one breadcrumb trail entry.
+ *
+ * Renamed from `BreadcrumbItem` in v1.0 — `BreadcrumbItem` is now the
+ * compound `<li>` component (formerly `BreadcrumbItemComponent`).
+ */
+export interface BreadcrumbItemData {
   /** Item label */
   label: ReactNode
   /** Item href */
@@ -14,15 +21,22 @@ export interface BreadcrumbItem {
 
 export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   /** Breadcrumb items */
-  items: BreadcrumbItem[]
+  items: BreadcrumbItemData[]
   /** Custom separator */
   separator?: ReactNode
   /** Show home icon */
   showHomeIcon?: boolean
   /** Max items to show (others collapsed) */
   maxItems?: number
-  /** Custom link renderer */
-  renderLink?: (item: BreadcrumbItem, isLast: boolean) => ReactNode
+  /**
+   * Custom link renderer for framework integration (React Router, Next.js).
+   *
+   * Called for every item that has an `href` with `{ href, children, className, active }`
+   * (`active` is true for the last item); items without an `href` keep the default
+   * non-interactive rendering. Breaking change in v1.0: the old
+   * `(item, isLast) => ReactNode` signature is no longer supported.
+   */
+  renderLink?: (props: { href: string; children: ReactNode; className?: string; active?: boolean }) => ReactNode
 }
 
 /** Navigation breadcrumb trail with collapsible items, custom separators, and link rendering. */
@@ -55,7 +69,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       hasEllipsis = true
     }
 
-    const renderItem = (item: BreadcrumbItem, index: number, isLast: boolean) => {
+    const renderItem = (item: BreadcrumbItemData, index: number, isLast: boolean) => {
       const content = (
         <>
           {index === 0 && showHomeIcon && !item.icon && (
@@ -66,8 +80,18 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         </>
       )
 
-      if (renderLink) {
-        return renderLink(item, isLast)
+      if (renderLink && item.href) {
+        return renderLink({
+          href: item.href,
+          children: content,
+          className: cn(
+            'inline-flex items-center gap-1.5',
+            isLast
+              ? 'font-medium text-foreground'
+              : 'text-muted-foreground hover:text-foreground transition-colors'
+          ),
+          active: isLast,
+        })
       }
 
       if (isLast || !item.href) {
@@ -156,8 +180,13 @@ BreadcrumbList.displayName = 'BreadcrumbList'
 
 export type BreadcrumbItemProps = HTMLAttributes<HTMLLIElement>
 
-/** Individual list item within a breadcrumb list. */
-export const BreadcrumbItemComponent = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
+/**
+ * Individual list item within a breadcrumb list.
+ *
+ * Renamed from `BreadcrumbItemComponent` in v1.0 — the `BreadcrumbItem` name
+ * previously referred to the item data shape, now `BreadcrumbItemData`.
+ */
+export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   ({ className, ...props }, ref) => (
     <li
       ref={ref}
@@ -167,7 +196,17 @@ export const BreadcrumbItemComponent = forwardRef<HTMLLIElement, BreadcrumbItemP
   )
 )
 
-BreadcrumbItemComponent.displayName = 'BreadcrumbItem'
+BreadcrumbItem.displayName = 'BreadcrumbItem'
+
+/** @deprecated Renamed to `BreadcrumbItem` — will be removed in v1.0. */
+export const BreadcrumbItemComponent = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
+  (props, ref) => {
+    warnDeprecated('Breadcrumb', 'BreadcrumbItemComponent', 'BreadcrumbItem')
+    return <BreadcrumbItem ref={ref} {...props} />
+  }
+)
+
+BreadcrumbItemComponent.displayName = 'BreadcrumbItemComponent'
 
 export interface BreadcrumbLinkProps extends HTMLAttributes<HTMLAnchorElement> {
   href?: string

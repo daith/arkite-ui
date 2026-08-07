@@ -121,3 +121,32 @@ describe('ColorPicker', () => {
     expect(message.className).toContain('text-destructive')
   })
 })
+
+describe('ColorPicker uncontrolled', () => {
+  it('renders defaultValue in the hex input', () => {
+    render(<ColorPicker defaultValue="#abcdef" />)
+    expect(screen.getByLabelText('Hex color value')).toHaveValue('abcdef')
+  })
+
+  it('falls back to #000000 when neither value nor defaultValue is given', () => {
+    render(<ColorPicker />)
+    expect(screen.getByLabelText('Hex color value')).toHaveValue('000000')
+  })
+
+  it('updates on preset click and still calls onChange', async () => {
+    const onChange = vi.fn()
+    render(
+      <ColorPicker defaultValue="#000000" onChange={onChange} presets={['#00ff00']} />
+    )
+    await userEvent.click(screen.getByLabelText('Select color #00ff00'))
+    expect(onChange).toHaveBeenCalledWith('#00ff00')
+    expect(screen.getByLabelText('Hex color value')).toHaveValue('00ff00')
+  })
+
+  it('updates via the hex text input without a value prop', () => {
+    render(<ColorPicker defaultValue="#000000" />)
+    const input = screen.getByLabelText('Hex color value')
+    fireEvent.change(input, { target: { value: 'ff0000' } })
+    expect(input).toHaveValue('ff0000')
+  })
+})

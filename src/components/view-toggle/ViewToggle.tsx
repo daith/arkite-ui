@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useState, type HTMLAttributes, type ReactNode } from 'react'
 import { LayoutGrid, LayoutList } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
@@ -6,11 +6,13 @@ import { useLocale } from '../../locale'
 export type ViewMode = 'table' | 'card'
 
 export interface ViewToggleProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  /** Current view mode */
-  value: ViewMode
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /** Current view mode (controlled) */
+  value?: ViewMode
+  /** Initial view mode for uncontrolled usage */
+  defaultValue?: ViewMode
   /** View change callback */
-  onChange: (mode: ViewMode) => void
+  onChange?: (mode: ViewMode) => void
   /** Size variant */
   size?: 'sm' | 'md'
   /** Additional class name */
@@ -30,9 +32,12 @@ const sizeStyles = {
 
 /** Toggle between table and card view layouts. */
 export const ViewToggle = forwardRef<HTMLDivElement, ViewToggleProps>(
-  ({ value, onChange, size = 'md', className, ...rest }, ref) => {
+  ({ value, defaultValue, onChange, size = 'md', className, ...rest }, ref) => {
     const locale = useLocale()
     const styles = sizeStyles[size]
+    const isControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState(defaultValue)
+    const currentValue = isControlled ? value : internalValue
 
     const options: ViewOption[] = [
       { mode: 'table', icon: <LayoutList className={styles.icon} />, label: locale.viewToggle.tableView },
@@ -56,13 +61,16 @@ export const ViewToggle = forwardRef<HTMLDivElement, ViewToggleProps>(
             key={mode}
             type="button"
             role="radio"
-            aria-checked={value === mode}
+            aria-checked={currentValue === mode}
             aria-label={label}
-            onClick={() => onChange(mode)}
+            onClick={() => {
+              if (!isControlled) setInternalValue(mode)
+              onChange?.(mode)
+            }}
             className={cn(
               'inline-flex items-center justify-center rounded-sm transition-colors',
               styles.button,
-              value === mode
+              currentValue === mode
                 ? 'bg-secondary text-foreground shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             )}

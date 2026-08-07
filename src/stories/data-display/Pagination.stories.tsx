@@ -31,7 +31,7 @@ const CompactDemo = () => {
       currentPage={page}
       totalPages={20}
       onPageChange={setPage}
-      mode="compact"
+      variant="compact"
     />
   )
 }

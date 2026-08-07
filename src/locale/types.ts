@@ -22,6 +22,7 @@ export interface ArkiteLocale {
     placeholder: string
     openCalendar: string
     today: string
+    clearDate: string
   }
   dateRangePicker: {
     startLabel: string

@@ -1,1 +1,1 @@
-export { Timeline, type TimelineProps, type TimelineItem } from './Timeline'
+export { Timeline, type TimelineProps, type TimelineItem, type TimelineVariant } from './Timeline'

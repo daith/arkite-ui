@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../../utils/cn'
+import { warnDeprecated } from '../../utils/deprecate'
 import { useLocale } from '../../locale'
 import { Button } from '../button/Button'
 
@@ -14,7 +15,9 @@ export interface PaginationProps extends Omit<HTMLAttributes<HTMLElement>, 'onCh
   totalItems?: number
   /** Items per page (for info display) */
   pageSize?: number
-  /** Display mode */
+  /** Display variant */
+  variant?: 'compact' | 'full'
+  /** @deprecated use `variant` instead — removed in v1.0 */
   mode?: 'compact' | 'full'
   /** Show page size selector */
   showPageSize?: boolean
@@ -103,7 +106,8 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
       onPageChange,
       totalItems,
       pageSize,
-      mode = 'full',
+      variant,
+      mode,
       showPageSize = false,
       pageSizeOptions = [10, 20, 50, 100],
       onPageSizeChange,
@@ -113,6 +117,12 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     },
     ref
   ) => {
+    if (mode && variant == null) {
+      warnDeprecated('Pagination', 'mode', 'variant')
+    }
+    // `variant` wins when both are provided
+    const resolvedVariant = variant ?? mode ?? 'full'
+
     const locale = useLocale()
     const canPrevious = currentPage > 1
     const canNext = currentPage < totalPages
@@ -150,7 +160,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
         {/* Right: navigation */}
         <div className="flex items-center gap-1">
-          {mode === 'full' && (
+          {resolvedVariant === 'full' && (
             <Button
               variant="outline"
               size="icon"
@@ -173,7 +183,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             <ChevronLeftIcon />
           </Button>
 
-          {mode === 'full' && totalPages > 0 && (
+          {resolvedVariant === 'full' && totalPages > 0 && (
             <div className="flex items-center gap-1">
               {getPageRange(currentPage, totalPages, siblingCount).map((page, i) =>
                 page === 'ellipsis' ? (
@@ -197,7 +207,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
             </div>
           )}
 
-          {mode === 'compact' && (
+          {resolvedVariant === 'compact' && (
             <span className="flex h-8 min-w-[4rem] items-center justify-center text-sm">
               {currentPage} / {totalPages}
             </span>
@@ -213,7 +223,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
           >
             <ChevronRightIcon />
           </Button>
-          {mode === 'full' && (
+          {resolvedVariant === 'full' && (
             <Button
               variant="outline"
               size="icon"

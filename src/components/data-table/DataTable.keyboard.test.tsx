@@ -87,7 +87,8 @@ describe('DataTable keyboard interaction', () => {
     const rowCheckbox = screen.getByRole('checkbox', { name: 'Select row 2' })
     rowCheckbox.focus()
     await user.keyboard(' ')
-    expect(onSelectionChange).toHaveBeenLastCalledWith(new Set([2]))
+    // Uncontrolled selection persists, so toggling row 2 removes it from the set
+    expect(onSelectionChange).toHaveBeenLastCalledWith(new Set([1, 3]))
   })
 
   it('opens the column filter dropdown with Enter and toggles options', async () => {
@@ -159,7 +160,7 @@ describe('DataTable keyboard interaction', () => {
         columns={columns}
         data={data}
         getRowKey={(r) => r.id}
-        expandable={(row) => <div>Details for {row.name}</div>}
+        renderExpandedRow={(row) => <div>Details for {row.name}</div>}
         pagination={false}
       />
     )

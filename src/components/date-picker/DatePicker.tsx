@@ -3,13 +3,14 @@ import {
   useState,
   useRef,
   useEffect,
+  useCallback,
   useId,
   type InputHTMLAttributes,
 } from 'react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
 import { useGridKeyboard, toDayKey } from '../calendar/use-grid-keyboard'
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react'
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate()
@@ -49,11 +50,22 @@ function parseDate(dateStr: string, format: string): Date | null {
 export type DatePickerSize = 'sm' | 'md' | 'lg'
 
 export interface DatePickerProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'size'> {
+  extends Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'value' | 'defaultValue' | 'onChange' | 'size'
+  > {
   /** Selected date */
   value?: Date | null
+  /** Initial date for uncontrolled usage */
+  defaultValue?: Date
   /** On date change */
   onChange?: (date: Date | null) => void
+  /** Controlled open state of the calendar popup */
+  open?: boolean
+  /** Initial open state of the calendar popup for uncontrolled usage */
+  defaultOpen?: boolean
+  /** Called when the calendar popup opens or closes */
+  onOpenChange?: (open: boolean) => void
   /** Date format */
   format?: string
   /** Minimum date */
@@ -84,18 +96,34 @@ const iconSizeStyles: Record<DatePickerSize, string> = {
   lg: 'h-5 w-5',
 }
 
+const clearPositionStyles: Record<DatePickerSize, string> = {
+  sm: 'right-8 top-4',
+  md: 'right-9 top-5',
+  lg: 'right-10 top-6',
+}
+
+const clearablePaddingStyles: Record<DatePickerSize, string> = {
+  sm: 'pr-12',
+  md: 'pr-14',
+  lg: 'pr-16',
+}
+
 /** Date input with an inline calendar dropdown for selecting dates. */
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
   (
     {
       className,
       value,
+      defaultValue,
       onChange,
+      open: openProp,
+      defaultOpen,
+      onOpenChange,
       format = 'yyyy-MM-dd',
       minDate,
       maxDate,
       disabledDates = [],
-      clearable: _clearable = true,
+      clearable = true,
       error,
       errorMessage,
       disabled,
@@ -106,9 +134,15 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     ref
   ) => {
     const locale = useLocale()
-    const [isOpen, setIsOpen] = useState(false)
-    const [inputValue, setInputValue] = useState(value ? formatDate(value, format) : '')
-    const [viewDate, setViewDate] = useState(value || new Date())
+    const isValueControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState<Date | null>(defaultValue ?? null)
+    const currentValue = isValueControlled ? (value ?? null) : internalValue
+    const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false)
+    const isOpen = openProp ?? internalOpen
+    const [inputValue, setInputValue] = useState(
+      currentValue ? formatDate(currentValue, format) : ''
+    )
+    const [viewDate, setViewDate] = useState(currentValue || new Date())
     const containerRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement | null>(null)
     // Set when we programmatically return focus to the input (Escape/select),
@@ -122,15 +156,28 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
       onNavigateToMonth: setViewDate,
     })
 
-    // Sync input value with prop value
+    const setOpen = useCallback(
+      (next: boolean) => {
+        setInternalOpen(next)
+        if (next !== isOpen) onOpenChange?.(next)
+      },
+      [isOpen, onOpenChange]
+    )
+
+    const setValue = (date: Date | null) => {
+      if (!isValueControlled) setInternalValue(date)
+      onChange?.(date)
+    }
+
+    // Sync input value with the current value
     useEffect(() => {
-      if (value) {
-        setInputValue(formatDate(value, format)) // eslint-disable-line react-hooks/set-state-in-effect -- syncing derived state from props
-        setViewDate(value)
+      if (currentValue) {
+        setInputValue(formatDate(currentValue, format))
+        setViewDate(currentValue)
       } else {
         setInputValue('')
       }
-    }, [value, format])
+    }, [currentValue, format])
 
     // Close on Escape without selecting, returning focus to the input
     useEffect(() => {
@@ -138,7 +185,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key !== 'Escape') return
-        setIsOpen(false)
+        setOpen(false)
         if (document.activeElement !== inputRef.current) {
           skipOpenOnFocusRef.current = true
           inputRef.current?.focus()
@@ -147,19 +194,21 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
       document.addEventListener('keydown', handleEscape)
       return () => document.removeEventListener('keydown', handleEscape)
-    }, [isOpen])
+    }, [isOpen, setOpen])
 
     // Close on click outside
     useEffect(() => {
+      if (!isOpen) return
+
       const handleClickOutside = (e: MouseEvent) => {
         if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-          setIsOpen(false)
+          setOpen(false)
         }
       }
 
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [])
+    }, [isOpen, setOpen])
 
     const isDateDisabled = (date: Date): boolean => {
       if (minDate && date < minDate) return true
@@ -175,13 +224,13 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
       const parsed = parseDate(val, format)
       if (parsed && !isNaN(parsed.getTime()) && !isDateDisabled(parsed)) {
-        onChange?.(parsed)
+        setValue(parsed)
         setViewDate(parsed)
       }
     }
 
     const closeAndFocusInput = () => {
-      setIsOpen(false)
+      setOpen(false)
       if (document.activeElement !== inputRef.current) {
         skipOpenOnFocusRef.current = true
         inputRef.current?.focus()
@@ -191,9 +240,13 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
     const handleDateSelect = (day: number) => {
       const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
       if (!isDateDisabled(newDate)) {
-        onChange?.(newDate)
+        setValue(newDate)
         closeAndFocusInput()
       }
+    }
+
+    const handleClear = () => {
+      setValue(null)
     }
 
     const handlePrevMonth = () => {
@@ -269,7 +322,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
 
               const date = new Date(year, month, day)
               const isDisabled = isDateDisabled(date)
-              const isSelected = value?.toDateString() === date.toDateString()
+              const isSelected = currentValue?.toDateString() === date.toDateString()
               const isToday = today.toDateString() === date.toDateString()
 
               return (
@@ -301,7 +354,7 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
               onClick={() => {
                 const today = new Date()
                 if (!isDateDisabled(today)) {
-                  onChange?.(today)
+                  setValue(today)
                   closeAndFocusInput()
                 }
               }}
@@ -331,13 +384,14 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
                 skipOpenOnFocusRef.current = false
                 return
               }
-              setIsOpen(true)
+              setOpen(true)
             }}
             placeholder={placeholder ?? locale.datePicker.placeholder}
             disabled={disabled}
             className={cn(
               'flex w-full rounded-md border border-input bg-background',
               inputSizeStyles[size],
+              clearable && currentValue && !disabled && clearablePaddingStyles[size],
               'ring-offset-background placeholder:text-muted-foreground',
               'focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-ring/30 focus-visible:ring-offset-0',
               'disabled:cursor-not-allowed disabled:opacity-50',
@@ -351,12 +405,12 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
             onClick={() => {
               if (disabled) return
               if (isOpen) {
-                setIsOpen(false)
+                setOpen(false)
               } else {
                 // APG: opening the dialog moves focus to the selected day
                 // (or today when nothing is selected).
-                setIsOpen(true)
-                focusDay(value ?? new Date())
+                setOpen(true)
+                focusDay(currentValue ?? new Date())
               }
             }}
             className={cn(
@@ -377,6 +431,22 @@ export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(
           >
             {renderCalendar()}
           </div>
+        )}
+
+        {/* Clear button — rendered after the dropdown so the popup keeps its
+            tab position right after the calendar trigger */}
+        {clearable && currentValue && !disabled && (
+          <button
+            type="button"
+            onClick={handleClear}
+            aria-label={locale.datePicker.clearDate}
+            className={cn(
+              '-translate-y-1/2 absolute text-muted-foreground hover:text-foreground focus:outline-none',
+              clearPositionStyles[size]
+            )}
+          >
+            <X className={iconSizeStyles[size]} />
+          </button>
         )}
 
         {errorMessage && (

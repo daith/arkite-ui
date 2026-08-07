@@ -27,8 +27,16 @@ export interface ComboboxProps {
   options: ComboboxOption[]
   /** Current value (controlled) */
   value?: string | string[]
+  /** Initial value for uncontrolled usage */
+  defaultValue?: string | string[]
   /** Callback when value changes */
   onChange?: (value: string | string[]) => void
+  /** Controlled open state of the dropdown */
+  open?: boolean
+  /** Initial open state of the dropdown for uncontrolled usage */
+  defaultOpen?: boolean
+  /** Called when the dropdown opens or closes */
+  onOpenChange?: (open: boolean) => void
   /** Placeholder text */
   placeholder?: string
   /** Search placeholder */
@@ -84,7 +92,11 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     {
       options,
       value,
+      defaultValue,
       onChange,
+      open: openProp,
+      defaultOpen,
+      onOpenChange,
       placeholder,
       searchPlaceholder,
       multiple = false,
@@ -105,15 +117,26 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
     const baseId = useId()
     const listboxId = `${baseId}-listbox`
     const valueId = `${baseId}-value`
-    const [open, setOpen] = useState(false)
+    const isValueControlled = value !== undefined
+    const [internalValue, setInternalValue] = useState<string | string[] | undefined>(
+      defaultValue
+    )
+    const currentValue = isValueControlled ? value : internalValue
+    const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false)
+    const open = openProp ?? internalOpen
     const [search, setSearch] = useState('')
     const [highlightedIndex, setHighlightedIndex] = useState(-1)
     const inputRef = useRef<HTMLInputElement>(null)
 
+    const setOpen = (nextOpen: boolean) => {
+      setInternalOpen(nextOpen)
+      if (nextOpen !== open) onOpenChange?.(nextOpen)
+    }
+
     const selectedValues = useMemo(() => {
-      if (!value) return new Set<string>()
-      return new Set(Array.isArray(value) ? value : [value])
-    }, [value])
+      if (!currentValue) return new Set<string>()
+      return new Set(Array.isArray(currentValue) ? currentValue : [currentValue])
+    }, [currentValue])
 
     const filtered = useMemo(() => {
       if (onSearch) return options // async search handles filtering
@@ -163,8 +186,11 @@ export const Combobox = forwardRef<HTMLButtonElement, ComboboxProps>(
         } else {
           next.add(optionValue)
         }
-        onChange?.(Array.from(next))
+        const nextValues = Array.from(next)
+        if (!isValueControlled) setInternalValue(nextValues)
+        onChange?.(nextValues)
       } else {
+        if (!isValueControlled) setInternalValue(optionValue)
         onChange?.(optionValue)
         setOpen(false)
         setSearch('')

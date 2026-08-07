@@ -35,3 +35,29 @@ describe('ViewToggle', () => {
     expect(screen.getByRole('radiogroup')).toBeInTheDocument()
   })
 })
+
+describe('ViewToggle uncontrolled', () => {
+  it('marks defaultValue as checked', () => {
+    render(<ViewToggle defaultValue="card" />)
+    expect(screen.getByRole('radio', { name: 'Card view' })).toHaveAttribute('aria-checked', 'true')
+  })
+
+  it('updates the checked option on click and still calls onChange', async () => {
+    const onChange = vi.fn()
+    render(<ViewToggle defaultValue="table" onChange={onChange} />)
+    await userEvent.click(screen.getByRole('radio', { name: 'Card view' }))
+
+    expect(onChange).toHaveBeenCalledWith('card')
+    expect(screen.getByRole('radio', { name: 'Card view' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByRole('radio', { name: 'Table view' })).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('remains controlled when value is provided', async () => {
+    const onChange = vi.fn()
+    render(<ViewToggle value="table" onChange={onChange} />)
+    await userEvent.click(screen.getByRole('radio', { name: 'Card view' }))
+
+    expect(onChange).toHaveBeenCalledWith('card')
+    expect(screen.getByRole('radio', { name: 'Table view' })).toHaveAttribute('aria-checked', 'true')
+  })
+})

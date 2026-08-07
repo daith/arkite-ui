@@ -21,7 +21,7 @@ describe('TenantSwitcher', () => {
   })
 
   it('renders trigger with current tenant name', () => {
-    render(<TenantSwitcher tenants={tenants} currentTenant={tenants[0]} />)
+    render(<TenantSwitcher tenants={tenants} value={tenants[0]} />)
     expect(screen.getByText('Acme Corp')).toBeInTheDocument()
   })
 
@@ -47,25 +47,25 @@ describe('TenantSwitcher', () => {
     expect(screen.queryByText('Beta Inc')).not.toBeInTheDocument()
   })
 
-  it('calls onSelect when a tenant is clicked', async () => {
-    const onSelect = vi.fn()
-    render(<TenantSwitcher tenants={tenants} onSelect={onSelect} />)
+  it('calls onChange when a tenant is clicked', async () => {
+    const onChange = vi.fn()
+    render(<TenantSwitcher tenants={tenants} onChange={onChange} />)
     await userEvent.click(getTrigger())
     await userEvent.click(screen.getByText('Beta Inc'))
-    expect(onSelect).toHaveBeenCalledWith(tenants[1])
+    expect(onChange).toHaveBeenCalledWith(tenants[1])
   })
 
-  it('calls onSelect with null when All Tenants option is clicked', async () => {
-    const onSelect = vi.fn()
-    render(<TenantSwitcher tenants={tenants} currentTenant={tenants[0]} onSelect={onSelect} />)
+  it('calls onChange with null when All Tenants option is clicked', async () => {
+    const onChange = vi.fn()
+    render(<TenantSwitcher tenants={tenants} value={tenants[0]} onChange={onChange} />)
     await userEvent.click(getTrigger())
     // Click the "Platform-wide view" text's parent button (the All Tenants dropdown option)
     await userEvent.click(screen.getByText('Platform-wide view'))
-    expect(onSelect).toHaveBeenCalledWith(null)
+    expect(onChange).toHaveBeenCalledWith(null)
   })
 
   it('hides All Tenants option when showAllOption is false', async () => {
-    render(<TenantSwitcher tenants={tenants} currentTenant={tenants[0]} showAllOption={false} />)
+    render(<TenantSwitcher tenants={tenants} value={tenants[0]} showAllOption={false} />)
     await userEvent.click(getTrigger())
     expect(screen.queryByText('Platform-wide view')).not.toBeInTheDocument()
   })
@@ -81,5 +81,48 @@ describe('TenantSwitcher', () => {
     render(<TenantSwitcher tenants={[]} loading />)
     await userEvent.click(getTrigger())
     expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument()
+  })
+
+  describe('deprecated aliases', () => {
+    it('supports deprecated currentTenant as alias for value and warns', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      render(<TenantSwitcher tenants={tenants} currentTenant={tenants[0]} />)
+      expect(screen.getByText('Acme Corp')).toBeInTheDocument()
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('`currentTenant` is deprecated')
+      )
+      warnSpy.mockRestore()
+    })
+
+    it('supports deprecated onSelect as alias for onChange and warns', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const onSelect = vi.fn()
+      render(<TenantSwitcher tenants={tenants} onSelect={onSelect} />)
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('`onSelect` is deprecated')
+      )
+      warnSpy.mockRestore()
+      await userEvent.click(getTrigger())
+      await userEvent.click(screen.getByText('Beta Inc'))
+      expect(onSelect).toHaveBeenCalledWith(tenants[1])
+    })
+
+    it('prefers value over deprecated currentTenant when both provided', () => {
+      render(
+        <TenantSwitcher tenants={tenants} value={tenants[1]} currentTenant={tenants[0]} />
+      )
+      expect(screen.getByText('Beta Inc')).toBeInTheDocument()
+      expect(screen.queryByText('Acme Corp')).not.toBeInTheDocument()
+    })
+
+    it('prefers onChange over deprecated onSelect when both provided', async () => {
+      const onChange = vi.fn()
+      const onSelect = vi.fn()
+      render(<TenantSwitcher tenants={tenants} onChange={onChange} onSelect={onSelect} />)
+      await userEvent.click(getTrigger())
+      await userEvent.click(screen.getByText('Beta Inc'))
+      expect(onChange).toHaveBeenCalledWith(tenants[1])
+      expect(onSelect).not.toHaveBeenCalled()
+    })
   })
 })

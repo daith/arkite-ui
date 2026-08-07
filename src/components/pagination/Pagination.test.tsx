@@ -56,10 +56,35 @@ describe('Pagination', () => {
     expect(onPageChange).toHaveBeenCalledWith(5)
   })
 
-  it('renders compact mode without page buttons', () => {
+  it('renders compact variant without page buttons', () => {
+    render(<Pagination currentPage={1} totalPages={5} onPageChange={vi.fn()} variant="compact" />)
+    expect(screen.queryByLabelText('First page')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Last page')).not.toBeInTheDocument()
+  })
+
+  it('still supports the deprecated mode alias and warns', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     render(<Pagination currentPage={1} totalPages={5} onPageChange={vi.fn()} mode="compact" />)
     expect(screen.queryByLabelText('First page')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Last page')).not.toBeInTheDocument()
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('`mode` is deprecated')
+    )
+    warnSpy.mockRestore()
+  })
+
+  it('prefers variant over deprecated mode when both provided', () => {
+    render(
+      <Pagination
+        currentPage={1}
+        totalPages={5}
+        onPageChange={vi.fn()}
+        variant="full"
+        mode="compact"
+      />
+    )
+    expect(screen.getByLabelText('First page')).toBeInTheDocument()
+    expect(screen.getByLabelText('Last page')).toBeInTheDocument()
   })
 
   it('renders page size selector', () => {

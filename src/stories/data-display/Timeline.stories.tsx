@@ -20,7 +20,13 @@ const auditItems: TimelineItem[] = [
     date: '2024-01-15 14:35',
     title: 'Settings updated',
     description: 'Changed notification preferences',
-    variant: 'default',
+    variant: 'muted',
+  },
+  {
+    date: '2024-01-15 14:38',
+    title: 'Verification email sent',
+    description: 'Delivery scheduled by the notification service',
+    variant: 'info',
   },
   {
     date: '2024-01-15 14:40',

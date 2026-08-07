@@ -66,7 +66,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 
 ## Spacing, radius, elevation
 
-- **Spacing**: 4px grid (Tailwind scale). Cards: `p-6` default, `density="compact"` for dashboard widgets. Forms stack on `gap-4`; sections on `gap-6`.
+- **Spacing**: 4px grid (Tailwind scale). Cards: compound children pad `p-4`; the root's `padding` prop defaults to `none` (`padding="lg"` = `p-6`). `density="compact"` for dashboard widgets. Forms stack on `gap-4`; sections on `gap-6`.
 - **Radius**: everything derives from one `--radius` (0.5rem): `rounded-lg` = var, `md` = −2px, `sm` = −4px. Pills/avatars use `rounded-full`. Changing `--radius` rethemes the whole library.
 - **Elevation**: soft low-alpha shadow scale `shadow-xs` → `shadow-2xl`. Cards sit at `xs/sm`; popovers `md/lg`; modals `xl`. Special: `shadow-sticky-left`, `shadow-sticky-header` for sticky table edges.
 - **Motion**: durations `fast` 100ms / `normal` 150ms / `slow` 300ms; easing tokens incl. `bounce`. Optional framer-motion components live in `@arkite-ui/core/motion`.
@@ -96,9 +96,15 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 
 - Change handlers on value components: **`onChange(value)`** (raw value, not event) — native-input wrappers keep React's event `onChange`
 - Error display on form controls: **`error?: boolean` + `errorMessage?: string`**
-- Open/close: **`open` + `onClose`** for dialogs/drawers/overlays; `defaultX` for uncontrolled counterparts
-- Sizes: **`sm | md | lg`** (`md` default); variants: `primary | secondary | outline | ghost | destructive`
+- Open/close: **`open` + `onClose`** for dialogs/drawers/overlays; `defaultX` for uncontrolled counterparts. Exceptions: Radix passthrough components (Popover/Tooltip/DropdownMenu) and trigger-anchored pickers (Combobox/DatePicker/SheetSelect) expose Radix-style **`open` + `onOpenChange` + `defaultOpen`** — intentional, do not "fix"
+- Non-overlay expand/collapse state uses the **`x` / `onXChange` / `defaultX`** triple (CollapsibleSection `open`, Sidebar `collapsed`)
+- Sizes: **`sm | md | lg` as the baseline** (`md` default) — components may extend both ends (`xs`, `xl`, `icon`, `full`) when the domain calls for it; variants: `primary | secondary | outline | ghost | destructive` (Button additionally ships `gradient`)
+- Semantic status values are `success | warning | destructive | info` — never `error`/`danger` in props. `EmptyState`'s `error` variant is a *scenario* (error page), not a color, and `StatusDot`'s `online/offline/busy/away` is a presence axis — both are separate value domains
 - Booleans are bare (`disabled`, `loading`, `open`) — never `isDisabled`
+- Collection props: tabular/hierarchical data is **`data`** (DataTable/Tree/Sparkline), flat renderable lists are **`items`** (Timeline/VirtualList/Breadcrumb); `Steps.steps` is grandfathered. Key extraction is **`get{Noun}Key(x, index)`** (`getRowKey`, `getItemKey`)
+- Selection callbacks: **`onSelect(value, object?)`** — first arg is the selected value/key, optional second is the full object. Multi-select checkbox trees/tables use **`onSelectionChange`**
+- Navigation: data-layer props are **`path`** (router semantics), render-layer receives **`href`** (DOM semantics); custom link rendering is **`renderLink({ href, children, className, active })`** across all nav components
+- Definition objects (table columns, nav items) may use short render-prop names (`cell`, `icon`) — the `renderX` rule applies to component props, not def-object fields
 - Escape hatches: `className` everywhere (merged via `cn`), `renderX` props for custom item rendering
 
 ## Theming
