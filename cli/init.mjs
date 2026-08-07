@@ -73,6 +73,7 @@ Usage:
 
 const pmFlag = args.indexOf('--pm')
 const pm = pmFlag !== -1 ? args[pmFlag + 1] : detectPM()
+const dryRun = args.includes('--dry-run')
 
 log(`Detected package manager: ${pm}`)
 
@@ -83,15 +84,20 @@ const deps = [
   'lucide-react',
   'tailwindcss@^4',
   'tw-animate-css',
+  'zustand',
 ]
 
-log('Installing dependencies...')
-try {
-  execSync(installCmd(pm, deps), { cwd, stdio: 'inherit' })
-  success('Dependencies installed')
-} catch {
-  warn('Failed to install some dependencies. You may need to install them manually:')
-  console.log(`  ${installCmd(pm, deps)}`)
+if (dryRun) {
+  log(`(dry-run) skipping install, would run: ${installCmd(pm, deps)}`)
+} else {
+  log('Installing dependencies...')
+  try {
+    execSync(installCmd(pm, deps), { cwd, stdio: 'inherit' })
+    success('Dependencies installed')
+  } catch {
+    warn('Failed to install some dependencies. You may need to install them manually:')
+    console.log(`  ${installCmd(pm, deps)}`)
+  }
 }
 
 // ─── Step 2: Write CSS file ───

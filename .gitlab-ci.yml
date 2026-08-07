@@ -74,14 +74,16 @@ size:
       when: never
     - when: on_success
 
+# 有程式碼異動卻沒附 changeset 就擋下 MR。
+# 純內部異動（不影響 consumer）用 `pnpm changeset --empty` 過閘。
 changeset:check:
   stage: check
   <<: *node-setup
   script:
-    - pnpm changeset status
+    - git fetch origin main:refs/remotes/origin/main
+    - pnpm changeset status --since=origin/main
   rules:
     - if: $CI_MERGE_REQUEST_IID
-  allow_failure: true
 
 build:
   stage: build
@@ -101,11 +103,17 @@ chromatic:
     - corepack enable && corepack prepare --activate
     - pnpm install --frozen-lockfile --ignore-scripts
   script:
-    - pnpm run chromatic
+    # MR：有未 review 的視覺變更就擋（到 Chromatic 上 approve 後重跑此 job）。
+    # main：MR 階段已審過，自動接受並更新 baseline。
+    - |
+      if [ -n "$CI_MERGE_REQUEST_IID" ]; then
+        pnpm exec chromatic
+      else
+        pnpm exec chromatic --auto-accept-changes
+      fi
   rules:
     - if: $CI_MERGE_REQUEST_IID && $CHROMATIC_PROJECT_TOKEN
     - if: $CI_COMMIT_BRANCH == "main" && $CHROMATIC_PROJECT_TOKEN
-  allow_failure: true
 
 # -------------------------------------------------------------------
 # Publish: only on tags on main branch
