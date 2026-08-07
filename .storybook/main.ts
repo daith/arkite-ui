@@ -21,7 +21,6 @@ const config: StorybookConfig = {
         },
       },
     },
-    '@storybook/addon-onboarding',
   ],
   framework: '@storybook/react-vite',
   viteFinal(config) {

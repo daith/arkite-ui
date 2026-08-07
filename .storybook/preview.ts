@@ -1,4 +1,5 @@
 import type { Preview } from '@storybook/react-vite'
+import { create } from 'storybook/theming'
 import '../src/styles/index.css'
 import {
   themePresets,
@@ -61,6 +62,16 @@ const preview: Preview = {
     },
     a11y: {
       test: 'error-based',
+    },
+    docs: {
+      theme: create({
+        base: 'light',
+        fontBase: '"Inter", system-ui, -apple-system, sans-serif',
+        fontCode: '"JetBrains Mono", ui-monospace, monospace',
+        colorPrimary: '#6a4dff',
+        colorSecondary: '#6a4dff',
+        textColor: '#16181d',
+      }),
     },
     layout: 'centered',
     options: {

@@ -2,36 +2,69 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 <Meta title="Introduction" />
 
-# Arkite UI
+<div className="not-prose mb-10 rounded-xl border border-border bg-card p-10">
+  <div className="flex items-center gap-3 mb-4">
+    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground text-xl font-bold">A</div>
+    <span className="text-sm font-medium text-muted-foreground tracking-wide">@arkite-ui/core</span>
+  </div>
+  <h1 className="text-3xl font-semibold tracking-tight mb-3">Arkite UI</h1>
+  <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
+    Production-ready React components for multi-tenant SaaS admin panels —
+    data-dense, utilitarian, calm. Built on Tailwind CSS v4 + Radix UI, shipped
+    as a versioned package so every product upgrades together.
+  </p>
+  <div className="mt-6 flex flex-wrap gap-2">
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">65+ components</span>
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">1,299 tests</span>
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">WCAG AA · CI-enforced</span>
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">i18n · en / zh-TW</span>
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">4 theme presets</span>
+    <span className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium">RSC-ready</span>
+  </div>
+</div>
 
-Production-ready React component library for SaaS admin panels.
-
-## Features
-
-- **55+ components** — Buttons, Forms, DataTable, Modal, Drawer, Toast, and more
-- **Theme system** — HSL CSS variables, 4 presets, `createTheme()` from hex colors
-- **Dark mode** — Class-based toggle with full token support
-- **Tailwind CSS v4** — CSS-first configuration with `@theme` tokens
-- **Accessible** — Built on Radix UI primitives with ARIA support
-- **TypeScript** — Full type safety with exported interfaces
-- **Tested** — 111+ unit tests with Vitest
-
-## Quick Start
+## Quick start
 
 ```bash
-pnpm add @arkite/ui
+pnpm add @arkite-ui/core
 ```
 
 ```tsx
-import { Button } from '@arkite/ui'
-import '@arkite/ui/styles.css'
+import { Button, LocaleProvider, zhTW } from '@arkite-ui/core'
+import '@arkite-ui/core/styles.css'
 
-<Button variant="primary">Get Started</Button>
+<LocaleProvider locale={zhTW}>
+  <Button variant="primary">開始使用</Button>
+</LocaleProvider>
 ```
+
+## Why this library
+
+<div className="not-prose grid grid-cols-1 gap-4 md:grid-cols-2 mb-10">
+  <div className="rounded-lg border border-border bg-card p-5">
+    <div className="text-sm font-semibold mb-1.5">Admin-panel vertical</div>
+    <p className="text-sm text-muted-foreground leading-relaxed">Composites no general-purpose kit ships: <code>AdminLayout</code> with permission-aware navigation, <code>TenantSwitcher</code>, <code>DataTable</code>, <code>FilterBar</code>, <code>BulkActionBar</code>.</p>
+  </div>
+  <div className="rounded-lg border border-border bg-card p-5">
+    <div className="text-sm font-semibold mb-1.5">Accessibility, guaranteed</div>
+    <p className="text-sm text-muted-foreground leading-relaxed">Every built-in color pair meets WCAG AA — enforced by tests, not policy. <code>createTheme()</code> picks foregrounds by real contrast, so any brand color stays readable.</p>
+  </div>
+  <div className="rounded-lg border border-border bg-card p-5">
+    <div className="text-sm font-semibold mb-1.5">Localized to the bone</div>
+    <p className="text-sm text-muted-foreground leading-relaxed">All built-in strings — placeholders, empty states, calendar names, every aria-label — resolve through <code>LocaleProvider</code>. One line localizes the whole tree.</p>
+  </div>
+  <div className="rounded-lg border border-border bg-card p-5">
+    <div className="text-sm font-semibold mb-1.5">Tokens all the way down</div>
+    <p className="text-sm text-muted-foreground leading-relaxed">HSL CSS variables, four presets, dark mode as an equal citizen. Cross-platform JS tokens for React Native via <code>@arkite-ui/core/tokens</code>.</p>
+  </div>
+</div>
 
 ## Explore
 
-- **Getting Started** — Installation and setup
-- **Foundation / Theme System** — Colors, dark mode, custom themes
-- **Form Patterns** — Form layout with validation examples
-- **Component Guidelines** — API conventions and contribution guide
+- **[Getting Started](?path=/docs/getting-started--docs)** — installation and setup
+- **[Foundation / Design Tokens](?path=/docs/foundation-design-tokens--docs)** — colors, scales, and the live contrast audit
+- **[Theme System](?path=/docs/foundation-theme-system--docs)** — presets, dark mode, `createTheme()`
+- **[Form Patterns](?path=/docs/form-patterns--docs)** — form layout with validation examples
+- **[Component Guidelines](?path=/docs/component-guidelines--docs)** — API conventions and contribution guide
+
+Use the **Theme** and **Mode** toolbar controls above to preview any story in all four presets, light and dark.
