@@ -87,7 +87,7 @@
   .nav-links .cta { color: var(--brand); font-weight: 550; }
 
   /* ── hero ── */
-  .hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 56px; align-items: center; padding: 88px 0 72px; }
+  .hero { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 64px; align-items: center; padding-block: 72px 64px; }
   .eyebrow { font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); font-weight: 650; margin-bottom: 14px; }
   h1 { font-size: clamp(34px, 4.5vw, 46px); line-height: 1.12; letter-spacing: -0.025em; font-weight: 675; text-wrap: balance; margin-bottom: 18px; }
   .lede { color: var(--muted); font-size: 16.5px; max-width: 30em; margin-bottom: 28px; }
@@ -133,18 +133,19 @@
   h2 { font-size: 24px; font-weight: 650; letter-spacing: -0.015em; margin-bottom: 6px; }
   .sec-head p { color: var(--muted); font-size: 15px; max-width: 44em; }
   .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  @media (min-width: 1200px) { .features { grid-template-columns: repeat(4, 1fr); } }
   .feature { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
   .feature h3 { font-size: 15px; font-weight: 620; margin-bottom: 6px; }
   .feature p { font-size: 13.5px; color: var(--muted); }
   .feature code { font-size: 12px; background: var(--line-soft); padding: 1px 5px; border-radius: 4px; }
 
   /* ── quickstart ── */
-  .qs { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 32px; align-items: start; }
+  .qs { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 780px); gap: 48px; align-items: start; }
   pre { background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 20px 22px; font-size: 13px; line-height: 1.75; overflow-x: auto; }
   .tok-k { color: #b3a5ff; } .tok-s { color: #9ece8f; } .tok-c { color: #7a8194; }
 
   /* ── presets ── */
-  .presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 250px)); gap: 14px; }
   .preset { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
   .swatches { display: flex; gap: 6px; margin-bottom: 10px; }
   .sw { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgb(0 0 0 / 0.06); }
@@ -155,7 +156,7 @@
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; width: 100%; }
 
   @media (max-width: 860px) {
-    .hero { grid-template-columns: 1fr; padding: 56px 0 48px; }
+    .hero { grid-template-columns: 1fr; padding-block: 56px 48px; }
     .qs { grid-template-columns: 1fr; }
   }
 </style>
