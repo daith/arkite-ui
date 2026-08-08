@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.14.0
+### Minor Changes
+
+- 40dc092: DX-audit fixes: AdminLayout injection points, Table frozen lead column, Table/DataTable selection guidance.
+  
+  - **AdminLayout**: new `classNames` prop (`root`/`sidebar`/`navbar`/`subNav`/`main`) — the supported way to restyle internal regions instead of global CSS targeting internal DOM; `hideSidebar` / `hideNavbar` (`true` removes, `'mobile'` hides below the `md` breakpoint) for mobile layouts.
+  - **Table**: `stickyLead` on `TableHead`/`TableCell` freezes the lead column during horizontal scroll (symmetric to the existing `stickyAction`); new `shadow-sticky-right` token.
+  - **DESIGN.md**: the `Table` family gets its own inventory entry (read-only lists included) plus an explicit Table-vs-DataTable decision rule — the audited root cause of consumers hand-rolling raw `<table>` with hardcoded palette classes. Regenerated into `llms.txt`/`llms-full.txt`.
+- b2d6a65: DX-audit gap fillers — the components behind 30+ consumer lint bypasses and hand-rolled inputs:
+  
+  - **`Button variant="link"`** — inline text-link appearance with button semantics (keeps the size's text scale, drops box dimensions). For real navigation keep using `<a>`.
+  - **`Card interactive`** — whole-card clickable with proper button semantics (`role`, `tabIndex`, Enter/Space activation only when the card itself is focused). Stays a `<div>` so inner interactive children keep working.
+  - **`FileTrigger`** — headless file-pick trigger: makes any element (thumbnail, icon, menu item) open the native picker; no wrapper element, no chrome. Completes the trio: `FileUpload` (dropzone) / `FileUploadButton` (styled button) / `FileTrigger` (headless).
+  - **`PinInput`** — OTP/verification-code input: per-character cells, auto-advance, Backspace/arrow navigation, paste distribution with filtering, `onComplete`, numeric/alphanumeric modes, `inputMode` + `one-time-code` autofill, localized cell labels.
+  - **`AdminLayout bottomNav`** — mobile bottom-navigation slot: fixed below `md` with safe-area padding built in; main content gets matching bottom padding. Pair with `hideSidebar="mobile"`.
+- 201b69d: Code-review hardening for the v1.0 groundwork:
+  
+  - **DataTable server mode**: new `onPageSizeChange` prop — in server mode (`totalRows`) the rows-per-page selector now only renders when it is provided; column filters only render when `filters`/`onFilterChange` are controlled and the column provides `filterOptions`; the pagination footer no longer renders while `data` is empty; a dev-only warning fires when `totalRows` is used without a controlled `page`.
+  - **FilterSelect**: no longer sets `aria-label` when the consumer provides their own accessible name (`id` for a native `<label htmlFor>`, or `aria-labelledby`).
+  - **v1.0 codemod**: `expandable` identifiers are classified via the type checker (boolean identifiers stay, only callable values migrate to `renderExpandedRow`, unresolvable ones get a TODO); toast rewrites match by symbol binding instead of identifier text, so same-named non-arkite objects are never touched; the glob fallback scans the whole project instead of only `src/`.
+  - **Build/CI**: `dist` is cleaned before tsup runs instead of via a racing per-config `clean`; playwright CI jobs use a separate node_modules cache key from the alpine jobs.
+- 74332c5: Table API conveniences from the ark-finance feedback (feedback 1):
+  
+  - **`TableCell`/`TableHead` `align`** (`'left' | 'center' | 'right'`) — replaces per-cell `text-right` repetition; rendered as classes, never the deprecated HTML `align` attribute.
+  - **`TableCell` `numeric`** — right-aligned `tabular-nums` for digit columns that must line up (financial tables).
+  - **`TableEmpty` / `TableLoading`** — full-width empty/loading rows for the Table family with automatic `colSpan` (measured from the header row; pass `colSpan` explicitly when columns change at runtime). Localized default copy.
+  - **`DataTable` `Column.pinned: 'left' | 'right'`** — frozen columns during horizontal scroll, wired to the Table family's `stickyLead`/`stickyAction`. Note: `'left'` pins at the table edge, so combine with `selectable`/expandable only when the leading utility columns may scroll under it.
+- 9b61041: Table/DataTable fixes from ark-finance migration testing (previously `compact`/`hoverable`/`striped` were dead props and dense tables were unusable):
+  
+  - **`compact`, `hoverable`, `variant="striped"` now actually work** — the data-attributes are wired to CSS. `compact` tightens cells to `px-3 py-2` (header `h-8`), `striped` zebra-stripes body rows, and row hover is now **opt-in via `hoverable`** instead of always-on (DataTable passes `hoverable` itself, so its visuals are unchanged; bare `Table` users add `hoverable` to keep the old hover).
+  - **Row separators render again** — the table is `border-separate` (required for cross-browser sticky headers), where `<tr>` borders never paint. Separators moved to the cells (`TableCell`/`TableHead` `border-b`, footer `[&_td]:border-t`), last body row exempt.
+  - **`DataTable compact`** — density passthrough, and **`rowClassName`** (string or `(row, index) => string`) for conditional row styling such as dimming disabled rows.
+  - `pagination` and other boolean props now document their defaults (`pagination` defaults to **true** — hide it when paginating outside).
+- fc15c9e: `toast.fromError(err, { prefix })` — one-line error toasts for `catch` blocks.
+  
+  Renders a destructive toast with `prefix` as the title and the parsed error message as the description. Error parsing stays in the app layer: register it once at startup with `toast.configure({ formatError: getErrorMessage })` (module-level by design, so the imperative `toast` keeps working outside React). Unconfigured, only zero-knowledge fallbacks apply (`Error#message`, plain strings); when no message can be derived the prefix alone is shown — this API never invents copy, keeping it out of the locale system. A throwing formatter falls back instead of crashing. Also available on `useToast()`. Deliberately out of scope: error reporting/logging hooks and burst dedupe.
+- a34a941: DX: server-table state hook and AI-readable docs.
+  
+  - **`useServerTable()`** — pure state helper for `<DataTable>` server-side mode. Owns the six controlled props (`page`/`onPageChange`, `onPageSizeChange`, `sortState`/`onSortChange`, `filters`/`onFilterChange`) and exposes them pre-wired via `props`; the consumer supplies `data` + `totalRows` and fetches on `queryKey`. Sort/filter/page-size changes reset to page 1.
+  - **`llms.txt` / `llms-full.txt`** — generated from DESIGN.md and the public API snapshot (`pnpm run generate:llms`, part of `build`) and shipped in the npm package, so AI coding agents get the setup, design rules, core patterns, and full typed API without reading source.
+
 ## 0.13.0
 ### Minor Changes
 
