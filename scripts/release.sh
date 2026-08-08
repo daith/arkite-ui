@@ -53,6 +53,8 @@ printf "${GREEN}✓ 測試與 build 通過${NC}\n"
 printf "\n${YELLOW}[4/6] 消化 changesets、bump 版本...${NC}\n"
 pnpm changeset version || exit 1
 NEW_VERSION=$(node -p "require('./package.json').version" 2>/dev/null)
+# llms.txt 標頭帶版本號,必須在 bump 之後重新生成,否則出貨的檔案寫舊版號
+pnpm run generate:llms || exit 1
 
 if ! grep -q "^## ${NEW_VERSION}" CHANGELOG.md; then
     printf "${RED}✗ CHANGELOG.md 沒有 ${NEW_VERSION} 的條目 — changeset version 可能失敗了，中止並還原。${NC}\n"
