@@ -755,6 +755,44 @@ describe('DataTable', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(20)
   })
 
+  // ─── Density / row styling (ark-finance feedback 3.1, 3.3) ───
+
+  it('passes hoverable and compact through to the underlying Table', () => {
+    render(
+      <DataTable columns={columns} data={data} getRowKey={(r) => r.id} compact />
+    )
+    const table = screen.getByRole('table')
+    expect(table).toHaveAttribute('data-hoverable', 'true')
+    expect(table).toHaveAttribute('data-compact', 'true')
+  })
+
+  it('rowClassName as function styles rows conditionally', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        rowClassName={(row) => (row.name === 'Bob' ? 'opacity-60' : '')}
+      />
+    )
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(rows[1]).toHaveClass('opacity-60')
+    expect(rows[0]).not.toHaveClass('opacity-60')
+  })
+
+  it('rowClassName as string applies to every body row', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        rowClassName="text-xs"
+      />
+    )
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(rows.every((r) => r.classList.contains('text-xs'))).toBe(true)
+  })
+
   // ─── Uncontrolled Selection Tests ───
 
   it('defaultSelectedRows sets initial uncontrolled selection', () => {

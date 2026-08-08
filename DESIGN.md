@@ -77,8 +77,8 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 |---|---|---|
 | Page title + actions | `PageHeader` (`size`, `badge`, `onBack`) | Hand-rolled flex headers |
 | Section on a page | `Card` (+`CardHeader actions`, `density="compact"` for widgets) | Bare bordered divs |
-| **Any tabular data — including plain read-only lists** | `Table` family (`Table`/`TableHeader`/`TableRow`/`TableHead`/`TableBody`/`TableCell`) — styled `<table>` with tokens, dark mode, `stickyHeader`, `stickyLead`/`stickyAction` frozen columns built in | Raw `<table><td className="px-3 py-2 text-slate-600">` (hardcodes palette + dark mode by hand) |
-| Data list w/ sorting/filters/selection/pagination | `DataTable` (column-config driven; server-side via `totalRows` + `useServerTable`) | Rebuilding sort/pagination around a raw table |
+| **Any tabular data — including plain read-only lists** | `Table` family (`Table`/`TableHeader`/`TableRow`/`TableHead`/`TableBody`/`TableCell`) — styled `<table>` with tokens, dark mode, `compact` density, `variant="striped"`, `hoverable`, `stickyHeader`, `stickyLead`/`stickyAction` frozen columns built in | Raw `<table><td className="px-3 py-2 text-slate-600">` (hardcodes palette + dark mode by hand) |
+| Data list w/ sorting/filters/selection/pagination | `DataTable` (column-config driven; `compact` density, `rowClassName` for conditional rows; server-side via `totalRows` + `useServerTable`) | Rebuilding sort/pagination around a raw table |
 | Huge lists (1000+ rows) | `VirtualList` | Rendering everything |
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |

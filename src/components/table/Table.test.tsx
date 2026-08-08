@@ -20,6 +20,48 @@ describe('Table', () => {
     render(<Table bordered><tbody><tr><td>Cell</td></tr></tbody></Table>)
     expect(screen.getByRole('table')).toHaveClass('border')
   })
+
+  // Regression (ark-finance feedback 3.1): the density/hover/stripe props must
+  // be wired to CSS, not just emitted as inert data-attributes
+  it('compact tightens cell padding via table[data-compact] selectors', () => {
+    render(
+      <Table compact>
+        <TableHeader><TableRow><TableHead>H</TableHead></TableRow></TableHeader>
+        <TableBody><TableRow><TableCell>C</TableCell></TableRow></TableBody>
+      </Table>
+    )
+    expect(screen.getByRole('table')).toHaveAttribute('data-compact', 'true')
+    expect(screen.getByRole('cell').className).toContain('[table[data-compact]_&]:py-2')
+    expect(screen.getByRole('columnheader').className).toContain('[table[data-compact]_&]:h-8')
+  })
+
+  it('hoverable and striped are consumed by TableRow selectors', () => {
+    render(
+      <Table hoverable variant="striped">
+        <TableBody><TableRow><TableCell>C</TableCell></TableRow></TableBody>
+      </Table>
+    )
+    const row = screen.getByRole('row')
+    expect(row.className).toContain('[table[data-hoverable]_&:hover]:bg-muted/50')
+    expect(row.className).toContain("[table[data-variant=striped]_tbody_&:nth-child(even)]:bg-muted/30")
+  })
+
+  // Regression (ark-finance feedback 3.2): the table is border-separate, so
+  // separators must live on cells — tr borders don't paint in that model
+  it('row separators are drawn by cells, with the last body row exempt', () => {
+    render(
+      <Table>
+        <TableHeader><TableRow><TableHead>H</TableHead></TableRow></TableHeader>
+        <TableBody><TableRow><TableCell>C</TableCell></TableRow></TableBody>
+      </Table>
+    )
+    expect(screen.getByRole('cell')).toHaveClass('border-b')
+    expect(screen.getByRole('columnheader').closest('thead')?.className).toContain('[&_th]:border-b')
+    expect(screen.getByRole('cell').closest('tbody')?.className).toContain(
+      '[&_tr:last-child_td]:border-b-0'
+    )
+    expect(screen.getByRole('row', { name: 'C' }).className).not.toContain('border-b')
+  })
 })
 
 describe('TableRow', () => {

@@ -166,8 +166,8 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 |---|---|---|
 | Page title + actions | `PageHeader` (`size`, `badge`, `onBack`) | Hand-rolled flex headers |
 | Section on a page | `Card` (+`CardHeader actions`, `density="compact"` for widgets) | Bare bordered divs |
-| **Any tabular data — including plain read-only lists** | `Table` family (`Table`/`TableHeader`/`TableRow`/`TableHead`/`TableBody`/`TableCell`) — styled `<table>` with tokens, dark mode, `stickyHeader`, `stickyLead`/`stickyAction` frozen columns built in | Raw `<table><td className="px-3 py-2 text-slate-600">` (hardcodes palette + dark mode by hand) |
-| Data list w/ sorting/filters/selection/pagination | `DataTable` (column-config driven; server-side via `totalRows` + `useServerTable`) | Rebuilding sort/pagination around a raw table |
+| **Any tabular data — including plain read-only lists** | `Table` family (`Table`/`TableHeader`/`TableRow`/`TableHead`/`TableBody`/`TableCell`) — styled `<table>` with tokens, dark mode, `compact` density, `variant="striped"`, `hoverable`, `stickyHeader`, `stickyLead`/`stickyAction` frozen columns built in | Raw `<table><td className="px-3 py-2 text-slate-600">` (hardcodes palette + dark mode by hand) |
+| Data list w/ sorting/filters/selection/pagination | `DataTable` (column-config driven; `compact` density, `rowClassName` for conditional rows; server-side via `totalRows` + `useServerTable`) | Rebuilding sort/pagination around a raw table |
 | Huge lists (1000+ rows) | `VirtualList` | Rendering everything |
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
@@ -657,6 +657,7 @@ type DataTableProps {
   className?: string | undefined
   columnToggle?: boolean | undefined
   columns: Column<T>[]
+  compact?: boolean | undefined
   data: T[]
   defaultPageSize?: number | undefined
   defaultSelectedRows?: Set<string | number> | undefined
@@ -677,6 +678,7 @@ type DataTableProps {
   pageSizeOptions?: number[] | undefined
   pagination?: boolean | undefined
   renderExpandedRow?: ((row: T, index: number) => ReactNode) | undefined
+  rowClassName?: string | ((row: T, index: number) => string) | undefined
   selectable?: boolean | undefined
   selectedRows?: Set<string | number> | undefined
   sortState?: SortState | null | undefined
@@ -1873,7 +1875,7 @@ value CopyButton: React.ForwardRefExoticComponent<CopyButtonProps & React.RefAtt
 
 value CopyInput: React.ForwardRefExoticComponent<CopyInputProps & React.RefAttributes<HTMLInputElement>>
 
-value DataTable: <T>({ data, columns, pagination, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
+value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
 
 value DatePicker: React.ForwardRefExoticComponent<DatePickerProps & React.RefAttributes<HTMLInputElement>>
 

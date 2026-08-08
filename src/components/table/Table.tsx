@@ -55,7 +55,10 @@ export const TableHeader = forwardRef<HTMLTableSectionElement, TableHeaderProps>
     <thead
       ref={ref}
       className={cn(
-        '[&_tr]:border-b',
+        // Separator lives on the cells: the table is border-separate (needed
+        // for cross-browser sticky headers) and row/row-group borders don't
+        // paint in that model
+        '[&_th]:border-b',
         /* Sticky header: activated by parent table[data-sticky-header] */
         '[table[data-sticky-header]_&]:sticky [table[data-sticky-header]_&]:top-0 [table[data-sticky-header]_&]:z-10 [table[data-sticky-header]_&]:bg-background [table[data-sticky-header]_&]:shadow-sticky-header',
         className
@@ -74,7 +77,7 @@ export const TableBody = forwardRef<HTMLTableSectionElement, TableBodyProps>(
   ({ className, ...props }, ref) => (
     <tbody
       ref={ref}
-      className={cn('[&_tr:last-child]:border-0', className)}
+      className={cn('[&_tr:last-child_td]:border-b-0', className)}
       {...props}
     />
   )
@@ -89,7 +92,7 @@ export const TableFooter = forwardRef<HTMLTableSectionElement, TableFooterProps>
   ({ className, ...props }, ref) => (
     <tfoot
       ref={ref}
-      className={cn('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', className)}
+      className={cn('bg-muted/50 font-medium [&_td]:border-t', className)}
       {...props}
     />
   )
@@ -108,8 +111,11 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
     <tr
       ref={ref}
       className={cn(
-        'border-b transition-colors',
-        'hover:bg-muted/50',
+        'transition-colors',
+        // Hover feedback is opt-in via table[data-hoverable] (Table `hoverable`)
+        '[table[data-hoverable]_&:hover]:bg-muted/50',
+        // Zebra striping via table[data-variant=striped], body rows only
+        '[table[data-variant=striped]_tbody_&:nth-child(even)]:bg-muted/30',
         'data-[state=selected]:bg-muted',
         selected && 'bg-muted',
         className
@@ -140,6 +146,7 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       ref={ref}
       className={cn(
         'h-10 px-4 text-left align-middle font-medium text-muted-foreground',
+        '[table[data-compact]_&]:h-8 [table[data-compact]_&]:px-3',
         '[&:has([role=checkbox])]:pr-0',
         sortable && 'cursor-pointer select-none hover:text-foreground',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
@@ -181,7 +188,9 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
     <td
       ref={ref}
       className={cn(
-        'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+        // Row separator lives here — tr borders don't paint under border-separate
+        'border-b p-4 align-middle [&:has([role=checkbox])]:pr-0',
+        '[table[data-compact]_&]:px-3 [table[data-compact]_&]:py-2',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
         stickyLead && 'sticky left-0 bg-background shadow-sticky-right',
         className

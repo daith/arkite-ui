@@ -53,8 +53,10 @@ export interface DataTableProps<T> {
   data: T[]
   /** Column definitions */
   columns: Column<T>[]
-  /** Enable pagination */
+  /** Show the pagination footer (rows-per-page + range + pager) @default true */
   pagination?: boolean
+  /** Compact density — tighter cell padding for data-dense admin tables @default false */
+  compact?: boolean
   /** Page size options */
   pageSizeOptions?: number[]
   /** Default page size */
@@ -67,6 +69,11 @@ export interface DataTableProps<T> {
   emptyContent?: ReactNode
   /** On row click */
   onRowClick?: (row: T, index: number) => void
+  /**
+   * Class for body rows — string, or a function of the row for conditional
+   * styling (e.g. dim disabled rows: `(r) => r.active ? '' : 'opacity-60'`)
+   */
+  rowClassName?: string | ((row: T, index: number) => string)
   /** Selected rows (controlled) */
   selectedRows?: Set<string | number>
   /** Default selected rows (uncontrolled) */
@@ -179,12 +186,14 @@ export function DataTable<T>({
   data,
   columns,
   pagination = true,
+  compact = false,
   pageSizeOptions = [10, 20, 50, 100],
   defaultPageSize = 10,
   getRowKey = (_row, index) => index,
   loading = false,
   emptyContent,
   onRowClick,
+  rowClassName,
   selectable = false,
   selectedRows,
   defaultSelectedRows,
@@ -589,7 +598,7 @@ export function DataTable<T>({
         )}
         style={stickyHeader && !fillHeight && maxHeight ? { maxHeight } : undefined}
       >
-      <Table stickyHeader={stickyHeader} fillHeight={fillHeight}>
+      <Table stickyHeader={stickyHeader} fillHeight={fillHeight} hoverable compact={compact}>
         <TableHeader>
           <TableRow>
             {isExpandable && (
@@ -754,7 +763,10 @@ export function DataTable<T>({
                 }
                 className={cn(
                   onRowClick && 'cursor-pointer',
-                  isSelected && 'bg-primary/5'
+                  isSelected && 'bg-primary/5',
+                  typeof rowClassName === 'function'
+                    ? rowClassName(row, globalIndex)
+                    : rowClassName
                 )}
                 data-selected={isSelected || undefined}
               >
