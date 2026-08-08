@@ -36,8 +36,11 @@ type AdminLayoutProps {
   brand: AdminBrandConfig
   children: ReactNode
   className?: string | undefined
+  classNames?: { root?: string; sidebar?: string; navbar?: string; subNav?: string; main?: string; } | undefined
   currentPath: string
   hasPermission?: ((permissions: string[]) => boolean) | undefined
+  hideNavbar?: boolean | "mobile" | undefined
+  hideSidebar?: boolean | "mobile" | undefined
   hideToast?: boolean | undefined
   navbarLeft?: ReactNode
   navbarRight?: ReactNode
@@ -1220,6 +1223,7 @@ type TableCaptionProps = TableCaptionProps
 
 type TableCellProps {
   stickyAction?: boolean | undefined
+  stickyLead?: boolean | undefined
 }
 
 type TableFooterProps = TableFooterProps
@@ -1228,6 +1232,7 @@ type TableHeadProps {
   sortDirection?: "desc" | "asc" | null | undefined
   sortable?: boolean | undefined
   stickyAction?: boolean | undefined
+  stickyLead?: boolean | undefined
 }
 
 type TableHeaderProps = TableHeaderProps
@@ -1520,7 +1525,7 @@ type VirtualListProps {
 
 value ActionButtons: React.ForwardRefExoticComponent<ActionButtonsProps & React.RefAttributes<HTMLElement>>
 
-value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, children, className, }: AdminLayoutProps) => JSX.Element
+value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, classNames, hideSidebar, hideNavbar, children, className, }: AdminLayoutProps) => JSX.Element
 
 value Alert: React.ForwardRefExoticComponent<AlertProps & React.RefAttributes<HTMLDivElement>>
 

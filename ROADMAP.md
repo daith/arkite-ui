@@ -117,6 +117,25 @@
 - [ ] MIGRATION.md 完善 — v0.x → v1.0 升級指南
 - [ ] 所有消費端升級驗證 — ark-crm、ark-harvest、ark-rendoc-web 全部跑通
 
+### DX 稽核產出(2026-08,證據見 docs/DX_AUDIT.md)
+
+已完成:
+
+- [x] `useServerTable` hook — 伺服器分頁六件套一次接好(0/9 使用 vs 26 處手刻的解方)
+- [x] DESIGN.md Table/DataTable 選型規則 — Table family 獨立條目 + 決策規則(51 檔手刻 table 的根因)
+- [x] `TableHead/TableCell stickyLead` — 凍結首欄(金融寬表剛需,真缺口)
+- [x] `AdminLayout classNames/hideSidebar/hideNavbar` — 注入點,消滅鎖內部 DOM 的全域 CSS hack
+- [x] `llms.txt`/`llms-full.txt` — AI agent 可讀的 API 與設計規則,隨包發佈
+
+待做(按證據頻率):
+
+- [ ] `toast.fromError(err, { prefix })` — 283+ 次 catch+toast.error 樣板的收斂點
+- [ ] `Button variant="link"` + clickable row/card 模式 — 16+ 處 lint bypass 的來源
+- [ ] `AdminLayout bottomNav` slot(含 safe-area padding)— 行動版底部導航,配合 hideSidebar='mobile'
+- [ ] `FileUpload` headless/自訂觸發器模式確認與文件化(7 處手刻隱藏 input)
+- [ ] `PinInput`(OTP 驗證碼)、Range Slider、通用 Backdrop primitive — 明確元件缺口
+- [ ] 零使用元件盤點 — CommandPalette/Tree/TagInput/VirtualList/BulkActionBar/ColorPicker(0/9):檢視需求或下架
+
 ### v1.0.0 什麼時候發？
 
 **3 個專案已穩定使用 ✅，等 API 半年沒有 breaking change 即可。**

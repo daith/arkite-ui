@@ -68,7 +68,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 
 - **Spacing**: 4px grid (Tailwind scale). Cards: compound children pad `p-4`; the root's `padding` prop defaults to `none` (`padding="lg"` = `p-6`). `density="compact"` for dashboard widgets. Forms stack on `gap-4`; sections on `gap-6`.
 - **Radius**: everything derives from one `--radius` (0.5rem): `rounded-lg` = var, `md` = −2px, `sm` = −4px. Pills/avatars use `rounded-full`. Changing `--radius` rethemes the whole library.
-- **Elevation**: soft low-alpha shadow scale `shadow-xs` → `shadow-2xl`. Cards sit at `xs/sm`; popovers `md/lg`; modals `xl`. Special: `shadow-sticky-left`, `shadow-sticky-header` for sticky table edges.
+- **Elevation**: soft low-alpha shadow scale `shadow-xs` → `shadow-2xl`. Cards sit at `xs/sm`; popovers `md/lg`; modals `xl`. Special: `shadow-sticky-left`, `shadow-sticky-right`, `shadow-sticky-header` for sticky table edges.
 - **Motion**: durations `fast` 100ms / `normal` 150ms / `slow` 300ms; easing tokens incl. `bounce`. Optional framer-motion components live in `@arkite-ui/core/motion`.
 
 ## Component inventory — what to reach for
@@ -77,7 +77,9 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 |---|---|---|
 | Page title + actions | `PageHeader` (`size`, `badge`, `onBack`) | Hand-rolled flex headers |
 | Section on a page | `Card` (+`CardHeader actions`, `density="compact"` for widgets) | Bare bordered divs |
-| Data list w/ sorting/selection | `DataTable` (or `Table` family for full control; `VirtualList` for huge lists) | Custom tables |
+| **Any tabular data — including plain read-only lists** | `Table` family (`Table`/`TableHeader`/`TableRow`/`TableHead`/`TableBody`/`TableCell`) — styled `<table>` with tokens, dark mode, `stickyHeader`, `stickyLead`/`stickyAction` frozen columns built in | Raw `<table><td className="px-3 py-2 text-slate-600">` (hardcodes palette + dark mode by hand) |
+| Data list w/ sorting/filters/selection/pagination | `DataTable` (column-config driven; server-side via `totalRows` + `useServerTable`) | Rebuilding sort/pagination around a raw table |
+| Huge lists (1000+ rows) | `VirtualList` | Rendering everything |
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
 | Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
@@ -91,6 +93,8 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |
 | App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells |
 | Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
+
+**Table vs DataTable — the decision rule:** reach for `DataTable` only when you want its built-in behavior (sorting, column filters, row selection, expansion, pagination). For a read-only list — most admin tables — the `Table` family is *less* code than a `Column<T>[]` config and still inherits tokens, dark mode, `stickyHeader`, and frozen columns. Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
 
 ## API conventions (follow when composing or wrapping)
 

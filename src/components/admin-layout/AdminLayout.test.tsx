@@ -339,4 +339,53 @@ describe('AdminLayout', () => {
       expect(screen.queryByRole('link')).not.toBeInTheDocument()
     })
   })
+
+  describe('classNames / hide props (customization injection points)', () => {
+    it('applies classNames to internal regions', () => {
+      const { container } = renderLayout({
+        subNav: <div>Sub</div>,
+        classNames: {
+          root: 'test-root',
+          sidebar: 'test-sidebar',
+          navbar: 'test-navbar',
+          subNav: 'test-subnav',
+          main: 'test-main',
+        },
+      })
+      expect(container.querySelector('.test-root')).toBeInTheDocument()
+      expect(container.querySelector('aside.test-sidebar')).toBeInTheDocument()
+      expect(container.querySelector('header.test-navbar')).toBeInTheDocument()
+      expect(container.querySelector('.test-subnav')).toBeInTheDocument()
+      expect(container.querySelector('main.test-main')).toBeInTheDocument()
+    })
+
+    it('applies classNames.sidebar to the rail variant aside', () => {
+      const { container } = renderLayout({
+        sidebarVariant: 'rail',
+        classNames: { sidebar: 'test-rail' },
+      })
+      expect(container.querySelector('aside.test-rail')).toBeInTheDocument()
+    })
+
+    it('hideSidebar removes the sidebar entirely', () => {
+      const { container } = renderLayout({ hideSidebar: true })
+      expect(container.querySelector('aside')).not.toBeInTheDocument()
+    })
+
+    it("hideSidebar='mobile' keeps the sidebar but hides it below md", () => {
+      const { container } = renderLayout({ hideSidebar: 'mobile' })
+      const aside = container.querySelector('aside')
+      expect(aside).toHaveClass('hidden', 'md:flex')
+    })
+
+    it('hideNavbar removes the navbar entirely', () => {
+      const { container } = renderLayout({ hideNavbar: true })
+      expect(container.querySelector('header')).not.toBeInTheDocument()
+    })
+
+    it("hideNavbar='mobile' keeps the navbar but hides it below md", () => {
+      const { container } = renderLayout({ hideNavbar: 'mobile' })
+      expect(container.querySelector('header')).toHaveClass('hidden', 'md:flex')
+    })
+  })
 })

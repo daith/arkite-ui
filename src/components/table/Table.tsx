@@ -129,11 +129,13 @@ export interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
   sortDirection?: 'asc' | 'desc' | null
   /** Sticky action column — pins to the right edge during horizontal scroll */
   stickyAction?: boolean
+  /** Sticky lead column — pins to the left edge during horizontal scroll (e.g. a ticker/name column in a wide table) */
+  stickyLead?: boolean
 }
 
 /** Table header cell with optional sort indicators and sticky positioning. */
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, sortable, sortDirection, stickyAction, children, ...props }, ref) => (
+  ({ className, sortable, sortDirection, stickyAction, stickyLead, children, ...props }, ref) => (
     <th
       ref={ref}
       className={cn(
@@ -141,9 +143,11 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
         '[&:has([role=checkbox])]:pr-0',
         sortable && 'cursor-pointer select-none hover:text-foreground',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
+        stickyLead && 'sticky left-0 bg-background shadow-sticky-right',
         className
       )}
       data-sticky-action={stickyAction || undefined}
+      data-sticky-lead={stickyLead || undefined}
       {...props}
     >
       {sortable ? (
@@ -167,19 +171,23 @@ TableHead.displayName = 'TableHead'
 export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
   /** Sticky action column — pins to the right edge during horizontal scroll */
   stickyAction?: boolean
+  /** Sticky lead column — pins to the left edge during horizontal scroll (e.g. a ticker/name column in a wide table) */
+  stickyLead?: boolean
 }
 
-/** Table data cell with optional sticky action column support. */
+/** Table data cell with optional sticky column support. */
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, stickyAction, ...props }, ref) => (
+  ({ className, stickyAction, stickyLead, ...props }, ref) => (
     <td
       ref={ref}
       className={cn(
         'p-4 align-middle [&:has([role=checkbox])]:pr-0',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
+        stickyLead && 'sticky left-0 bg-background shadow-sticky-right',
         className
       )}
       data-sticky-action={stickyAction || undefined}
+      data-sticky-lead={stickyLead || undefined}
       {...props}
     />
   )

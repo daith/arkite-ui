@@ -116,6 +116,23 @@ export interface AdminLayoutProps {
   toastPosition?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center'
   /** Hide toast container (if consumer manages their own) */
   hideToast?: boolean
+  /**
+   * Class overrides for the internal regions — the supported way to restyle
+   * parts AdminLayout renders itself. Use this instead of global CSS that
+   * targets internal DOM (aria-labels, utility-class combos): those selectors
+   * break silently on any markup change, with no build-time signal.
+   */
+  classNames?: {
+    root?: string
+    sidebar?: string
+    navbar?: string
+    subNav?: string
+    main?: string
+  }
+  /** Hide the sidebar: `true` removes it, `'mobile'` hides it below the `md` breakpoint */
+  hideSidebar?: boolean | 'mobile'
+  /** Hide the navbar: `true` removes it, `'mobile'` hides it below the `md` breakpoint */
+  hideNavbar?: boolean | 'mobile'
   /** Main content */
   children: ReactNode
   className?: string
@@ -188,6 +205,9 @@ export function AdminLayout({
   subNav,
   toastPosition = 'top-right',
   hideToast = false,
+  classNames,
+  hideSidebar = false,
+  hideNavbar = false,
   children,
   className,
 }: AdminLayoutProps) {
@@ -261,11 +281,15 @@ export function AdminLayout({
   }
 
   return (
-    <div className={cn('flex h-screen bg-background', className)}>
+    <div className={cn('flex h-screen bg-background', classNames?.root, className)}>
       {/* Sidebar */}
-      {sidebarVariant === 'rail' ? (
+      {hideSidebar === true ? null : sidebarVariant === 'rail' ? (
         <aside
-          className="flex w-[72px] min-w-[72px] flex-col border-r bg-card"
+          className={cn(
+            'flex w-[72px] min-w-[72px] flex-col border-r bg-card',
+            hideSidebar === 'mobile' && 'hidden md:flex',
+            classNames?.sidebar
+          )}
           aria-label={locale.adminLayout.primaryNavigation}
         >
           <div className="flex h-14 items-center justify-center border-b">
@@ -342,7 +366,11 @@ export function AdminLayout({
           )}
         </aside>
       ) : (
-      <Sidebar collapsible defaultCollapsed={false}>
+      <Sidebar
+        collapsible
+        defaultCollapsed={false}
+        className={cn(hideSidebar === 'mobile' && 'hidden md:flex', classNames?.sidebar)}
+      >
         <SidebarBrand brand={brand} />
 
         <SidebarContent>
@@ -413,7 +441,12 @@ export function AdminLayout({
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Navbar */}
-        <Navbar sticky bordered>
+        {hideNavbar !== true && (
+        <Navbar
+          sticky
+          bordered
+          className={cn(hideNavbar === 'mobile' && 'hidden md:flex', classNames?.navbar)}
+        >
           <NavbarContent align="left">
             {navbarLeft}
           </NavbarContent>
@@ -444,16 +477,17 @@ export function AdminLayout({
             )}
           </NavbarContent>
         </Navbar>
+        )}
 
         {/* Sub-navigation slot (e.g., rail variant's sub pill row) */}
         {subNav && (
-          <div className="border-b bg-card/50 px-6 py-2">
+          <div className={cn('border-b bg-card/50 px-6 py-2', classNames?.subNav)}>
             {subNav}
           </div>
         )}
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className={cn('flex-1 overflow-auto p-6', classNames?.main)}>
           {children}
         </main>
       </div>

@@ -59,6 +59,13 @@ describe('TableHead', () => {
     )
     expect(screen.getByRole('columnheader')).toHaveClass('sticky', 'right-0')
   })
+
+  it('applies stickyLead class', () => {
+    render(
+      <table><thead><tr><TableHead stickyLead>Ticker</TableHead></tr></thead></table>
+    )
+    expect(screen.getByRole('columnheader')).toHaveClass('sticky', 'left-0')
+  })
 })
 
 describe('TableCell', () => {
@@ -67,6 +74,13 @@ describe('TableCell', () => {
       <table><tbody><tr><TableCell stickyAction>Edit</TableCell></tr></tbody></table>
     )
     expect(screen.getByRole('cell')).toHaveClass('sticky', 'right-0')
+  })
+
+  it('applies stickyLead class', () => {
+    render(
+      <table><tbody><tr><TableCell stickyLead>AAPL</TableCell></tr></tbody></table>
+    )
+    expect(screen.getByRole('cell')).toHaveClass('sticky', 'left-0')
   })
 })
 
