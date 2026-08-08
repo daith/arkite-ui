@@ -34,6 +34,7 @@
   #arkite-site-header .lk a { color: #6b7280; text-decoration: none; }
   #arkite-site-header .lk a:hover { color: #16181d; }
   #arkite-site-header .lk a.on { color: #6a4dff; font-weight: 550; }
+  #arkite-site-header .lk a.cta { color: #6a4dff; font-weight: 550; }
   /* The injected header already carries the wordmark — drop the
      sidebar's duplicate brand block (title comes from our brandTitle). */
   .sidebar-header a[title="Arkite UI"] { display: none; }
@@ -45,12 +46,11 @@
     h.innerHTML =
       '<a class="wm" href="../"><span>A</span>Arkite UI</a>' +
       '<nav class="lk">' +
-      '<a href="../">Home</a>' +
       '<a class="on" href="./">Components</a>' +
       '<a href="./?path=/docs/getting-started--docs">Docs</a>' +
       '<a href="./?path=/docs/foundation-design-tokens--docs">Tokens</a>' +
-      '<a href="https://starter.foson.co">Live demo</a>' +
       '<a href="https://github.com/foson-co/arkite-ui">GitHub</a>' +
+      '<a class="cta" href="https://starter.foson.co">Live demo \u2192</a>' +
       '</nav>'
     document.body.prepend(h)
   })
