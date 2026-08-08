@@ -28,7 +28,7 @@ Arkite UI is not another generic component library. It focuses on the components
 - **Framer Motion** — Optional animation system for Modal, Drawer, Toast
 - **Theme System** — 4 built-in presets + `createTheme()` utility with CSS Variables
 - **Density System** — Consistent `sm/md/lg` sizing across all interactive components
-- **Tested** — 412 unit tests with Vitest + Testing Library
+- **Tested** — 1,200+ unit tests with Vitest + Testing Library, plus real-Chromium keyboard specs and a Next.js RSC smoke test in CI
 - **Bundle Monitoring** — size-limit budget (< 300 KB)
 
 ## Installation
@@ -386,7 +386,7 @@ pnpm install             # Install dependencies
 pnpm build               # Build the package (tsup)
 pnpm dev                 # Watch mode
 pnpm storybook           # Launch Storybook (http://localhost:6006)
-pnpm test                # Run unit tests (412 tests)
+pnpm test                # Run unit tests
 pnpm test:watch          # Tests in watch mode
 pnpm test:coverage       # Tests with coverage report
 pnpm lint                # Lint source code
