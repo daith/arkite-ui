@@ -316,3 +316,41 @@ const SelectionRulesDemo = () => {
 
 export const SelectionRules: StoryFn = () => <SelectionRulesDemo />
 SelectionRules.storyName = 'isRowSelectable + onRowSelect'
+
+// cellStyle: CONTINUOUS values that class strings can't express —
+// heatmap alpha computed from the row at runtime. headerStyle: vertical
+// writing-mode for rotated matrix headers.
+interface HeatRow {
+  metric: string
+  q1: number
+  q2: number
+  q3: number
+  q4: number
+}
+
+const heatRows: HeatRow[] = [
+  { metric: 'Revenue growth', q1: 0.12, q2: 0.35, q3: 0.61, q4: 0.88 },
+  { metric: 'Churn', q1: 0.72, q2: 0.44, q3: 0.28, q4: 0.09 },
+  { metric: 'NPS', q1: 0.2, q2: 0.51, q3: 0.66, q4: 0.94 },
+]
+
+const heatCell = (key: keyof HeatRow & string): Column<HeatRow> => ({
+  key,
+  header: key.toUpperCase(),
+  align: 'right',
+  headerStyle: { writingMode: 'vertical-rl' },
+  cellStyle: (row) => ({ backgroundColor: `rgba(106, 77, 255, ${row[key] as number})` }),
+  cell: (row) => `${Math.round((row[key] as number) * 100)}%`,
+})
+
+export const ContinuousHeatmap: StoryFn = () => (
+  <DataTable<HeatRow>
+    data={heatRows}
+    columns={[{ key: 'metric', header: 'Metric' }, heatCell('q1'), heatCell('q2'), heatCell('q3'), heatCell('q4')]}
+    getRowKey={(r) => r.metric}
+    compact
+    hoverable={false}
+    pagination={false}
+  />
+)
+ContinuousHeatmap.storyName = 'cellStyle heatmap (continuous alpha)'
