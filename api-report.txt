@@ -330,11 +330,13 @@ type Column {
   align?: "center" | "right" | "left" | undefined
   cell?: ((row: T, index: number) => ReactNode) | undefined
   cellClassName?: string | ((row: T, index: number) => string) | undefined
+  cellStyle?: CSSProperties | ((row: T, index: number) => CSSProperties) | undefined
   filterFn?: ((row: T, filterValue: string) => boolean) | undefined
   filterOptions?: string[] | undefined
   filterable?: boolean | undefined
   header: ReactNode
   headerClassName?: string | undefined
+  headerStyle?: CSSProperties | undefined
   hidden?: boolean | "mobile" | "desktop" | undefined
   key: string
   pinned?: "right" | "left" | undefined

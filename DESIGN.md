@@ -104,7 +104,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 
 1. **Data list with header semantics → `DataTable`.** This includes **runtime-determined dynamic columns** — one column per data source / schema field / period is fine: build the `Column<T>[]` array from the data itself. `cell(row, index)` receives the row index, so cross-row computation (compare with the previous row) works too. Don't fall back to a raw `<table>` just because columns aren't static.
 2. **Headerless compact list / key-value display → `Table` family** — *less* code than a column config, still inherits tokens, dark mode, `compact`, `stickyHeader`, frozen columns. It also maps 1:1 onto markdown/HTML renderer overrides (`td`/`th` → `TableCell`/`TableHead`; `align` tolerates HTML's deprecated values).
-3. **Visual matrices** (cells are colored blocks, per-cell dynamic styling) → use `Column.cellClassName` (string or `(row, index) => string`) on `DataTable`, or `cellClassName`-style classes on `TableCell`.
+3. **Visual matrices** (cells are colored blocks, per-cell dynamic styling) → discrete/binary grades: `Column.cellClassName` (class string per row). **Continuous values** (heatmap alpha computed at runtime): `Column.cellStyle` — class strings can't express continuous values and Tailwind can't compile runtime-generated classes. Vertical headers: `Column.headerStyle` (`writingMode`).
 
 Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
 

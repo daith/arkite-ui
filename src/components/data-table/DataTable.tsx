@@ -1,4 +1,4 @@
-import { Fragment, useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from 'react'
+import { Fragment, useState, useMemo, useCallback, useRef, useEffect, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 import { warnDeprecated, warnUsage } from '../../utils/deprecate'
 import { useLocale } from '../../locale'
@@ -35,8 +35,17 @@ export interface Column<T> {
   hidden?: boolean | 'mobile' | 'desktop'
   /** Class for this column's header cell */
   headerClassName?: string
+  /** Inline style for this column's header cell (e.g. vertical writing-mode) */
+  headerStyle?: CSSProperties
   /** Class for this column's body cells — string, or a function of the row */
   cellClassName?: string | ((row: T, index: number) => string)
+  /**
+   * Inline style for this column's body cells — for CONTINUOUS values class
+   * strings can't express (e.g. heatmap alpha computed from the row:
+   * `(row) => ({ background: \`rgb(106 77 255 / ${row.t})\` })`).
+   * Discrete/binary styling should prefer `cellClassName`.
+   */
+  cellStyle?: CSSProperties | ((row: T, index: number) => CSSProperties)
   /** Enable filtering for this column */
   filterable?: boolean
   /** Custom filter options. If not provided, auto-detect unique values from data. */
@@ -689,7 +698,7 @@ export function DataTable<T>({
                       : 'descending'
                     : undefined
                 }
-                style={{ width: column.width }}
+                style={{ width: column.width, ...column.headerStyle }}
                 className={cn(
                   // Pinned headers are position:sticky — `relative` would
                   // override it (the filter dropdown anchors fine either way)
@@ -865,6 +874,11 @@ export function DataTable<T>({
                     key={column.key}
                     stickyLead={column.pinned === 'left'}
                     stickyAction={column.pinned === 'right'}
+                    style={
+                      typeof column.cellStyle === 'function'
+                        ? column.cellStyle(row, globalIndex)
+                        : column.cellStyle
+                    }
                     className={cn(
                       responsiveHiddenClass(column.hidden),
                       column.align === 'center' && 'text-center',

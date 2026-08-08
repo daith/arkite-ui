@@ -873,6 +873,44 @@ describe('DataTable', () => {
     expect(within(rows[0]).getAllByRole('cell')[0]).not.toHaveClass('text-destructive')
   })
 
+  it('cellStyle carries continuous values class strings cannot (heatmap alpha)', () => {
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[
+          {
+            key: 'age',
+            header: 'Age',
+            // Continuous alpha computed from the row — the cellClassName-can't case
+            cellStyle: (row) => ({ backgroundColor: `rgba(106, 77, 255, ${row.age / 100})` }),
+          },
+        ]}
+      />
+    )
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(within(rows[0]).getAllByRole('cell')[0]).toHaveStyle({
+      backgroundColor: 'rgba(106, 77, 255, 0.3)',
+    })
+    expect(within(rows[2]).getAllByRole('cell')[0]).toHaveStyle({
+      backgroundColor: 'rgba(106, 77, 255, 0.35)',
+    })
+  })
+
+  it('headerStyle merges with the width style (e.g. vertical writing mode)', () => {
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[{ key: 'name', header: 'Name', width: 80, headerStyle: { writingMode: 'vertical-rl' } }]}
+      />
+    )
+    const head = screen.getByRole('columnheader', { name: 'Name' })
+    expect(head).toHaveStyle({ width: '80px', writingMode: 'vertical-rl' })
+  })
+
   it("hidden:'mobile' keeps the column rendered but hides it below md via CSS", () => {
     render(
       <DataTable
