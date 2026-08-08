@@ -95,7 +95,7 @@
 - [x] Sparkline 補 nullable data / `placeholder`（無資料時的虛線 placeholder）— 2026-07-03 完成，ark-finance 可移除 wrapper
 
 - [ ] Bundle size regression 顯示在 MR comment（CI job 已有 size-limit）
-- [x] Storybook 部署到公開 URL（GitHub Pages：daith.github.io/arkite-ui）
+- [x] Storybook 部署到公開 URL（GitHub Pages：ui.foson.co）
 - [ ] README 的 Quick Start 確保 copy-paste 就能跑（新專案開局時驗證）
 
 ### 不做

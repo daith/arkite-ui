@@ -4,10 +4,10 @@ Production-ready React components for SaaS admin panels. Built with Tailwind CSS
 
 [![npm version](https://img.shields.io/npm/v/%40arkite-ui%2Fcore)](https://www.npmjs.com/package/@arkite-ui/core)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/%40arkite-ui%2Fcore)](https://bundlephobia.com/package/@arkite-ui/core)
-[![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://daith.github.io/arkite-ui/storybook/)
+[![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://ui.foson.co/storybook/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-**[Website](https://daith.github.io/arkite-ui/)** · **[Storybook](https://daith.github.io/arkite-ui/storybook/)** · **[Getting Started](https://daith.github.io/arkite-ui/storybook/?path=/docs/getting-started--docs)** · **[llms.txt](https://daith.github.io/arkite-ui/llms.txt)** (for AI agents)
+**[Website](https://ui.foson.co/)** · **[Storybook](https://ui.foson.co/storybook/)** · **[Getting Started](https://ui.foson.co/storybook/?path=/docs/getting-started--docs)** · **[llms.txt](https://ui.foson.co/llms.txt)** (for AI agents)
 
 Arkite UI is not another generic component library. It focuses on the components you actually need to build multi-tenant SaaS admin panels — tenant switchers, data tables, stat dashboards, filter bars, and more.
 
@@ -15,10 +15,10 @@ Arkite UI is not another generic component library. It focuses on the components
 
 **Links:**
 
-- [Website](https://daith.github.io/arkite-ui/) — Landing page & live demo
-- [Storybook (Component Docs)](https://daith.github.io/arkite-ui/storybook/) — Every component, every state
-- [GitHub Repository](https://github.com/daith/arkite-ui) — Source code
-- [Issue Tracker](https://github.com/daith/arkite-ui/issues) — Bug reports & feature requests
+- [Website](https://ui.foson.co/) — Landing page & live demo
+- [Storybook (Component Docs)](https://ui.foson.co/storybook/) — Every component, every state
+- [GitHub Repository](https://github.com/foson-co/arkite-ui) — Source code
+- [Issue Tracker](https://github.com/foson-co/arkite-ui/issues) — Bug reports & feature requests
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — Development guide
 - [CHANGELOG.md](./CHANGELOG.md) — Release history
 
@@ -42,8 +42,8 @@ Most component libraries make coding agents guess. Arkite ships its documentatio
 
 | File | Contents | Where |
 |------|----------|-------|
-| [`llms.txt`](https://daith.github.io/arkite-ui/llms.txt) | Setup, design rules, core patterns, full export inventory | Site root + inside the npm package |
-| [`llms-full.txt`](https://daith.github.io/arkite-ui/llms-full.txt) | The above + complete design spec + the typed public API of every export | Site root + inside the npm package |
+| [`llms.txt`](https://ui.foson.co/llms.txt) | Setup, design rules, core patterns, full export inventory | Site root + inside the npm package |
+| [`llms-full.txt`](https://ui.foson.co/llms-full.txt) | The above + complete design spec + the typed public API of every export | Site root + inside the npm package |
 | `DESIGN.md` | Machine-readable design system spec (tokens, hard rules, component selection) | Inside the npm package |
 
 Point your agent at `node_modules/@arkite-ui/core/llms-full.txt` (or the hosted URL) and it imports the right component with the right props on the first try. Both files are regenerated from the type-checked API snapshot on every build, so they can't drift from the code.
@@ -97,13 +97,13 @@ import arkitePreset from '@arkite-ui/core/tailwind'
 import { AdminLayout, DataTable, Button, Badge } from '@arkite-ui/core'
 ```
 
-## Components (55+)
+## Components (70)
 
 ### UI Primitives
 
 | Component | Description |
 |-----------|-------------|
-| `Button` | 6 variants (primary, secondary, outline, ghost, destructive, gradient), sm/md/lg |
+| `Button` | 7 variants (primary, secondary, outline, ghost, destructive, gradient, link), sm/md/lg |
 | `Input` | Text input with addons, error state, sm/md/lg |
 | `Textarea` | Multi-line input with autoResize, sm/md/lg |
 | `Badge` | Status badges with sm/md sizes (default, success, warning, destructive, info) |

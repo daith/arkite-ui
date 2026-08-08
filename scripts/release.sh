@@ -82,8 +82,8 @@ git tag "v${NEW_VERSION}" || exit 1
 # 只推新 tag，避免 --tags 把本地殘留的舊 tag 一起推上去觸發舊 pipeline
 git push origin main "refs/tags/v${NEW_VERSION}" || exit 1
 
-# Step 6: 同步 GitHub 鏡像（daith/arkite-ui；push 會觸發 Pages 部署展示站）
-# 鏡像屬 daith 帳號，走 gh credential helper 繞過 keychain 預設憑證。
+# Step 6: 同步 GitHub 鏡像（foson-co/arkite-ui；push 會觸發 Pages 部署展示站）
+# 鏡像在 foson-co org（daith 為 owner），走 daith 憑證的 gh credential helper。
 # 鏡像失敗不影響發版（npm 已由 GitLab pipeline 接手），僅提示手動補推。
 printf "\n${YELLOW}[6/6] 同步 GitHub 鏡像...${NC}\n"
 if git remote get-url github > /dev/null 2>&1; then
@@ -105,4 +105,4 @@ printf "${GREEN}========================================${NC}\n"
 printf "Pipeline:  https://gitlab.com/foson.co/arkite-ui/-/pipelines\n"
 printf "npm:       https://www.npmjs.com/package/@arkite-ui/core\n"
 printf "GitLab:    https://gitlab.com/foson.co/arkite-ui/-/packages\n"
-printf "Pages:     https://daith.github.io/arkite-ui/\n\n"
+printf "Pages:     https://ui.foson.co/\n\n"
