@@ -46,13 +46,30 @@
     h.innerHTML =
       '<a class="wm" href="../"><span>A</span>Arkite UI</a>' +
       '<nav class="lk">' +
-      '<a class="on" href="./">Components</a>' +
-      '<a href="./?path=/docs/getting-started--docs">Docs</a>' +
-      '<a href="./?path=/docs/foundation-design-tokens--docs">Tokens</a>' +
+      '<a data-nav="components" href="./">Components</a>' +
+      '<a data-nav="docs" href="./?path=/docs/getting-started--docs">Docs</a>' +
+      '<a data-nav="tokens" href="./?path=/docs/foundation-design-tokens--docs">Tokens</a>' +
       '<a href="https://github.com/foson-co/arkite-ui">GitHub</a>' +
       '<a class="cta" href="https://starter.foson.co">Live demo \u2192</a>' +
       '</nav>'
     document.body.prepend(h)
+
+    // Storybook is an SPA: ?path= changes via pushState (no event), so poll
+    // lightly and move the highlight to match the section being viewed.
+    var DOCS = /\/docs\/(introduction|getting-started|accessibility|component-guidelines|form-patterns)--/
+    var TOKENS = /\/docs\/foundation-/
+    var last = null
+    function update() {
+      var path = (new URLSearchParams(location.search).get('path')) || ''
+      if (path === last) return
+      last = path
+      var active = TOKENS.test(path) ? 'tokens' : DOCS.test(path) ? 'docs' : 'components'
+      h.querySelectorAll('[data-nav]').forEach(function (a) {
+        a.classList.toggle('on', a.getAttribute('data-nav') === active)
+      })
+    }
+    update()
+    setInterval(update, 400)
   })
 </script>
 
