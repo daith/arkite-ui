@@ -445,12 +445,15 @@ type DataTableProps {
   fillHeight?: boolean | undefined
   filters?: Record<string, string[]> | undefined
   getRowKey?: ((row: T, index: number) => string | number) | undefined
+  hoverable?: boolean | undefined
+  isRowSelectable?: ((row: T, index: number) => boolean) | undefined
   loading?: boolean | undefined
   maxHeight?: string | number | undefined
   onFilterChange?: ((filters: Record<string, string[]>) => void) | undefined
   onPageChange?: ((page: number) => void) | undefined
   onPageSizeChange?: ((pageSize: number) => void) | undefined
   onRowClick?: ((row: T, index: number) => void) | undefined
+  onRowSelect?: ((row: T, selected: boolean) => void) | undefined
   onSelectionChange?: ((selected: Set<string | number>) => void) | undefined
   onSortChange?: ((sort: SortState | null) => void) | undefined
   page?: number | undefined
@@ -676,7 +679,9 @@ type FormFieldProps {
   disabled?: boolean | undefined
   error?: string | undefined
   errorMessage?: string | undefined
+  label?: ReactNode
   name?: string | undefined
+  required?: boolean | undefined
 }
 
 type FormLabelProps {
@@ -1135,6 +1140,7 @@ type SkeletonProps {
 }
 
 type SkeletonTableProps {
+  columnWidths?: (string | number)[] | undefined
   columns?: number | undefined
   rows?: number | undefined
 }
@@ -1670,7 +1676,7 @@ value CopyButton: React.ForwardRefExoticComponent<CopyButtonProps & React.RefAtt
 
 value CopyInput: React.ForwardRefExoticComponent<CopyInputProps & React.RefAttributes<HTMLInputElement>>
 
-value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
+value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, hoverable, onRowSelect, isRowSelectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
 
 value DatePicker: React.ForwardRefExoticComponent<DatePickerProps & React.RefAttributes<HTMLInputElement>>
 

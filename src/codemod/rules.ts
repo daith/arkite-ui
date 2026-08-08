@@ -844,7 +844,7 @@ const toastFromErrorRule: Rule = {
   name: 'toast-from-error',
   description: 'toast.error(`X:${getErrorMessage(err)}`) → toast.fromError(err, { prefix: "X" })',
   transform(sf) {
-    return editUntilStable(() => {
+    let total = editUntilStable(() => {
       const hit = matchFromErrorCall(sf)
       if (hit == null) return false
       const opts: string[] = []
@@ -854,6 +854,31 @@ const toastFromErrorRule: Rule = {
       hit.call.replaceWithText(`${hit.objText}.fromError(${hit.errText}${optionsText})`)
       return true
     })
+    // 清理:getErrorMessage 若已無任何參照,移除 import specifier(空了連
+    // declaration 一起移),否則 type-check 會因 unused import 而紅
+    for (const decl of sf.getImportDeclarations()) {
+      for (const ni of decl.getNamedImports()) {
+        if (ni.getName() !== 'getErrorMessage') continue
+        const localName = ni.getAliasNode()?.getText() ?? ni.getName()
+        const used = sf.getDescendantsOfKind(SyntaxKind.Identifier).some(
+          (id) =>
+            id.getText() === localName &&
+            id.getFirstAncestorByKind(SyntaxKind.ImportDeclaration) == null
+        )
+        if (used) continue
+        const parent = ni.getImportDeclaration()
+        ni.remove()
+        if (
+          parent.getNamedImports().length === 0 &&
+          parent.getDefaultImport() == null &&
+          parent.getNamespaceImport() == null
+        ) {
+          parent.remove()
+        }
+        total += 1
+      }
+    }
+    return total
   },
 }
 

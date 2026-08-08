@@ -2,12 +2,14 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import {
   Form,
+  FormControl,
   FormField,
   FormLabel,
   FormMessage,
   FormSection,
   FormActions,
 } from './Form'
+import { Input } from '../input/Input'
 
 describe('Form', () => {
   it('renders as form element', () => {
@@ -214,5 +216,33 @@ describe('Form disabled propagation', () => {
     )
     const label = screen.getByText('Name').closest('label')!
     expect(label.className).toContain('opacity-70')
+  })
+})
+
+describe('FormField label prop (ark-finance round-2 A1)', () => {
+  it('renders a FormLabel wired to the field context', () => {
+    render(
+      <Form>
+        <FormField name="email" label="Email" required>
+          <FormControl>
+            <Input />
+          </FormControl>
+        </FormField>
+      </Form>
+    )
+    // Label associates with the control through the shared field id
+    expect(screen.getByLabelText(/Email/)).toBeInTheDocument()
+  })
+
+  it('FormLabel accepts htmlFor (LabelHTMLAttributes)', () => {
+    render(
+      <>
+        <FormField name="x">
+          <FormLabel htmlFor="outside">Outside</FormLabel>
+        </FormField>
+        <input id="outside" />
+      </>
+    )
+    expect(screen.getByLabelText('Outside')).toBeInTheDocument()
   })
 })

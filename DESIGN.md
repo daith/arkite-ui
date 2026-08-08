@@ -100,7 +100,13 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`, `classNames`, mobile: `hideSidebar="mobile"` + `bottomNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells; global CSS targeting AdminLayout internals |
 | Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
 
-**Table vs DataTable — the decision rule:** reach for `DataTable` only when you want its built-in behavior (sorting, column filters, row selection, expansion, pagination). For a read-only list — most admin tables — the `Table` family is *less* code than a `Column<T>[]` config and still inherits tokens, dark mode, `stickyHeader`, and frozen columns. Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
+**Table vs DataTable — the decision rule (field-tested across a 47-file consumer migration):**
+
+1. **Data list with header semantics → `DataTable`.** This includes **runtime-determined dynamic columns** — one column per data source / schema field / period is fine: build the `Column<T>[]` array from the data itself. `cell(row, index)` receives the row index, so cross-row computation (compare with the previous row) works too. Don't fall back to a raw `<table>` just because columns aren't static.
+2. **Headerless compact list / key-value display → `Table` family** — *less* code than a column config, still inherits tokens, dark mode, `compact`, `stickyHeader`, frozen columns. It also maps 1:1 onto markdown/HTML renderer overrides (`td`/`th` → `TableCell`/`TableHead`; `align` tolerates HTML's deprecated values).
+3. **Visual matrices** (cells are colored blocks, per-cell dynamic styling) → use `Column.cellClassName` (string or `(row, index) => string`) on `DataTable`, or `cellClassName`-style classes on `TableCell`.
+
+Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
 
 ## API conventions (follow when composing or wrapping)
 

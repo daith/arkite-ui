@@ -755,6 +755,61 @@ describe('DataTable', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(20)
   })
 
+
+  // ─── Round-2 feedback: incremental selection, per-row disable, hoverable ───
+
+  it('onRowSelect fires per changed row (single toggle and select-all)', async () => {
+    const user = userEvent.setup()
+    const onRowSelect = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set([1])}
+        onSelectionChange={() => {}}
+        onRowSelect={onRowSelect}
+        pagination={false}
+      />
+    )
+    await user.click(screen.getByLabelText('Select row 2'))
+    expect(onRowSelect).toHaveBeenCalledWith(data[1], true)
+    onRowSelect.mockClear()
+    // Select-all: rows 2 and 3 flip on; row 1 (already selected) must NOT fire
+    await user.click(screen.getByLabelText('Select all rows'))
+    expect(onRowSelect).toHaveBeenCalledTimes(2)
+    expect(onRowSelect).toHaveBeenCalledWith(data[1], true)
+    expect(onRowSelect).toHaveBeenCalledWith(data[2], true)
+  })
+
+  it('isRowSelectable disables the checkbox and excludes the row from select-all', async () => {
+    const user = userEvent.setup()
+    const onSelectionChange = vi.fn()
+    render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        selectable
+        selectedRows={new Set()}
+        onSelectionChange={onSelectionChange}
+        isRowSelectable={(r) => r.name !== 'Bob'}
+        pagination={false}
+      />
+    )
+    expect(screen.getByLabelText('Select row 2')).toBeDisabled()
+    await user.click(screen.getByLabelText('Select all rows'))
+    expect(onSelectionChange).toHaveBeenCalledWith(new Set([1, 3]))
+  })
+
+  it('hoverable={false} passes through to the underlying Table', () => {
+    render(
+      <DataTable columns={columns} data={data} getRowKey={(r) => r.id} hoverable={false} />
+    )
+    expect(screen.getByRole('table')).not.toHaveAttribute('data-hoverable')
+  })
+
   // ─── Density / row styling (ark-finance feedback 3.1, 3.3) ───
 
   it('passes hoverable and compact through to the underlying Table', () => {

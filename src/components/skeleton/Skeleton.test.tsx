@@ -68,3 +68,13 @@ describe('SkeletonTable', () => {
     expect(rows).toHaveLength(4)
   })
 })
+
+describe('SkeletonTable columnWidths', () => {
+  it('applies fixed widths per column and stays fluid where unspecified', () => {
+    const { container } = render(<SkeletonTable rows={1} columnWidths={[120, '30%']} />)
+    const cells = container.querySelectorAll('.flex.gap-4 > *')
+    // header row: 2 cells per columnWidths length
+    expect(cells[0]).toHaveStyle({ width: '120px' })
+    expect(cells[1]).toHaveStyle({ width: '30%' })
+  })
+})

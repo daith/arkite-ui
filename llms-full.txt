@@ -189,7 +189,13 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`, `classNames`, mobile: `hideSidebar="mobile"` + `bottomNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells; global CSS targeting AdminLayout internals |
 | Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
 
-**Table vs DataTable — the decision rule:** reach for `DataTable` only when you want its built-in behavior (sorting, column filters, row selection, expansion, pagination). For a read-only list — most admin tables — the `Table` family is *less* code than a `Column<T>[]` config and still inherits tokens, dark mode, `stickyHeader`, and frozen columns. Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
+**Table vs DataTable — the decision rule (field-tested across a 47-file consumer migration):**
+
+1. **Data list with header semantics → `DataTable`.** This includes **runtime-determined dynamic columns** — one column per data source / schema field / period is fine: build the `Column<T>[]` array from the data itself. `cell(row, index)` receives the row index, so cross-row computation (compare with the previous row) works too. Don't fall back to a raw `<table>` just because columns aren't static.
+2. **Headerless compact list / key-value display → `Table` family** — *less* code than a column config, still inherits tokens, dark mode, `compact`, `stickyHeader`, frozen columns. It also maps 1:1 onto markdown/HTML renderer overrides (`td`/`th` → `TableCell`/`TableHead`; `align` tolerates HTML's deprecated values).
+3. **Visual matrices** (cells are colored blocks, per-cell dynamic styling) → use `Column.cellClassName` (string or `(row, index) => string`) on `DataTable`, or `cellClassName`-style classes on `TableCell`.
+
+Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
 
 ## API conventions (follow when composing or wrapping)
 
@@ -670,12 +676,15 @@ type DataTableProps {
   fillHeight?: boolean | undefined
   filters?: Record<string, string[]> | undefined
   getRowKey?: ((row: T, index: number) => string | number) | undefined
+  hoverable?: boolean | undefined
+  isRowSelectable?: ((row: T, index: number) => boolean) | undefined
   loading?: boolean | undefined
   maxHeight?: string | number | undefined
   onFilterChange?: ((filters: Record<string, string[]>) => void) | undefined
   onPageChange?: ((page: number) => void) | undefined
   onPageSizeChange?: ((pageSize: number) => void) | undefined
   onRowClick?: ((row: T, index: number) => void) | undefined
+  onRowSelect?: ((row: T, selected: boolean) => void) | undefined
   onSelectionChange?: ((selected: Set<string | number>) => void) | undefined
   onSortChange?: ((sort: SortState | null) => void) | undefined
   page?: number | undefined
@@ -901,7 +910,9 @@ type FormFieldProps {
   disabled?: boolean | undefined
   error?: string | undefined
   errorMessage?: string | undefined
+  label?: ReactNode
   name?: string | undefined
+  required?: boolean | undefined
 }
 
 type FormLabelProps {
@@ -1360,6 +1371,7 @@ type SkeletonProps {
 }
 
 type SkeletonTableProps {
+  columnWidths?: (string | number)[] | undefined
   columns?: number | undefined
   rows?: number | undefined
 }
@@ -1895,7 +1907,7 @@ value CopyButton: React.ForwardRefExoticComponent<CopyButtonProps & React.RefAtt
 
 value CopyInput: React.ForwardRefExoticComponent<CopyInputProps & React.RefAttributes<HTMLInputElement>>
 
-value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
+value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, hoverable, onRowSelect, isRowSelectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
 
 value DatePicker: React.ForwardRefExoticComponent<DatePickerProps & React.RefAttributes<HTMLInputElement>>
 

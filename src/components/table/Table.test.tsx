@@ -163,6 +163,15 @@ describe('align / numeric', () => {
     expect(screen.getByRole('columnheader')).toHaveClass('text-right')
   })
 
+  it("HTML's deprecated align values are tolerated and apply nothing", () => {
+    render(
+      <table><tbody><tr><TableCell align="justify">md</TableCell></tr></tbody></table>
+    )
+    const cell = screen.getByRole('cell')
+    expect(cell).not.toHaveClass('text-center', 'text-right')
+    expect(cell).not.toHaveAttribute('align')
+  })
+
   it('numeric right-aligns with tabular figures', () => {
     render(
       <table><tbody><tr><TableCell numeric>3.4T</TableCell></tr></tbody></table>

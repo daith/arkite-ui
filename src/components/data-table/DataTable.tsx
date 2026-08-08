@@ -99,10 +99,20 @@ export interface DataTableProps<T> {
   selectedRows?: Set<string | number>
   /** Default selected rows (uncontrolled) */
   defaultSelectedRows?: Set<string | number>
-  /** On selection change */
+  /** On selection change — receives the complete next selection */
   onSelectionChange?: (selected: Set<string | number>) => void
+  /**
+   * Incremental companion to `onSelectionChange`: fires once per row whose
+   * selection actually changed. Handy when existing code speaks
+   * `toggle(id)`-style events instead of whole-set state.
+   */
+  onRowSelect?: (row: T, selected: boolean) => void
+  /** Per-row selectability — unselectable rows render a disabled checkbox and are skipped by select-all */
+  isRowSelectable?: (row: T, index: number) => boolean
   /** Enable row selection */
   selectable?: boolean
+  /** Row hover feedback (passed to the underlying Table) @default true */
+  hoverable?: boolean
   /**
    * Enable expandable rows; provide the row content via `renderExpandedRow`.
    *
@@ -219,6 +229,9 @@ export function DataTable<T>({
   onRowClick,
   rowClassName,
   selectable = false,
+  hoverable = true,
+  onRowSelect,
+  isRowSelectable,
   selectedRows,
   defaultSelectedRows,
   onSelectionChange,
@@ -481,9 +494,21 @@ export function DataTable<T>({
     [isSelectionControlled, onSelectionChange]
   )
 
+  const pageRows = useMemo(
+    () =>
+      paginatedData.map((row, i) => {
+        const index = pageIndex * pageSize + i
+        return {
+          row,
+          key: getRowKey(row, index),
+          selectableRow: isRowSelectable ? isRowSelectable(row, index) : true,
+        }
+      }),
+    [paginatedData, getRowKey, pageIndex, pageSize, isRowSelectable]
+  )
   const allPageKeys = useMemo(
-    () => paginatedData.map((row, i) => getRowKey(row, pageIndex * pageSize + i)),
-    [paginatedData, getRowKey, pageIndex, pageSize]
+    () => pageRows.filter((r) => r.selectableRow).map((r) => r.key),
+    [pageRows]
   )
 
   const headerCheckState: CheckState = useMemo(() => {
@@ -496,25 +521,34 @@ export function DataTable<T>({
 
   const toggleAll = useCallback(() => {
     const next = new Set(selection)
-    if (headerCheckState === 'checked') {
-      allPageKeys.forEach((k) => next.delete(k))
-    } else {
-      allPageKeys.forEach((k) => next.add(k))
+    const adding = headerCheckState !== 'checked'
+    for (const { row, key, selectableRow } of pageRows) {
+      if (!selectableRow) continue
+      const had = next.has(key)
+      if (adding && !had) {
+        next.add(key)
+        onRowSelect?.(row, true)
+      } else if (!adding && had) {
+        next.delete(key)
+        onRowSelect?.(row, false)
+      }
     }
     updateSelection(next)
-  }, [updateSelection, selection, headerCheckState, allPageKeys])
+  }, [updateSelection, selection, headerCheckState, pageRows, onRowSelect])
 
   const toggleRow = useCallback(
-    (key: string | number) => {
+    (key: string | number, row: T) => {
       const next = new Set(selection)
-      if (next.has(key)) {
-        next.delete(key)
-      } else {
+      const selectedNow = !next.has(key)
+      if (selectedNow) {
         next.add(key)
+      } else {
+        next.delete(key)
       }
+      onRowSelect?.(row, selectedNow)
       updateSelection(next)
     },
-    [updateSelection, selection]
+    [updateSelection, selection, onRowSelect]
   )
 
   // ─── Expand helpers ───
@@ -623,7 +657,7 @@ export function DataTable<T>({
         )}
         style={stickyHeader && !fillHeight && maxHeight ? { maxHeight } : undefined}
       >
-      <Table stickyHeader={stickyHeader} fillHeight={fillHeight} hoverable compact={compact}>
+      <Table stickyHeader={stickyHeader} fillHeight={fillHeight} hoverable={hoverable} compact={compact}>
         <TableHeader>
           <TableRow>
             {isExpandable && (
@@ -820,7 +854,8 @@ export function DataTable<T>({
                   <TableCell className="px-3">
                     <SelectionCheckbox
                       state={isSelected ? 'checked' : 'unchecked'}
-                      onChange={() => toggleRow(rowKey)}
+                      onChange={() => toggleRow(rowKey, row)}
+                      disabled={isRowSelectable ? !isRowSelectable(row, globalIndex) : false}
                       aria-label={locale.dataTable.selectRow(rowKey)}
                     />
                   </TableCell>

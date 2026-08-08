@@ -553,6 +553,26 @@ export const f = (e: unknown) => {
     expect(text).toContain("toast.fromError(e, { prefix: '刪除失敗' })")
   })
 
+  it('清理失去引用的 getErrorMessage import;仍有引用則保留', () => {
+    const cleaned = applyFromError(`import { toast } from '@arkite-ui/core'
+import { getErrorMessage } from '@arkite/utils'
+export const f = (e: unknown) => toast.error(\`失敗:\${getErrorMessage(e)}\`)
+`)
+    expect(cleaned).toContain('toast.fromError')
+    expect(cleaned).not.toContain('getErrorMessage')
+    expect(cleaned).not.toContain('@arkite/utils')
+
+    const kept = applyFromError(`import { toast } from '@arkite-ui/core'
+import { getErrorMessage } from '@arkite/utils'
+export const f = (e: unknown) => {
+  toast.error(\`失敗:\${getErrorMessage(e)}\`)
+  console.warn(getErrorMessage(e))
+}
+`)
+    expect(kept).toContain("import { getErrorMessage } from '@arkite/utils'")
+    expect(kept).toContain('console.warn(getErrorMessage(e))')
+  })
+
   it('干擾項:非 arkite toast、多插值模板、插值後有尾字 → 不動', () => {
     const code = `import { useToast } from './toast'
 declare const toast2: { error: (m: string) => void }

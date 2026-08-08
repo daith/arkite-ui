@@ -8,6 +8,7 @@ import {
   useId,
   type FormHTMLAttributes,
   type HTMLAttributes,
+  type LabelHTMLAttributes,
   type ReactNode,
 } from 'react'
 import { cn } from '../../utils/cn'
@@ -68,6 +69,14 @@ export function useFormFieldContext() {
 export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
   /** Field name */
   name?: string
+  /**
+   * Field label — renders a `FormLabel` above the control. Equivalent to
+   * composing `<FormLabel>` yourself; use composition when you need the
+   * label's extra props.
+   */
+  label?: ReactNode
+  /** Required indicator on the built-in `label` */
+  required?: boolean
   /** Error message */
   errorMessage?: string
   /** @deprecated use `errorMessage` instead — removed in v1.0 */
@@ -78,7 +87,7 @@ export interface FormFieldProps extends HTMLAttributes<HTMLDivElement> {
 
 /** Form field container that provides id, name, and error context to its children. */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
-  ({ className, name, errorMessage, error, disabled, children, ...props }, ref) => {
+  ({ className, name, label, required, errorMessage, error, disabled, children, ...props }, ref) => {
     const id = useId()
     const formContext = useFormContext()
     const isDisabled = disabled || formContext.disabled
@@ -93,6 +102,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
         value={{ id, name, error: resolvedError, errorMessage: resolvedError, disabled: isDisabled }}
       >
         <div ref={ref} className={cn('space-y-2', className)} {...props}>
+          {label != null && <FormLabel required={required}>{label}</FormLabel>}
           {children}
         </div>
       </FormFieldContext.Provider>
@@ -103,7 +113,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
 FormField.displayName = 'FormField'
 
 // FormLabel component
-export interface FormLabelProps extends HTMLAttributes<HTMLLabelElement> {
+export interface FormLabelProps extends LabelHTMLAttributes<HTMLLabelElement> {
   /** Required indicator */
   required?: boolean
   /** Optional indicator */

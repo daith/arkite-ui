@@ -162,28 +162,43 @@ export interface SkeletonTableProps extends HTMLAttributes<HTMLDivElement> {
   rows?: number
   /** Number of columns */
   columns?: number
+  /**
+   * Per-column widths (px number or any CSS width). Match them to the real
+   * table's columns so the layout doesn't jump when content swaps in;
+   * unspecified columns stay fluid (`flex-1`).
+   */
+  columnWidths?: (string | number)[]
 }
 
 /** Table-shaped skeleton with configurable rows and columns. */
 export const SkeletonTable = forwardRef<HTMLDivElement, SkeletonTableProps>(
-  ({ rows = 5, columns = 4, className, ...props }, ref) => (
-    <div ref={ref} className={cn('space-y-3', className)} {...props}>
-      {/* Header */}
-      <div className="flex gap-4">
-        {Array.from({ length: columns }).map((_, i) => (
-          <Skeleton key={i} className="h-4 flex-1" />
+  ({ rows = 5, columns = 4, columnWidths, className, ...props }, ref) => {
+    const count = columnWidths?.length ?? columns
+    const cellProps = (i: number) =>
+      columnWidths?.[i] != null
+        ? { className: 'shrink-0', style: { width: columnWidths[i] } }
+        : { className: 'flex-1' }
+    return (
+      <div ref={ref} className={cn('space-y-3', className)} {...props}>
+        {/* Header */}
+        <div className="flex gap-4">
+          {Array.from({ length: count }).map((_, i) => {
+            const p = cellProps(i)
+            return <Skeleton key={i} className={cn('h-4', p.className)} style={p.style} />
+          })}
+        </div>
+        {/* Rows */}
+        {Array.from({ length: rows }).map((_, rowIndex) => (
+          <div key={rowIndex} className="flex gap-4">
+            {Array.from({ length: count }).map((_, colIndex) => {
+              const p = cellProps(colIndex)
+              return <Skeleton key={colIndex} className={cn('h-8', p.className)} style={p.style} />
+            })}
+          </div>
         ))}
       </div>
-      {/* Rows */}
-      {Array.from({ length: rows }).map((_, rowIndex) => (
-        <div key={rowIndex} className="flex gap-4">
-          {Array.from({ length: columns }).map((_, colIndex) => (
-            <Skeleton key={colIndex} className="h-8 flex-1" />
-          ))}
-        </div>
-      ))}
-    </div>
-  )
+    )
+  }
 )
 
 SkeletonTable.displayName = 'SkeletonTable'

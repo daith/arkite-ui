@@ -11,12 +11,16 @@ import {
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
 
-type TableAlign = 'left' | 'center' | 'right'
+// Includes HTML's deprecated `align` values so third-party renderers (e.g.
+// markdown td/th mappings) type-check — justify/char simply apply nothing.
+type TableAlign = 'left' | 'center' | 'right' | 'justify' | 'char'
 
 const alignStyles: Record<TableAlign, string | false> = {
   left: false,
   center: 'text-center',
   right: 'text-right',
+  justify: false,
+  char: false,
 }
 
 export interface TableProps extends HTMLAttributes<HTMLTableElement> {
