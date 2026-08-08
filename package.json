@@ -2,7 +2,7 @@
   "name": "@arkite-ui/core",
   "version": "0.14.0",
   "packageManager": "pnpm@10.28.2",
-  "description": "Production-ready React components for SaaS admin panels. Tailwind CSS v4 + Radix UI + TypeScript.",
+  "description": "Production-ready React components for multi-tenant SaaS admin panels. Tailwind CSS v4 + Radix UI + TypeScript. AI-ready docs (llms.txt) built in.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -213,7 +213,11 @@
     "tailwindcss",
     "multi-tenant",
     "radix-ui",
-    "design-system"
+    "design-system",
+    "admin-panel",
+    "react-components",
+    "llms-txt",
+    "ai-ready"
   ],
   "author": "Wilson Hsieh <rin397@gmail.com>",
   "bugs": {
