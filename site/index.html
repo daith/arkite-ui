@@ -23,6 +23,7 @@
   "codeRepository": "https://github.com/foson-co/arkite-ui",
   "programmingLanguage": "TypeScript",
   "runtimePlatform": "React",
+  "keywords": "react admin components, react data table server-side pagination, multi-select combobox, accessible react components WCAG, zero-runtime css tailwind components, react admin dashboard, dark mode react ui, command palette react, otp input react",
   "license": "https://opensource.org/licenses/MIT",
   "author": { "@type": "Organization", "name": "Foson", "url": "https://foson.co" }
 }
@@ -160,6 +161,12 @@
   .preset b { font-size: 14px; font-weight: 620; }
   .preset span { display: block; font-size: 12.5px; color: var(--muted); }
 
+  .cindex { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .cindex div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .cindex b { display: block; font-size: 14px; font-weight: 650; margin-bottom: 8px; }
+  .cindex span { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .cindex-cta { text-align: center; margin-top: 22px; font-size: 14px; }
+  .cindex-cta a { color: var(--brand); font-weight: 550; }
   .band { max-width: 1240px; margin: 24px auto 72px; padding: 56px 32px; text-align: center; border-radius: 18px; background: linear-gradient(150deg, var(--brand-soft), var(--surface) 70%); border: 1px solid var(--line); }
   .band h2 { font-size: 28px; margin-bottom: 10px; }
   .band p { color: var(--muted); margin-bottom: 24px; }
@@ -246,10 +253,10 @@
   </div>
   <div class="features">
     <div class="feature lg"><h3>Admin composites</h3><p><code>AdminLayout</code> with permission-aware nav, <code>TenantSwitcher</code>, <code>DataTable</code>, <code>FilterBar</code>, <code>BulkActionBar</code> — wired to work together.</p></div>
-    <div class="feature"><h3>Accessibility, guaranteed</h3><p>Every color pair meets WCAG AA — enforced by CI, not policy. <code>createTheme()</code> picks foregrounds by real contrast for any brand color.</p></div>
-    <div class="feature"><h3>Localized to the bone</h3><p>Placeholders, empty states, calendar names, every aria-label — one <code>LocaleProvider</code> localizes the whole tree. en and zh-TW built in.</p></div>
-    <div class="feature"><h3>Tokens all the way down</h3><p>HSL variables, dark mode as an equal citizen, cross-platform JS tokens for React Native. Retheme everything from one <code>--radius</code>.</p></div>
-    <div class="feature"><h3>Server-side tables, one hook</h3><p><code>useServerTable</code> owns paging, sorting, and filter state; you fetch on <code>queryKey</code>, the table renders it. Six wired props, zero boilerplate.</p></div>
+    <div class="feature"><h3>Accessible React components</h3><p>WCAG AA contrast enforced by CI, keyboard navigation tested in real Chromium, screen-reader-friendly forms with proper label association. Accessibility is a test suite here, not a promise.</p></div>
+    <div class="feature"><h3>Localized to the bone</h3><p>Placeholders, empty states, calendar names, every aria-label — one <code>LocaleProvider</code> localizes the whole tree. English and Traditional Chinese built in.</p></div>
+    <div class="feature"><h3>Zero-runtime CSS, automatic dark mode</h3><p>Tailwind CSS v4 + design tokens — no CSS-in-JS runtime, no style recalculation cost. Dark mode follows <code>prefers-color-scheme</code> out of the box; retheme everything from one <code>--radius</code>.</p></div>
+    <div class="feature"><h3>Data table with server-side pagination</h3><p>Server-side pagination, sorting, and column filters with one hook — <code>useServerTable</code> owns the state, you fetch, the table renders. Frozen columns, row selection, and expandable rows included.</p></div>
     <div class="feature lg"><h3>AI-ready by design</h3><p><code>llms.txt</code> ships in the package — setup, design rules, and the full typed API, machine-readable. Your coding agent imports the right component on the first try.</p></div>
     <div class="feature lg"><h3>Upgrades that don't break you</h3><p>The public API is snapshot-tested — every prop change is deliberate. Breaking changes ship with a codemod: one command migrates your repo.</p></div>
     <div class="feature lg"><h3>Mobile back-office, built in</h3><p>Desktop sidebar, mobile bottom tabs: <code>hideSidebar="mobile"</code> + <code>bottomNav</code> slot with safe-area padding handled. One layout, both form factors.</p></div>
@@ -285,6 +292,21 @@ npx @arkite-ui/core init
     <div class="preset"><div class="swatches"><span class="sw" style="background:#0073e6"></span><span class="sw" style="background:#0bc5de"></span><span class="sw" style="background:#1d6ff4"></span></div><b>Ocean</b><span>Blue tones</span></div>
     <div class="preset"><div class="swatches"><span class="sw" style="background:#218757"></span><span class="sw" style="background:#e8933a"></span><span class="sw" style="background:#1d6ff4"></span></div><b>Forest</b><span>Green tones</span></div>
   </div>
+</section>
+
+
+<section class="wrap">
+  <div class="sec-head center">
+    <h2>Everything an admin panel needs</h2>
+    <p>70 components. The ones other libraries make you wish for — multi-select, frozen columns, command palette — are already here.</p>
+  </div>
+  <div class="cindex">
+    <div><b>Tables &amp; data</b><span>Data table with sorting, column filters, row selection, expandable rows · server-side pagination hook · frozen / sticky columns · virtualized list for 10,000+ rows · infinite scroll · pagination · description list · timeline · calendar · tree view</span></div>
+    <div><b>Inputs &amp; forms</b><span>Searchable multi-select combobox · tag input · date picker &amp; date range picker · number input · OTP / one-time-code input · color picker · file upload with drag-and-drop · headless file trigger · password input · switch, checkbox, radio group · form layout with validation messages</span></div>
+    <div><b>Overlays &amp; feedback</b><span>Modal dialog with form support · side drawer · confirm &amp; delete dialogs · dropdown menu with nested submenus · popover · tooltip · toast notifications with error helper · alert · progress · skeleton loaders · empty &amp; error states</span></div>
+    <div><b>Navigation &amp; layout</b><span>Admin layout with collapsible sidebar &amp; mobile bottom navigation · command palette (⌘K) · tenant switcher for multi-tenant SaaS · breadcrumbs · tabs · steps wizard · segmented control · filter bar · bulk action bar · sticky page header</span></div>
+  </div>
+  <p class="cindex-cta"><a href="./storybook/">Browse all 70 in Storybook →</a></p>
 </section>
 
 <div class="wrap"><div class="band">
