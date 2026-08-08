@@ -1,4 +1,4 @@
-import { createContext, forwardRef, useContext, type HTMLAttributes, type ReactNode } from 'react'
+import { createContext, forwardRef, useContext, type HTMLAttributes, type MouseEvent, type ReactNode } from 'react'
 import { cn } from '../../utils/cn'
 
 export type CardDensity = 'default' | 'compact'
@@ -12,6 +12,14 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean
   /** Card border */
   bordered?: boolean
+  /**
+   * Whole-card clickable: with `onClick` present, adds button semantics
+   * (`role="button"`, `tabIndex`, Enter/Space activation) plus hover/focus
+   * styling. Stays a `<div>` so the card can contain its own interactive
+   * children — Enter/Space only activates when the card itself is focused.
+   * This is the supported alternative to wrapping a card in a raw `<button>`.
+   */
+  interactive?: boolean
   /** Content density — `compact` tightens header/content/footer padding and typography for dashboard widgets. Inherited by CardHeader/CardContent/CardFooter. */
   density?: CardDensity
 }
@@ -70,22 +78,45 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       shadow = 'sm',
       hoverable = false,
       bordered = true,
+      interactive = false,
       density = 'default',
       children,
+      onClick,
+      onKeyDown,
       ...props
     },
     ref
   ) => {
+    const isInteractive = interactive && onClick != null
     return (
       <CardDensityContext.Provider value={density}>
         <div
           ref={ref}
+          role={isInteractive ? 'button' : undefined}
+          tabIndex={isInteractive ? 0 : undefined}
+          onClick={onClick}
+          onKeyDown={
+            isInteractive
+              ? (e) => {
+                  onKeyDown?.(e)
+                  // Only when the card itself is focused — Enter/Space on
+                  // inner interactive children must not double-activate.
+                  if (e.target !== e.currentTarget || e.defaultPrevented) return
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onClick?.(e as unknown as MouseEvent<HTMLDivElement>)
+                  }
+                }
+              : onKeyDown
+          }
           className={cn(
             'rounded-lg bg-card text-card-foreground',
             bordered && 'border',
             paddingStyles[padding],
             shadowStyles[shadow],
             hoverable && 'transition-shadow hover:shadow-md cursor-pointer',
+            isInteractive &&
+              'cursor-pointer transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40',
             className
           )}
           {...props}

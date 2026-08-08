@@ -123,6 +123,10 @@ export const zhTW: ArkiteLocale = {
     primaryNavigation: '主導覽',
     logout: '登出',
     expandMenu: '展開選單',
+    bottomNavigation: '底部導覽',
+  },
+  pinInput: {
+    charLabel: (index, length) => `第 ${index} 碼,共 ${length} 碼`,
   },
   viewToggle: {
     label: '檢視模式',

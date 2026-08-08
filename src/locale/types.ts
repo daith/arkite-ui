@@ -132,6 +132,11 @@ export interface ArkiteLocale {
     primaryNavigation: string
     logout: string
     expandMenu: string
+    bottomNavigation: string
+  }
+  pinInput: {
+    /** Accessible name for the nth character cell (1-based) */
+    charLabel: (index: number, length: number) => string
   }
   viewToggle: {
     label: string

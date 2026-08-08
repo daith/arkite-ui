@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi } from 'vitest'
 import { Card, CardHeader, CardContent, CardFooter } from './Card'
 
 describe('Card', () => {
@@ -126,5 +127,43 @@ describe('CardFooter', () => {
   it('renders children', () => {
     render(<CardFooter>Footer</CardFooter>)
     expect(screen.getByText('Footer')).toBeInTheDocument()
+  })
+})
+
+describe('Card interactive', () => {
+  it('adds button semantics and activates on click and Enter/Space', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+    render(<Card interactive onClick={onClick}>Open item</Card>)
+    const card = screen.getByRole('button', { name: 'Open item' })
+    expect(card).toHaveAttribute('tabindex', '0')
+    await user.click(card)
+    card.focus()
+    await user.keyboard('{Enter} ')
+    expect(onClick).toHaveBeenCalledTimes(3)
+  })
+
+  it('Enter on an inner interactive child does not double-activate the card', async () => {
+    const user = userEvent.setup()
+    const onCardClick = vi.fn()
+    const onInnerClick = vi.fn()
+    render(
+      <Card interactive aria-label="Item card" onClick={onCardClick}>
+        <button type="button" onClick={onInnerClick}>Inner</button>
+      </Card>
+    )
+    screen.getByRole('button', { name: 'Inner' }).focus()
+    await user.keyboard('{Enter}')
+    expect(onInnerClick).toHaveBeenCalled()
+    // Click bubbling from the inner button is the consumer's stopPropagation
+    // call to make; Enter must not synthesize an extra card activation
+    expect(onCardClick).not.toHaveBeenCalledWith(
+      expect.objectContaining({ key: 'Enter' })
+    )
+  })
+
+  it('without onClick stays a plain div (no role/tabindex)', () => {
+    render(<Card interactive>Static</Card>)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })

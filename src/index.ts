@@ -49,6 +49,7 @@ export * from './components/table'
 // Form
 export * from './components/form'
 export * from './components/number-input'
+export * from './components/pin-input'
 export * from './components/textarea'
 export * from './components/search-input'
 export * from './components/tag-input'

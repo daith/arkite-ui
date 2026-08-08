@@ -83,6 +83,10 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
 | Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
+| OTP / verification code | `PinInput` (`length`, `type`, `onComplete`; SMS autofill built in) | Hand-styled single inputs with tracking CSS |
+| File pick from a custom trigger (thumbnail, icon, menu item) | `FileTrigger` (headless — makes any element open the picker) | Hand-rolled hidden `<input type="file">` |
+| Action styled as a text link (e.g. in a table cell) | `Button variant="link"` | `eslint-disable` + raw `<button>` with underline classes |
+| Whole card/row clickable | `Card interactive onClick` (button semantics, keyboard included); table rows: `DataTable onRowClick` | Wrapping cards in raw `<button>` or clickable `<div>`s |
 | Mobile select | `SheetSelect` (bottom sheet) | Desktop `Select` on touch UIs |
 | Binary toggle | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
@@ -92,7 +96,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
 | Empty / error / loading | `EmptyState` / `ErrorState` / `Skeleton` family / `Spinner` / `LoadingOverlay` (`fullscreen`) | Blank screens |
 | Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |
-| App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells |
+| App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`, `classNames`, mobile: `hideSidebar="mobile"` + `bottomNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells; global CSS targeting AdminLayout internals |
 | Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
 
 **Table vs DataTable — the decision rule:** reach for `DataTable` only when you want its built-in behavior (sorting, column filters, row selection, expansion, pagination). For a read-only list — most admin tables — the `Table` family is *less* code than a `Column<T>[]` config and still inherits tokens, dark mode, `stickyHeader`, and frozen columns. Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.

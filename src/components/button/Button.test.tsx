@@ -63,4 +63,12 @@ describe('Button', () => {
     render(<Button ref={ref}>Ref</Button>)
     expect(ref).toHaveBeenCalledWith(expect.any(HTMLButtonElement))
   })
+
+  it('variant="link" strips box dimensions but keeps button semantics', () => {
+    render(<Button variant="link">Details</Button>)
+    const btn = screen.getByRole('button', { name: 'Details' })
+    expect(btn.className).toContain('hover:underline')
+    expect(btn.className).toContain('h-auto')
+    expect(btn.className).toContain('p-0')
+  })
 })

@@ -130,10 +130,11 @@
 待做(按證據頻率):
 
 - [x] `toast.fromError(err, { prefix })` + `toast.configure({ formatError })` — 283+ 次 catch+toast.error 樣板的收斂點(解析留 app 層,一次接線)
-- [ ] `Button variant="link"` + clickable row/card 模式 — 16+ 處 lint bypass 的來源
-- [ ] `AdminLayout bottomNav` slot(含 safe-area padding)— 行動版底部導航,配合 hideSidebar='mobile'
-- [ ] `FileUpload` headless/自訂觸發器模式確認與文件化(7 處手刻隱藏 input)
-- [ ] `PinInput`(OTP 驗證碼)、Range Slider、通用 Backdrop primitive — 明確元件缺口
+- [x] `Button variant="link"` + `Card interactive`(整卡可點,含鍵盤語意)— 16+ 處 lint bypass 的來源
+- [x] `AdminLayout bottomNav` slot(fixed + safe-area padding + main 自動讓位)— 配合 hideSidebar='mobile'
+- [x] `FileTrigger` — headless 檔案選取觸發器(任意元素開 picker;FileUpload=dropzone、FileUploadButton=按鈕、FileTrigger=headless 三層並列)
+- [x] `PinInput`(OTP 驗證碼,含 SMS autofill / 貼上分配 / 鍵盤導航)
+- [ ] Range Slider、通用 Backdrop primitive — 缺口確認但證據量低(各 1-4 處),待需求再排
 - [ ] 零使用元件盤點 — CommandPalette/Tree/TagInput/VirtualList/BulkActionBar/ColorPicker(0/9):檢視需求或下架
 
 ### v1.0.0 什麼時候發？

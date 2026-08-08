@@ -9,6 +9,7 @@ export type ButtonVariant =
   | 'ghost'
   | 'destructive'
   | 'gradient'
+  | 'link'
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon'
 
@@ -40,6 +41,10 @@ const variantStyles: Record<ButtonVariant, string> = {
     'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
   gradient:
     'gradient-primary text-white hover:opacity-90 shadow-sm',
+  // Inline text link *appearance* with button semantics — for actions styled
+  // as links (e.g. inside table cells). For real navigation use an <a>.
+  link:
+    'text-primary underline-offset-4 hover:underline',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -82,6 +87,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           variantStyles[variant],
           // Size styles
           sizeStyles[size],
+          // Link variant keeps the size's text scale but no box dimensions
+          variant === 'link' && 'h-auto p-0 rounded-none',
           // Full width
           fullWidth && 'w-full',
           className

@@ -29,6 +29,8 @@ const buttonVariantStyles: Record<ButtonVariant, string> = {
     'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm',
   gradient:
     'gradient-primary text-white hover:opacity-90 shadow-sm',
+  link:
+    'text-primary underline-offset-4 hover:underline h-auto p-0 rounded-none',
 }
 
 const buttonSizeStyles: Record<ButtonSize, string> = {

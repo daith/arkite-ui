@@ -387,5 +387,24 @@ describe('AdminLayout', () => {
       const { container } = renderLayout({ hideNavbar: 'mobile' })
       expect(container.querySelector('header')).toHaveClass('hidden', 'md:flex')
     })
+
+    it('bottomNav renders a labeled fixed bar with safe-area padding and pads main', () => {
+      const { container } = renderLayout({
+        bottomNav: <div>Tabs</div>,
+        classNames: { bottomNav: 'test-bottomnav' },
+      })
+      const nav = screen.getByRole('navigation', { name: 'Bottom navigation' })
+      expect(nav).toHaveClass('fixed', 'md:hidden', 'test-bottomnav')
+      expect(nav.className).toContain('safe-area-inset-bottom')
+      expect(container.querySelector('main')).toHaveClass('max-md:pb-24')
+    })
+
+    it('without bottomNav no navigation landmark or extra padding is added', () => {
+      const { container } = renderLayout()
+      expect(
+        screen.queryByRole('navigation', { name: 'Bottom navigation' })
+      ).not.toBeInTheDocument()
+      expect(container.querySelector('main')).not.toHaveClass('max-md:pb-24')
+    })
   })
 })

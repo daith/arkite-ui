@@ -128,11 +128,20 @@ export interface AdminLayoutProps {
     navbar?: string
     subNav?: string
     main?: string
+    bottomNav?: string
   }
   /** Hide the sidebar: `true` removes it, `'mobile'` hides it below the `md` breakpoint */
   hideSidebar?: boolean | 'mobile'
   /** Hide the navbar: `true` removes it, `'mobile'` hides it below the `md` breakpoint */
   hideNavbar?: boolean | 'mobile'
+  /**
+   * Mobile bottom navigation slot — rendered as a fixed bar below the `md`
+   * breakpoint with safe-area (home indicator) padding built in; the main
+   * area gets matching bottom padding so content is never hidden behind it.
+   * Pair with `hideSidebar="mobile"` for the sidebar-on-desktop /
+   * bottom-tabs-on-mobile pattern.
+   */
+  bottomNav?: ReactNode
   /** Main content */
   children: ReactNode
   className?: string
@@ -208,6 +217,7 @@ export function AdminLayout({
   classNames,
   hideSidebar = false,
   hideNavbar = false,
+  bottomNav,
   children,
   className,
 }: AdminLayoutProps) {
@@ -487,10 +497,29 @@ export function AdminLayout({
         )}
 
         {/* Page Content */}
-        <main className={cn('flex-1 overflow-auto p-6', classNames?.main)}>
+        <main
+          className={cn(
+            'flex-1 overflow-auto p-6',
+            bottomNav != null && 'max-md:pb-24',
+            classNames?.main
+          )}
+        >
           {children}
         </main>
       </div>
+
+      {/* Mobile bottom navigation */}
+      {bottomNav != null && (
+        <nav
+          aria-label={locale.adminLayout.bottomNavigation}
+          className={cn(
+            'fixed inset-x-0 bottom-0 z-40 border-t bg-card pb-[env(safe-area-inset-bottom)] md:hidden',
+            classNames?.bottomNav
+          )}
+        >
+          {bottomNav}
+        </nav>
+      )}
 
       {/* Toast Container */}
       {!hideToast && <ToastContainer position={toastPosition} />}

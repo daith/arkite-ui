@@ -128,6 +128,10 @@ export const enUS: ArkiteLocale = {
     primaryNavigation: 'Primary',
     logout: 'Logout',
     expandMenu: 'Expand menu',
+    bottomNavigation: 'Bottom navigation',
+  },
+  pinInput: {
+    charLabel: (index, length) => `Character ${index} of ${length}`,
   },
   viewToggle: {
     label: 'View mode',

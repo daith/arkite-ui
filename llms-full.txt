@@ -77,7 +77,7 @@ applyTheme(createTheme({ primary: '#7c3aed' })) // HSL tokens from one hex
 
 ## Export inventory
 
-Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
+Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileTrigger, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, PinInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
 
 Hooks: useCommandPalette, useFormContext, useFormFieldContext, useLocale, useServerTable, useSidebar, useToast, useToastStore
 
@@ -172,6 +172,10 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
 | Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
+| OTP / verification code | `PinInput` (`length`, `type`, `onComplete`; SMS autofill built in) | Hand-styled single inputs with tracking CSS |
+| File pick from a custom trigger (thumbnail, icon, menu item) | `FileTrigger` (headless — makes any element open the picker) | Hand-rolled hidden `<input type="file">` |
+| Action styled as a text link (e.g. in a table cell) | `Button variant="link"` | `eslint-disable` + raw `<button>` with underline classes |
+| Whole card/row clickable | `Card interactive onClick` (button semantics, keyboard included); table rows: `DataTable onRowClick` | Wrapping cards in raw `<button>` or clickable `<div>`s |
 | Mobile select | `SheetSelect` (bottom sheet) | Desktop `Select` on touch UIs |
 | Binary toggle | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
@@ -181,7 +185,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
 | Empty / error / loading | `EmptyState` / `ErrorState` / `Skeleton` family / `Spinner` / `LoadingOverlay` (`fullscreen`) | Blank screens |
 | Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |
-| App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells |
+| App frame | `AdminLayout` (`sidebarVariant="classic|rail"`, `subNav`, `classNames`, mobile: `hideSidebar="mobile"` + `bottomNav`) + `Sidebar`/`Navbar`/`Breadcrumb`/`TenantSwitcher` | Custom shells; global CSS targeting AdminLayout internals |
 | Steps / history | `Steps`, `Timeline`, `Calendar`, `Tree`, `Pagination` | Custom widgets |
 
 **Table vs DataTable — the decision rule:** reach for `DataTable` only when you want its built-in behavior (sorting, column filters, row selection, expansion, pagination). For a read-only list — most admin tables — the `Table` family is *less* code than a `Column<T>[]` config and still inherits tokens, dark mode, `stickyHeader`, and frozen columns. Never hand-roll a raw `<table>`: hardcoded `text-slate-*`/manual `dark:` styling always follows.
@@ -253,10 +257,11 @@ type AdminLayoutContext {
 
 type AdminLayoutProps {
   basePath?: string | undefined
+  bottomNav?: ReactNode
   brand: AdminBrandConfig
   children: ReactNode
   className?: string | undefined
-  classNames?: { root?: string; sidebar?: string; navbar?: string; subNav?: string; main?: string; } | undefined
+  classNames?: { root?: string; sidebar?: string; navbar?: string; subNav?: string; main?: string; bottomNav?: string; } | undefined
   currentPath: string
   hasPermission?: ((permissions: string[]) => boolean) | undefined
   hideNavbar?: boolean | "mobile" | undefined
@@ -317,7 +322,7 @@ type AlertVariant = AlertVariant
 
 type ArkiteLocale {
   actionButtons: { label: string; }
-  adminLayout: { primaryNavigation: string; logout: string; expandMenu: string; }
+  adminLayout: { primaryNavigation: string; logout: string; expandMenu: string; bottomNavigation: string; }
   breadcrumb: { label: string; }
   bulkActionBar: { selected: (count: number) => string; deselectAll: string; }
   calendar: { previousMonth: string; nextMonth: string; weekdays: [string, string, string, string, string, string, string]; weekdaysShort: [string, string, string, string, string, string, string]; }
@@ -341,6 +346,7 @@ type ArkiteLocale {
   pageHeader: { back: string; }
   pagination: { label: string; rowsPerPage: string; firstPage: string; previousPage: string; nextPage: string; lastPage: string; pageLabel: (page: number) => string; rangeInfo: (start: number, end: number, total: number) => string; }
   passwordInput: { hide: string; show: string; }
+  pinInput: { charLabel: (index: number, length: number) => string; }
   progress: { label: string; }
   searchInput: { clear: string; }
   sheetSelect: { placeholder: string; }
@@ -483,6 +489,7 @@ type CardProps {
   bordered?: boolean | undefined
   density?: CardDensity | undefined
   hoverable?: boolean | undefined
+  interactive?: boolean | undefined
   padding?: "sm" | "md" | "lg" | "none" | undefined
   shadow?: "sm" | "md" | "lg" | "none" | undefined
 }
@@ -821,6 +828,14 @@ type ErrorStateProps {
   title?: ReactNode
 }
 
+type FileTriggerProps {
+  accept?: string | undefined
+  children: ReactElement<{ onClick?: (e: MouseEvent) => void; }, string | React.JSXElementConstructor<any>>
+  disabled?: boolean | undefined
+  multiple?: boolean | undefined
+  onChange: (files: File[]) => void
+}
+
 type FileUploadButtonProps {
   accept?: string | undefined
   disabled?: boolean | undefined
@@ -1091,7 +1106,7 @@ type PaginationState {
 
 type PartialArkiteLocale {
   actionButtons?: Partial<{ label: string; }> | undefined
-  adminLayout?: Partial<{ primaryNavigation: string; logout: string; expandMenu: string; }> | undefined
+  adminLayout?: Partial<{ primaryNavigation: string; logout: string; expandMenu: string; bottomNavigation: string; }> | undefined
   breadcrumb?: Partial<{ label: string; }> | undefined
   bulkActionBar?: Partial<{ selected: (count: number) => string; deselectAll: string; }> | undefined
   calendar?: Partial<{ previousMonth: string; nextMonth: string; weekdays: [string, string, string, string, string, string, string]; weekdaysShort: [string, string, string, string, string, string, string]; }> | undefined
@@ -1115,6 +1130,7 @@ type PartialArkiteLocale {
   pageHeader?: Partial<{ back: string; }> | undefined
   pagination?: Partial<{ label: string; rowsPerPage: string; firstPage: string; previousPage: string; nextPage: string; lastPage: string; pageLabel: (page: number) => string; rangeInfo: (start: number, end: number, total: number) => string; }> | undefined
   passwordInput?: Partial<{ hide: string; show: string; }> | undefined
+  pinInput?: Partial<{ charLabel: (index: number, length: number) => string; }> | undefined
   progress?: Partial<{ label: string; }> | undefined
   searchInput?: Partial<{ clear: string; }> | undefined
   sheetSelect?: Partial<{ placeholder: string; }> | undefined
@@ -1137,6 +1153,22 @@ type PasswordInputProps {
   size?: InputSize | undefined
   visible?: boolean | undefined
 }
+
+type PinInputProps {
+  autoFocus?: boolean | undefined
+  defaultValue?: string | undefined
+  disabled?: boolean | undefined
+  error?: boolean | undefined
+  length?: number | undefined
+  masked?: boolean | undefined
+  onChange?: ((value: string) => void) | undefined
+  onComplete?: ((value: string) => void) | undefined
+  size?: PinInputSize | undefined
+  type?: "numeric" | "alphanumeric" | undefined
+  value?: string | undefined
+}
+
+type PinInputSize = PinInputSize
 
 type PopoverContentProps {
   showArrow?: boolean | undefined
@@ -1757,7 +1789,7 @@ type VirtualListProps {
 
 value ActionButtons: React.ForwardRefExoticComponent<ActionButtonsProps & React.RefAttributes<HTMLElement>>
 
-value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, classNames, hideSidebar, hideNavbar, children, className, }: AdminLayoutProps) => JSX.Element
+value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, classNames, hideSidebar, hideNavbar, bottomNav, children, className, }: AdminLayoutProps) => JSX.Element
 
 value Alert: React.ForwardRefExoticComponent<AlertProps & React.RefAttributes<HTMLDivElement>>
 
@@ -1899,6 +1931,8 @@ value ErrorBoundary: typeof ErrorBoundary
 
 value ErrorState: React.ForwardRefExoticComponent<ErrorStateProps & React.RefAttributes<HTMLDivElement>>
 
+value FileTrigger: ({ accept, multiple, disabled, onChange, children, }: FileTriggerProps) => JSX.Element
+
 value FileUpload: React.ForwardRefExoticComponent<FileUploadProps & React.RefAttributes<HTMLInputElement>>
 
 value FileUploadButton: React.ForwardRefExoticComponent<FileUploadButtonProps & React.RefAttributes<HTMLButtonElement>>
@@ -1982,6 +2016,8 @@ value PageHeader: React.ForwardRefExoticComponent<PageHeaderProps & React.RefAtt
 value Pagination: React.ForwardRefExoticComponent<PaginationProps & React.RefAttributes<HTMLElement>>
 
 value PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps & React.RefAttributes<HTMLInputElement>>
+
+value PinInput: React.ForwardRefExoticComponent<PinInputProps & React.RefAttributes<HTMLDivElement>>
 
 value Popover: React.FC<PopoverPrimitive.PopoverProps>
 

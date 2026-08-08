@@ -33,10 +33,11 @@ type AdminLayoutContext {
 
 type AdminLayoutProps {
   basePath?: string | undefined
+  bottomNav?: ReactNode
   brand: AdminBrandConfig
   children: ReactNode
   className?: string | undefined
-  classNames?: { root?: string; sidebar?: string; navbar?: string; subNav?: string; main?: string; } | undefined
+  classNames?: { root?: string; sidebar?: string; navbar?: string; subNav?: string; main?: string; bottomNav?: string; } | undefined
   currentPath: string
   hasPermission?: ((permissions: string[]) => boolean) | undefined
   hideNavbar?: boolean | "mobile" | undefined
@@ -97,7 +98,7 @@ type AlertVariant = AlertVariant
 
 type ArkiteLocale {
   actionButtons: { label: string; }
-  adminLayout: { primaryNavigation: string; logout: string; expandMenu: string; }
+  adminLayout: { primaryNavigation: string; logout: string; expandMenu: string; bottomNavigation: string; }
   breadcrumb: { label: string; }
   bulkActionBar: { selected: (count: number) => string; deselectAll: string; }
   calendar: { previousMonth: string; nextMonth: string; weekdays: [string, string, string, string, string, string, string]; weekdaysShort: [string, string, string, string, string, string, string]; }
@@ -121,6 +122,7 @@ type ArkiteLocale {
   pageHeader: { back: string; }
   pagination: { label: string; rowsPerPage: string; firstPage: string; previousPage: string; nextPage: string; lastPage: string; pageLabel: (page: number) => string; rangeInfo: (start: number, end: number, total: number) => string; }
   passwordInput: { hide: string; show: string; }
+  pinInput: { charLabel: (index: number, length: number) => string; }
   progress: { label: string; }
   searchInput: { clear: string; }
   sheetSelect: { placeholder: string; }
@@ -263,6 +265,7 @@ type CardProps {
   bordered?: boolean | undefined
   density?: CardDensity | undefined
   hoverable?: boolean | undefined
+  interactive?: boolean | undefined
   padding?: "sm" | "md" | "lg" | "none" | undefined
   shadow?: "sm" | "md" | "lg" | "none" | undefined
 }
@@ -601,6 +604,14 @@ type ErrorStateProps {
   title?: ReactNode
 }
 
+type FileTriggerProps {
+  accept?: string | undefined
+  children: ReactElement<{ onClick?: (e: MouseEvent) => void; }, string | React.JSXElementConstructor<any>>
+  disabled?: boolean | undefined
+  multiple?: boolean | undefined
+  onChange: (files: File[]) => void
+}
+
 type FileUploadButtonProps {
   accept?: string | undefined
   disabled?: boolean | undefined
@@ -871,7 +882,7 @@ type PaginationState {
 
 type PartialArkiteLocale {
   actionButtons?: Partial<{ label: string; }> | undefined
-  adminLayout?: Partial<{ primaryNavigation: string; logout: string; expandMenu: string; }> | undefined
+  adminLayout?: Partial<{ primaryNavigation: string; logout: string; expandMenu: string; bottomNavigation: string; }> | undefined
   breadcrumb?: Partial<{ label: string; }> | undefined
   bulkActionBar?: Partial<{ selected: (count: number) => string; deselectAll: string; }> | undefined
   calendar?: Partial<{ previousMonth: string; nextMonth: string; weekdays: [string, string, string, string, string, string, string]; weekdaysShort: [string, string, string, string, string, string, string]; }> | undefined
@@ -895,6 +906,7 @@ type PartialArkiteLocale {
   pageHeader?: Partial<{ back: string; }> | undefined
   pagination?: Partial<{ label: string; rowsPerPage: string; firstPage: string; previousPage: string; nextPage: string; lastPage: string; pageLabel: (page: number) => string; rangeInfo: (start: number, end: number, total: number) => string; }> | undefined
   passwordInput?: Partial<{ hide: string; show: string; }> | undefined
+  pinInput?: Partial<{ charLabel: (index: number, length: number) => string; }> | undefined
   progress?: Partial<{ label: string; }> | undefined
   searchInput?: Partial<{ clear: string; }> | undefined
   sheetSelect?: Partial<{ placeholder: string; }> | undefined
@@ -917,6 +929,22 @@ type PasswordInputProps {
   size?: InputSize | undefined
   visible?: boolean | undefined
 }
+
+type PinInputProps {
+  autoFocus?: boolean | undefined
+  defaultValue?: string | undefined
+  disabled?: boolean | undefined
+  error?: boolean | undefined
+  length?: number | undefined
+  masked?: boolean | undefined
+  onChange?: ((value: string) => void) | undefined
+  onComplete?: ((value: string) => void) | undefined
+  size?: PinInputSize | undefined
+  type?: "numeric" | "alphanumeric" | undefined
+  value?: string | undefined
+}
+
+type PinInputSize = PinInputSize
 
 type PopoverContentProps {
   showArrow?: boolean | undefined
@@ -1537,7 +1565,7 @@ type VirtualListProps {
 
 value ActionButtons: React.ForwardRefExoticComponent<ActionButtonsProps & React.RefAttributes<HTMLElement>>
 
-value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, classNames, hideSidebar, hideNavbar, children, className, }: AdminLayoutProps) => JSX.Element
+value AdminLayout: ({ currentPath, navigation, brand, user, basePath, onNavigate, renderLink, hasPermission, onLogout, navbarLeft, navbarRight, sidebarFooter, sidebarVariant, subNav, toastPosition, hideToast, classNames, hideSidebar, hideNavbar, bottomNav, children, className, }: AdminLayoutProps) => JSX.Element
 
 value Alert: React.ForwardRefExoticComponent<AlertProps & React.RefAttributes<HTMLDivElement>>
 
@@ -1679,6 +1707,8 @@ value ErrorBoundary: typeof ErrorBoundary
 
 value ErrorState: React.ForwardRefExoticComponent<ErrorStateProps & React.RefAttributes<HTMLDivElement>>
 
+value FileTrigger: ({ accept, multiple, disabled, onChange, children, }: FileTriggerProps) => JSX.Element
+
 value FileUpload: React.ForwardRefExoticComponent<FileUploadProps & React.RefAttributes<HTMLInputElement>>
 
 value FileUploadButton: React.ForwardRefExoticComponent<FileUploadButtonProps & React.RefAttributes<HTMLButtonElement>>
@@ -1762,6 +1792,8 @@ value PageHeader: React.ForwardRefExoticComponent<PageHeaderProps & React.RefAtt
 value Pagination: React.ForwardRefExoticComponent<PaginationProps & React.RefAttributes<HTMLElement>>
 
 value PasswordInput: React.ForwardRefExoticComponent<PasswordInputProps & React.RefAttributes<HTMLInputElement>>
+
+value PinInput: React.ForwardRefExoticComponent<PinInputProps & React.RefAttributes<HTMLDivElement>>
 
 value Popover: React.FC<PopoverPrimitive.PopoverProps>
 
