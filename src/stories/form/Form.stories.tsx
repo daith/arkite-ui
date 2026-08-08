@@ -270,3 +270,20 @@ export const MultiSection: StoryFn = () => (
     </FormActions>
   </Form>
 )
+
+export const LabelShorthand: StoryFn = () => (
+  <Form className="w-96">
+    <FormSection title="Shorthand" description="FormField label/required render a wired FormLabel">
+      <FormField name="name" label="Full Name" required>
+        <FormControl>
+          <Input placeholder="John Doe" />
+        </FormControl>
+      </FormField>
+      <FormField name="bio" label="Bio" errorMessage="Required for public profiles">
+        <FormControl>
+          <Input />
+        </FormControl>
+      </FormField>
+    </FormSection>
+  </Form>
+)

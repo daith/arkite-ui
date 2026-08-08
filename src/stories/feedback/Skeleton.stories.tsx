@@ -56,3 +56,12 @@ export const TableSkeleton: Story = {
   render: () => <SkeletonTable rows={4} columns={3} />,
   parameters: { layout: 'padded' },
 }
+
+export const TableWithColumnWidths: Story = {
+  render: () => (
+    <div className="w-[560px]">
+      {/* Widths mirror the real table so the layout doesn't jump on swap-in */}
+      <SkeletonTable rows={4} columnWidths={[48, '40%', undefined, 96]} />
+    </div>
+  ),
+}

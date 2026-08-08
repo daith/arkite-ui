@@ -167,7 +167,7 @@ export interface SkeletonTableProps extends HTMLAttributes<HTMLDivElement> {
    * table's columns so the layout doesn't jump when content swaps in;
    * unspecified columns stay fluid (`flex-1`).
    */
-  columnWidths?: (string | number)[]
+  columnWidths?: (string | number | undefined)[]
 }
 
 /** Table-shaped skeleton with configurable rows and columns. */

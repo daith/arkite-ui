@@ -259,3 +259,60 @@ export const PinnedColumns: StoryFn = () => (
     />
   </div>
 )
+
+// ── 0.15 additions ──
+
+const heatColumns: Column<User>[] = [
+  { key: 'name', header: 'Name' },
+  {
+    key: 'age',
+    header: 'Age',
+    align: 'right',
+    // Whole-cell styling — no negative-margin hacks needed for matrix/heatmap cells
+    cellClassName: (row) =>
+      row.age >= 35 ? 'bg-destructive-soft' : row.age >= 30 ? 'bg-warning-soft' : 'bg-success-soft',
+    headerClassName: 'bg-muted',
+  },
+  { key: 'email', header: 'Email (hidden on mobile)', hidden: 'mobile' },
+]
+
+export const CellStylingAndResponsive: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={heatColumns}
+    getRowKey={(row) => row.id}
+    compact
+    pagination={false}
+  />
+)
+CellStylingAndResponsive.storyName = 'cellClassName + hidden:"mobile"'
+
+const SelectionRulesDemo = () => {
+  const [selected, setSelected] = useState<Set<string | number>>(new Set())
+  const [log, setLog] = useState<string[]>([])
+  return (
+    <div className="space-y-3">
+      <DataTable<User>
+        data={sampleData}
+        columns={columns}
+        getRowKey={(row) => row.id}
+        selectable
+        selectedRows={selected}
+        onSelectionChange={setSelected}
+        // Incremental events alongside the whole-set callback
+        onRowSelect={(row, isSelected) =>
+          setLog((prev) => [...prev.slice(-4), `${row.name} → ${isSelected ? 'on' : 'off'}`])
+        }
+        // Admins can't be deselected/selected here
+        isRowSelectable={(row) => row.role !== 'Admin'}
+        pagination={false}
+      />
+      <p className="text-xs text-muted-foreground">
+        onRowSelect log: {log.join(' · ') || '(interact with checkboxes)'}
+      </p>
+    </div>
+  )
+}
+
+export const SelectionRules: StoryFn = () => <SelectionRulesDemo />
+SelectionRules.storyName = 'isRowSelectable + onRowSelect'

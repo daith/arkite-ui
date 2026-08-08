@@ -1140,7 +1140,7 @@ type SkeletonProps {
 }
 
 type SkeletonTableProps {
-  columnWidths?: (string | number)[] | undefined
+  columnWidths?: (string | number | undefined)[] | undefined
   columns?: number | undefined
   rows?: number | undefined
 }
