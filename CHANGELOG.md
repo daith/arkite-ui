@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.15.0
+### Minor Changes
+
+- 99b66cb: DataTable column-level styling and responsive gaps (ark-finance migration feedback, round 4):
+  
+  - **`Column.cellClassName`** (string or `(row, index) => string`) and **`Column.headerClassName`** — per-column cell styling without negative-margin hacks (matrix cell backgrounds, selected-column highlights).
+  - **`Column.hidden: 'mobile' | 'desktop'`** — responsive column hiding in pure CSS (`max-md:hidden`/`md:hidden`), aligned with AdminLayout's `hideSidebar="mobile"` convention. SSR-safe: no JS breakpoint math, replaces `useMediaQuery`-into-`hidden` workarounds. `hidden: true` still removes the column entirely.
+  - **Inline `columns` now infer `T` from `data`** via `NoInfer`, so `cell`/`cellClassName` callbacks are fully typed without `<DataTable<Row>>` annotations. Note: with an empty-literal `data={[]}` and no annotation, `T` is no longer inferred from `columns` — annotate explicitly in that corner. Emitted types use `NoInfer` (TypeScript ≥ 5.4, or `skipLibCheck`).
+- f538f21: Modal fixes from ark-finance's modal audit (4 hand-rolled modals traced to these gaps):
+  
+  - **Height cap + scrollable body** — the panel now caps at `calc(100vh-2rem)` and the body scrolls. Previously long content grew past the viewport while the body scroll-lock made the page unscrollable, forcing every consumer to hand-roll `max-h-[85vh] overflow-y-auto`. Those workarounds can be removed.
+  - **`onSubmit`** — wraps header/body/footer in a real `<form>`, so a `type="submit"` button in `footer` submits the fields in `children` (the most common admin dialog) with no `form="<id>"` plumbing. New `FormDialog` and `LongContent` stories document both.
+  - **Shadowing guard in the shared ESLint config** — a local declaration named `Modal`/`Card`/`Table`/… (24 collision-prone core names) now warns: shadowing makes the library component unimportable in that file and reliably leads to re-implementation.
+- 1c3a775: ark-finance round-2 migration feedback — the remaining API gaps:
+  
+  - **`FormField label` / `required`** — the prop DESIGN.md always documented now exists (renders a wired `FormLabel`); `FormLabelProps` extends `LabelHTMLAttributes` so `htmlFor` type-checks.
+  - **DataTable `onRowSelect(row, selected)`** — incremental companion to `onSelectionChange` for `toggle(id)`-style consumer code (fires once per actually-changed row, including select-all).
+  - **DataTable `isRowSelectable(row, index)`** — per-row disable: disabled checkbox, excluded from select-all and the header state.
+  - **DataTable `hoverable`** — passthrough to the underlying Table (default `true`).
+  - **`SkeletonTable columnWidths`** — match the real table's column widths so layout doesn't jump on swap-in.
+  - **`TableCell`/`TableHead` `align`** tolerates HTML's deprecated `justify`/`char` values (applies nothing) so markdown/third-party `td` mappings type-check.
+  - **`codemod:from-error` removes orphaned `getErrorMessage` imports** — previously left 32 files failing type-check.
+  - DESIGN.md: field-tested three-tier Table/DataTable/matrix selection rules, runtime-dynamic-columns and cross-row `cell(row, index)` notes.
+
+### Patch Changes
+
+- 01b4fd4: `styles.css` now declares `@source "../../dist"` itself, so Tailwind v4 consumers no longer need the manual `@source "../node_modules/@arkite-ui/core/dist"` line (which every project had to discover the hard way — without it, all component utilities silently fail to generate and pages render unstyled). Existing manual `@source` lines keep working and can be removed.
+
 ## 0.14.2
 ### Patch Changes
 
