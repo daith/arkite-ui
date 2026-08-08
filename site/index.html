@@ -87,21 +87,23 @@
   .nav-links .cta { color: var(--brand); font-weight: 550; }
 
   /* ── hero ── */
-  .hero { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 64px; align-items: center; padding-block: 72px 64px; }
+  .hero { max-width: 880px; margin: 0 auto; text-align: center; padding-block: 88px 48px; }
   .eyebrow { font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--brand); font-weight: 650; margin-bottom: 14px; }
   h1 { font-size: clamp(34px, 4.5vw, 46px); line-height: 1.12; letter-spacing: -0.025em; font-weight: 675; text-wrap: balance; margin-bottom: 18px; }
-  .lede { color: var(--muted); font-size: 16.5px; max-width: 30em; margin-bottom: 28px; }
-  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+  .lede { color: var(--muted); font-size: 17px; max-width: 34em; margin: 0 auto 30px; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 34px; }
   .btn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 20px; border-radius: 8px; font-size: 14.5px; font-weight: 550; transition: 0.15s; }
   .btn-primary { background: var(--brand); color: var(--brand-ink); }
   .btn-primary:hover { filter: brightness(1.08); }
   .btn-ghost { border: 1px solid var(--line); background: var(--surface); }
   .btn-ghost:hover { border-color: var(--muted); }
-  .stats { display: flex; gap: 26px; flex-wrap: wrap; }
+  .stats { display: flex; gap: 34px; flex-wrap: wrap; justify-content: center; }
   .stat b { display: block; font-size: 19px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
   .stat span { font-size: 12.5px; color: var(--muted); }
 
   /* ── admin vignette ── */
+  .stage { position: relative; max-width: 1240px; margin: 0 auto; padding: 8px 24px 72px; }
+  .stage::before { content: ''; position: absolute; inset: -40px 15% 30% 15%; background: radial-gradient(closest-side, var(--brand-soft), transparent 70%); z-index: -1; }
   .vignette { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; font-size: 13px; }
   .v-titlebar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
   .dot { width: 10px; height: 10px; border-radius: 99px; background: var(--line); }
@@ -128,35 +130,44 @@
   .pg.on { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
 
   /* ── sections ── */
-  section { padding: 48px 0 58px; }
+  section { padding: 56px 0 64px; max-width: 1240px; margin: 0 auto; }
+  .sec-head.center { text-align: center; }
+  .sec-head.center p { margin: 0 auto; }
   .sec-head { margin-bottom: 26px; }
   h2 { font-size: 24px; font-weight: 650; letter-spacing: -0.015em; margin-bottom: 6px; }
   .sec-head p { color: var(--muted); font-size: 15px; max-width: 44em; }
-  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-  @media (min-width: 1200px) { .features { grid-template-columns: repeat(4, 1fr); } }
+  .features { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 1000px) { .features { grid-template-columns: repeat(4, 1fr); } .feature.lg { grid-column: span 2; } }
+  @media (max-width: 640px) { .features { grid-template-columns: 1fr; } }
+  .feature.lg { background: linear-gradient(160deg, var(--brand-soft), var(--surface) 55%); }
   .feature { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
   .feature h3 { font-size: 15px; font-weight: 620; margin-bottom: 6px; }
   .feature p { font-size: 13.5px; color: var(--muted); }
   .feature code { font-size: 12px; background: var(--line-soft); padding: 1px 5px; border-radius: 4px; }
 
   /* ── quickstart ── */
-  .qs { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 780px); gap: 48px; align-items: start; }
+  .qs { max-width: 760px; margin: 0 auto; text-align: center; }
+  .qs pre { text-align: left; margin-top: 26px; }
   pre { background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 20px 22px; font-size: 13px; line-height: 1.75; overflow-x: auto; }
   .tok-k { color: #b3a5ff; } .tok-s { color: #9ece8f; } .tok-c { color: #7a8194; }
 
   /* ── presets ── */
-  .presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 250px)); gap: 14px; }
+  .presets { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .preset { flex: 0 1 230px; }
   .preset { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
   .swatches { display: flex; gap: 6px; margin-bottom: 10px; }
   .sw { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgb(0 0 0 / 0.06); }
   .preset b { font-size: 14px; font-weight: 620; }
   .preset span { display: block; font-size: 12.5px; color: var(--muted); }
 
+  .band { max-width: 1240px; margin: 24px auto 72px; padding: 56px 32px; text-align: center; border-radius: 18px; background: linear-gradient(150deg, var(--brand-soft), var(--surface) 70%); border: 1px solid var(--line); }
+  .band h2 { font-size: 28px; margin-bottom: 10px; }
+  .band p { color: var(--muted); margin-bottom: 24px; }
   footer { border-top: 1px solid var(--line); padding: 26px 0 40px; color: var(--muted); font-size: 13px; display: flex; }
   footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; width: 100%; }
 
   @media (max-width: 860px) {
-    .hero { grid-template-columns: 1fr; padding-block: 56px 48px; }
+    .hero { padding-block: 56px 36px; }
     .qs { grid-template-columns: 1fr; }
   }
 </style>
@@ -191,7 +202,9 @@
       <div class="stat"><b>en · 繁中</b><span>built-in locales</span></div>
     </div>
   </div>
+</header>
 
+<div class="stage">
   <div class="vignette" aria-hidden="true">
     <div class="v-titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
     <div class="v-body">
@@ -224,28 +237,28 @@
       </div>
     </div>
   </div>
-</header>
+</div>
 
 <section class="wrap">
-  <div class="sec-head">
+  <div class="sec-head center">
     <h2>Built for back-offices, not brochures</h2>
     <p>General-purpose kits stop at buttons and dialogs. Arkite ships the layer above — the composites every admin panel rebuilds badly.</p>
   </div>
   <div class="features">
-    <div class="feature"><h3>Admin composites</h3><p><code>AdminLayout</code> with permission-aware nav, <code>TenantSwitcher</code>, <code>DataTable</code>, <code>FilterBar</code>, <code>BulkActionBar</code> — wired to work together.</p></div>
+    <div class="feature lg"><h3>Admin composites</h3><p><code>AdminLayout</code> with permission-aware nav, <code>TenantSwitcher</code>, <code>DataTable</code>, <code>FilterBar</code>, <code>BulkActionBar</code> — wired to work together.</p></div>
     <div class="feature"><h3>Accessibility, guaranteed</h3><p>Every color pair meets WCAG AA — enforced by CI, not policy. <code>createTheme()</code> picks foregrounds by real contrast for any brand color.</p></div>
     <div class="feature"><h3>Localized to the bone</h3><p>Placeholders, empty states, calendar names, every aria-label — one <code>LocaleProvider</code> localizes the whole tree. en and zh-TW built in.</p></div>
     <div class="feature"><h3>Tokens all the way down</h3><p>HSL variables, dark mode as an equal citizen, cross-platform JS tokens for React Native. Retheme everything from one <code>--radius</code>.</p></div>
-    <div class="feature"><h3>AI-ready by design</h3><p><code>llms.txt</code> ships in the package — setup, design rules, and the full typed API, machine-readable. Your coding agent imports the right component on the first try.</p></div>
-    <div class="feature"><h3>Mobile back-office, built in</h3><p>Desktop sidebar, mobile bottom tabs: <code>hideSidebar="mobile"</code> + <code>bottomNav</code> slot with safe-area padding handled. One layout, both form factors.</p></div>
-    <div class="feature"><h3>Upgrades that don't break you</h3><p>The public API is snapshot-tested — every prop change is deliberate. Breaking changes ship with a codemod: one command migrates your repo.</p></div>
     <div class="feature"><h3>Server-side tables, one hook</h3><p><code>useServerTable</code> owns paging, sorting, and filter state; you fetch on <code>queryKey</code>, the table renders it. Six wired props, zero boilerplate.</p></div>
+    <div class="feature lg"><h3>AI-ready by design</h3><p><code>llms.txt</code> ships in the package — setup, design rules, and the full typed API, machine-readable. Your coding agent imports the right component on the first try.</p></div>
+    <div class="feature lg"><h3>Upgrades that don't break you</h3><p>The public API is snapshot-tested — every prop change is deliberate. Breaking changes ship with a codemod: one command migrates your repo.</p></div>
+    <div class="feature lg"><h3>Mobile back-office, built in</h3><p>Desktop sidebar, mobile bottom tabs: <code>hideSidebar="mobile"</code> + <code>bottomNav</code> slot with safe-area padding handled. One layout, both form factors.</p></div>
   </div>
 </section>
 
 <section class="wrap">
   <div class="qs">
-    <div class="sec-head">
+    <div class="sec-head center">
       <h2>One command to start</h2>
       <p>Not a zero-dependency drop-in: components need React, Tailwind CSS v4, and a few peer packages. <code class="mono">init</code> sets all of it up — installs the peers and writes the theme CSS. Prefer manual control? The <a href="./storybook/?path=/docs/getting-started--docs" style="color:var(--brand)">Getting Started</a> guide lists every step.</p>
     </div>
@@ -262,7 +275,7 @@ npx @arkite-ui/core init
 </section>
 
 <section class="wrap">
-  <div class="sec-head">
+  <div class="sec-head center">
     <h2>Four presets, or bring a hex</h2>
     <p>Swap the entire palette at runtime. Custom brands get AA-passing foregrounds automatically.</p>
   </div>
@@ -273,6 +286,15 @@ npx @arkite-ui/core init
     <div class="preset"><div class="swatches"><span class="sw" style="background:#218757"></span><span class="sw" style="background:#e8933a"></span><span class="sw" style="background:#1d6ff4"></span></div><b>Forest</b><span>Green tones</span></div>
   </div>
 </section>
+
+<div class="wrap"><div class="band">
+  <h2>Ship your back-office this week</h2>
+  <p>Start from the template — admin shell, server-driven table, forms, and mobile nav already wired.</p>
+  <div class="cta-row" style="justify-content:center; margin-bottom:0">
+    <a class="btn btn-primary" href="https://starter.foson.co">Open the live demo →</a>
+    <a class="btn btn-ghost" href="https://github.com/foson-co/arkite-admin-starter">Use the template</a>
+  </div>
+</div></div>
 
 <footer><div class="wrap">
   <span>© 2026 Arkite UI — MIT License</span>
