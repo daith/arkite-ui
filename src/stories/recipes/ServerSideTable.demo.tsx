@@ -3,8 +3,9 @@ import {
   Badge,
   DataTable,
   PageHeader,
+  useServerTable,
   type Column,
-  type SortState,
+  type ServerTableQuery,
 } from '../../index'
 
 interface Deployment {
@@ -38,11 +39,7 @@ interface PageResult {
   total: number
 }
 
-function fetchDeployments(
-  page: number,
-  pageSize: number,
-  sort: SortState | null
-): Promise<PageResult> {
+function fetchDeployments({ page, pageSize, sort }: ServerTableQuery): Promise<PageResult> {
   return new Promise((resolve) => {
     setTimeout(() => {
       const sorted = [...DB]
@@ -63,21 +60,17 @@ function fetchDeployments(
 
 // ─── Page ──────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 10
-
 /**
  * Recipe: a fully server-driven table.
  *
- * The page owns `page` (1-based) and `sortState`; every change refetches
- * and the server returns one pre-sorted slice plus the total count.
- * DataTable is told the data is already processed via `totalRows`, so it
- * only renders — no client-side sorting or slicing. `loading` bridges
- * each round-trip, and a sort change resets to page 1 because the old
- * page number is meaningless under a new ordering.
+ * `useServerTable` owns the query state — page, page size, sort, filters —
+ * and hands DataTable its six controlled props via `{...table.props}`.
+ * The page just fetches whenever `table.query` changes and passes the
+ * slice back with `totalRows`. Sort and page-size changes reset to page 1
+ * automatically (page N of a re-sorted result set is a different page N).
  */
 export function ServerSideTable() {
-  const [page, setPage] = useState(1)
-  const [sortState, setSortState] = useState<SortState | null>(null)
+  const table = useServerTable({ initialPageSize: 10 })
   const [rows, setRows] = useState<Deployment[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -85,7 +78,7 @@ export function ServerSideTable() {
   useEffect(() => {
     let cancelled = false
     setLoading(true)
-    fetchDeployments(page, PAGE_SIZE, sortState).then((result) => {
+    fetchDeployments(table.query).then((result) => {
       if (cancelled) return // a newer request superseded this one
       setRows(result.rows)
       setTotal(result.total)
@@ -94,12 +87,7 @@ export function ServerSideTable() {
     return () => {
       cancelled = true
     }
-  }, [page, sortState])
-
-  const handleSortChange = (next: SortState | null) => {
-    setSortState(next)
-    setPage(1)
-  }
+  }, [table.query])
 
   const columns: Column<Deployment>[] = [
     { key: 'service', header: 'Service', sortable: true },
@@ -140,13 +128,8 @@ export function ServerSideTable() {
           columns={columns}
           getRowKey={(d) => d.id}
           loading={loading}
-          page={page}
-          onPageChange={setPage}
-          sortState={sortState}
-          onSortChange={handleSortChange}
           totalRows={total}
-          defaultPageSize={PAGE_SIZE}
-          pageSizeOptions={[PAGE_SIZE]}
+          {...table.props}
         />
       </div>
     </div>

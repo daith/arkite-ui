@@ -120,3 +120,25 @@ export const Hoverable: Story = {
     </div>
   ),
 }
+
+export const Interactive: Story = {
+  render: () => (
+    <div className="flex gap-4">
+      {['Project A', 'Project B'].map((name) => (
+        <Card
+          key={name}
+          interactive
+          onClick={() => alert(`Open ${name}`)}
+          className="w-56"
+        >
+          <CardContent>
+            <p className="font-medium">{name}</p>
+            <p className="text-sm text-muted-foreground">
+              Whole card is a button — Tab to it, press Enter.
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  ),
+}

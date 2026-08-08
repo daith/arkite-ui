@@ -231,3 +231,52 @@ RailWithSubNav.storyName = 'Rail Variant (with subNav)'
 
 export const RailWithoutSubNav: StoryFn = () => <RailDemo withSubNav={false} />
 RailWithoutSubNav.storyName = 'Rail Variant (no subNav)'
+
+const MobileBottomNavDemo = () => {
+  const [path, setPath] = useState('/dashboard')
+  const tabs = [
+    { path: '/dashboard', label: '總覽', icon: '▦' },
+    { path: '/users', label: '用戶', icon: '▤' },
+    { path: '/reports', label: '報表', icon: '◔' },
+    { path: '/settings', label: '設定', icon: '⚙' },
+  ]
+  return (
+    <AdminLayout
+      currentPath={path}
+      onNavigate={setPath}
+      navigation={navigation}
+      brand={{ name: 'Arkite', shortName: 'A' }}
+      // Desktop keeps the sidebar; below `md` it hides and bottomNav takes over
+      hideSidebar="mobile"
+      bottomNav={
+        <div className="flex">
+          {tabs.map((t) => (
+            <button
+              key={t.path}
+              type="button"
+              onClick={() => setPath(t.path)}
+              className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-xs ${
+                path.startsWith(t.path) ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              <span className="text-base leading-none">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      }
+    >
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold">Mobile bottom nav</h1>
+        <p className="text-muted-foreground">Current path: {path}</p>
+        <p className="text-sm text-muted-foreground">
+          縮窄視窗(或用 Storybook viewport 切到 mobile):側欄消失、底部導覽出現,
+          safe-area padding 已內建,main 區自動讓位。
+        </p>
+      </div>
+    </AdminLayout>
+  )
+}
+
+export const MobileBottomNav: StoryFn = () => <MobileBottomNavDemo />
+MobileBottomNav.storyName = 'Mobile (hideSidebar + bottomNav)'

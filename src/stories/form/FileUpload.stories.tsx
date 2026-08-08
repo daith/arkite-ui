@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { FileUpload, FileUploadButton } from '../../components/file-upload'
+import { FileTrigger, FileUpload, FileUploadButton } from '../../components/file-upload'
 
 const meta = {
   title: 'Form/FileUpload',
@@ -54,4 +55,28 @@ export const SmallMaxFiles: Story = {
     onError: (error: string) => alert(error),
   },
   decorators: [(Story) => <div className="w-96">{Story()}</div>],
+}
+
+const FileTriggerDemo = () => {
+  const [name, setName] = useState<string | null>(null)
+  return (
+    <div className="flex items-center gap-4">
+      {/* Headless: ANY element opens the picker — here an avatar thumbnail */}
+      <FileTrigger accept="image/*" onChange={([file]) => setName(file.name)}>
+        <button
+          type="button"
+          className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/40 text-xs text-muted-foreground hover:border-muted-foreground"
+        >
+          {name ? '✓' : '照片'}
+        </button>
+      </FileTrigger>
+      <p className="text-sm text-muted-foreground">
+        {name ? `Picked: ${name}` : 'Click the avatar to pick an image — no dropzone chrome, no wrapper element.'}
+      </p>
+    </div>
+  )
+}
+
+export const HeadlessTrigger: Story = {
+  render: () => <FileTriggerDemo />,
 }

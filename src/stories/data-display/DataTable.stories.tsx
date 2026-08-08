@@ -226,3 +226,36 @@ export const WithFilters: StoryFn = () => (
     defaultPageSize={5}
   />
 )
+
+export const CompactDense: StoryFn = () => (
+  <DataTable<User>
+    data={sampleData}
+    columns={columns}
+    getRowKey={(row) => row.id}
+    compact
+    rowClassName={(row) => (row.status === 'inactive' ? 'opacity-60' : '')}
+    pagination={false}
+  />
+)
+CompactDense.storyName = 'Compact + rowClassName'
+
+const pinnedColumns: Column<User>[] = [
+  { key: 'name', header: 'Name', pinned: 'left', sortable: true },
+  { key: 'email', header: 'Email' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+  { key: 'email2', header: 'Backup Email', cell: (r) => r.email },
+  { key: 'role2', header: 'Previous Role', cell: (r) => r.role },
+]
+
+export const PinnedColumns: StoryFn = () => (
+  <div className="max-w-xl">
+    <DataTable<User>
+      data={sampleData}
+      columns={pinnedColumns}
+      getRowKey={(row) => row.id}
+      compact
+      pagination={false}
+    />
+  </div>
+)

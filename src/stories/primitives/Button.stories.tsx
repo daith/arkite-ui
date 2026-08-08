@@ -76,7 +76,18 @@ export const AllVariants: Story = {
       <Button variant="ghost">Ghost</Button>
       <Button variant="destructive">Destructive</Button>
       <Button variant="gradient">Gradient</Button>
+      <Button variant="link">Link</Button>
     </div>
+  ),
+}
+
+export const Link: Story = {
+  render: () => (
+    <p className="text-sm">
+      Inline action in a sentence or table cell:{' '}
+      <Button variant="link">view details</Button> — link look, button semantics.
+      Use a real <code>&lt;a&gt;</code> for navigation.
+    </p>
   ),
 }
 
