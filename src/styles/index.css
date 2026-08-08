@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Zero-config for consumers: Tailwind v4 skips node_modules by default, so
+   point it at this package's own dist — resolved relative to THIS file, i.e.
+   node_modules/@arkite-ui/core/dist when installed (repo dist in dev). */
+@source "../../dist";
 
 @custom-variant dark (&:is(.dark *));
 

@@ -83,6 +83,10 @@ With Tailwind CSS v4, import the preset in your CSS:
 /* app.css */
 @import "tailwindcss";
 @import "@arkite-ui/core/styles.css";
+
+/* Only needed on @arkite-ui/core <= 0.14.2 — newer versions ship this
+   themselves. Tailwind v4 skips node_modules, so point it at the library: */
+@source "../node_modules/@arkite-ui/core/dist";
 ```
 
 Or use the JS preset for Tailwind v4 config:
