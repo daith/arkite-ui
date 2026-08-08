@@ -36,6 +36,21 @@ describe('Table', () => {
     expect(screen.getByRole('columnheader').className).toContain('[table[data-compact]_&]:h-8')
   })
 
+  // Regression (0.14.0 shipped hover as opt-in and every consumer's bare
+  // Table silently lost row hover): hoverable defaults to TRUE, and a false
+  // value must not render the attribute (CSS matches on presence)
+  it('hoverable defaults to true; false removes the attribute entirely', () => {
+    const { rerender } = render(<Table><tbody><tr><td>Cell</td></tr></tbody></Table>)
+    expect(screen.getByRole('table')).toHaveAttribute('data-hoverable', 'true')
+    rerender(<Table hoverable={false}><tbody><tr><td>Cell</td></tr></tbody></Table>)
+    expect(screen.getByRole('table')).not.toHaveAttribute('data-hoverable')
+  })
+
+  it('compact={false} does not render the data attribute', () => {
+    render(<Table compact={false}><tbody><tr><td>Cell</td></tr></tbody></Table>)
+    expect(screen.getByRole('table')).not.toHaveAttribute('data-compact')
+  })
+
   it('hoverable and striped are consumed by TableRow selectors', () => {
     render(
       <Table hoverable variant="striped">

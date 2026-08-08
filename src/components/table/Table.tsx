@@ -26,7 +26,7 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   compact?: boolean
   /** Bordered table */
   bordered?: boolean
-  /** Hoverable rows */
+  /** Row hover feedback @default true — pass `false` for static/print-like tables */
   hoverable?: boolean
   /** Sticky header — stays fixed while scrolling vertically */
   stickyHeader?: boolean
@@ -40,9 +40,14 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   fillHeight?: boolean
 }
 
-/** Styled HTML table with support for striping, borders, and sticky headers. */
+/**
+ * Styled HTML table with support for striping, density, borders, and sticky
+ * headers. The style props are exposed as `data-*` attributes consumed by CSS
+ * on the child components — attribute PRESENCE activates the selectors, so
+ * falsy values must render as `undefined` (never `"false"`).
+ */
 export const Table = forwardRef<HTMLTableElement, TableProps>(
-  ({ className, variant = 'default', compact, bordered, hoverable, stickyHeader, fillHeight, ...props }, ref) => (
+  ({ className, variant = 'default', compact, bordered, hoverable = true, stickyHeader, fillHeight, ...props }, ref) => (
     <div className={cn('relative w-full overflow-auto', fillHeight && 'h-full')}>
       <table
         ref={ref}
@@ -54,8 +59,8 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           className
         )}
         data-variant={variant}
-        data-compact={compact}
-        data-hoverable={hoverable}
+        data-compact={compact || undefined}
+        data-hoverable={hoverable || undefined}
         data-sticky-header={stickyHeader || undefined}
         {...props}
       />
