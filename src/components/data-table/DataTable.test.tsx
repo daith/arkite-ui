@@ -42,17 +42,17 @@ describe('DataTable', () => {
   })
 
   it('shows empty content when data is empty', () => {
-    render(<DataTable columns={columns} data={[]} emptyContent="No data" />)
+    render(<DataTable<TestRow> columns={columns} data={[]} emptyContent="No data" />)
     expect(screen.getByText('No data')).toBeInTheDocument()
   })
 
   it('shows default empty message', () => {
-    render(<DataTable columns={columns} data={[]} />)
+    render(<DataTable<TestRow> columns={columns} data={[]} />)
     expect(screen.getByText('No results found.')).toBeInTheDocument()
   })
 
   it('shows loading state', () => {
-    render(<DataTable columns={columns} data={[]} loading />)
+    render(<DataTable<TestRow> columns={columns} data={[]} loading />)
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
@@ -668,7 +668,7 @@ describe('DataTable', () => {
 
   it('totalRows hides the pagination footer while data is empty (loading)', () => {
     render(
-      <DataTable
+      <DataTable<TestRow>
         columns={columns}
         data={[]}
         getRowKey={(r) => r.id}
@@ -791,6 +791,77 @@ describe('DataTable', () => {
     )
     const rows = screen.getAllByRole('row').slice(1)
     expect(rows.every((r) => r.classList.contains('text-xs'))).toBe(true)
+  })
+
+  // ark-finance feedback: cell-level classes and responsive hiding were the
+  // root causes behind negative-margin hacks and a JS media-query workaround
+  it('cellClassName / headerClassName reach the right cells', () => {
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[
+          {
+            key: 'name',
+            header: 'Name',
+            headerClassName: 'bg-muted',
+            cellClassName: (row) => (row.age > 30 ? 'text-destructive' : ''),
+          },
+          { key: 'age', header: 'Age' },
+        ]}
+      />
+    )
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveClass('bg-muted')
+    const rows = screen.getAllByRole('row').slice(1)
+    expect(within(rows[2]).getAllByRole('cell')[0]).toHaveClass('text-destructive') // Charlie, 35
+    expect(within(rows[0]).getAllByRole('cell')[0]).not.toHaveClass('text-destructive')
+  })
+
+  it("hidden:'mobile' keeps the column rendered but hides it below md via CSS", () => {
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[
+          { key: 'name', header: 'Name' },
+          { key: 'age', header: 'Age', hidden: 'mobile' },
+        ]}
+      />
+    )
+    const ageHead = screen.getByRole('columnheader', { name: 'Age' })
+    expect(ageHead).toHaveClass('max-md:hidden')
+    const firstRowCells = screen.getAllByRole('row')[1].querySelectorAll('td')
+    expect(firstRowCells[1]).toHaveClass('max-md:hidden')
+  })
+
+  it('hidden:true still removes the column entirely', () => {
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[
+          { key: 'name', header: 'Name' },
+          { key: 'age', header: 'Age', hidden: true },
+        ]}
+      />
+    )
+    expect(screen.queryByRole('columnheader', { name: 'Age' })).not.toBeInTheDocument()
+  })
+
+  it('infers T from data for inline columns (NoInfer) — compile-level check', () => {
+    // No <TestRow> annotation: `row` must be typed from `data`
+    render(
+      <DataTable
+        data={data}
+        getRowKey={(r) => r.id}
+        pagination={false}
+        columns={[{ key: 'name', header: 'Name', cell: (row) => row.name.toUpperCase() }]}
+      />
+    )
+    expect(screen.getByText('ALICE')).toBeInTheDocument()
   })
 
   it('Column.pinned pins header and body cells left/right', () => {

@@ -329,11 +329,13 @@ type ColorPickerSize = ColorPickerSize
 type Column {
   align?: "center" | "right" | "left" | undefined
   cell?: ((row: T, index: number) => ReactNode) | undefined
+  cellClassName?: string | ((row: T, index: number) => string) | undefined
   filterFn?: ((row: T, filterValue: string) => boolean) | undefined
   filterOptions?: string[] | undefined
   filterable?: boolean | undefined
   header: ReactNode
-  hidden?: boolean | undefined
+  headerClassName?: string | undefined
+  hidden?: boolean | "mobile" | "desktop" | undefined
   key: string
   pinned?: "right" | "left" | undefined
   sortable?: boolean | undefined
@@ -433,7 +435,7 @@ type CreateThemeOptions {
 type DataTableProps {
   className?: string | undefined
   columnToggle?: boolean | undefined
-  columns: Column<T>[]
+  columns: Column<NoInfer<T>>[]
   compact?: boolean | undefined
   data: T[]
   defaultPageSize?: number | undefined

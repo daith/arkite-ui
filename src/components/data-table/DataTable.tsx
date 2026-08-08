@@ -26,8 +26,17 @@ export interface Column<T> {
   width?: string | number
   /** Text alignment */
   align?: 'left' | 'center' | 'right'
-  /** Hide column */
-  hidden?: boolean
+  /**
+   * Hide column: `true` removes it entirely; `'mobile'` hides it below the
+   * `md` breakpoint, `'desktop'` at `md` and up — both via pure CSS
+   * (SSR-safe, no JS breakpoint math), aligned with AdminLayout's
+   * `hideSidebar="mobile"` convention.
+   */
+  hidden?: boolean | 'mobile' | 'desktop'
+  /** Class for this column's header cell */
+  headerClassName?: string
+  /** Class for this column's body cells — string, or a function of the row */
+  cellClassName?: string | ((row: T, index: number) => string)
   /** Enable filtering for this column */
   filterable?: boolean
   /** Custom filter options. If not provided, auto-detect unique values from data. */
@@ -59,8 +68,12 @@ export interface PaginationState {
 export interface DataTableProps<T> {
   /** Table data */
   data: T[]
-  /** Column definitions */
-  columns: Column<T>[]
+  /**
+   * Column definitions. `NoInfer` makes TypeScript infer `T` from `data`
+   * alone, so inline `columns` literals get fully typed `cell`/`cellClassName`
+   * callbacks without annotating `<DataTable<Row> …>`.
+   */
+  columns: Column<NoInfer<T>>[]
   /** Show the pagination footer (rows-per-page + range + pager) @default true */
   pagination?: boolean
   /** Compact density — tighter cell padding for data-dense admin tables @default false */
@@ -189,6 +202,9 @@ function SelectionCheckbox({
   )
 }
 
+const responsiveHiddenClass = (hidden?: boolean | 'mobile' | 'desktop') =>
+  hidden === 'mobile' ? 'max-md:hidden' : hidden === 'desktop' ? 'md:hidden' : undefined
+
 /** Feature-rich data table with sorting, pagination, and custom cell rendering. */
 export function DataTable<T>({
   data,
@@ -288,13 +304,14 @@ export function DataTable<T>({
 
   // Filter visible columns
   const visibleColumns = useMemo(
-    () => columns.filter((col) => !col.hidden && !hiddenColumnKeys.has(col.key)),
+    // `'mobile'`/`'desktop'` stay in the render and hide via CSS classes
+    () => columns.filter((col) => col.hidden !== true && !hiddenColumnKeys.has(col.key)),
     [columns, hiddenColumnKeys]
   )
 
   // Toggleable columns (non-hidden by definition)
   const toggleableColumns = useMemo(
-    () => columns.filter((col) => !col.hidden),
+    () => columns.filter((col) => col.hidden !== true),
     [columns]
   )
 
@@ -643,8 +660,10 @@ export function DataTable<T>({
                   // Pinned headers are position:sticky — `relative` would
                   // override it (the filter dropdown anchors fine either way)
                   !column.pinned && 'relative',
+                  responsiveHiddenClass(column.hidden),
                   column.align === 'center' && 'text-center',
-                  column.align === 'right' && 'text-right'
+                  column.align === 'right' && 'text-right',
+                  column.headerClassName
                 )}
               >
                 <div className="inline-flex items-center gap-1">
@@ -812,8 +831,12 @@ export function DataTable<T>({
                     stickyLead={column.pinned === 'left'}
                     stickyAction={column.pinned === 'right'}
                     className={cn(
+                      responsiveHiddenClass(column.hidden),
                       column.align === 'center' && 'text-center',
-                      column.align === 'right' && 'text-right'
+                      column.align === 'right' && 'text-right',
+                      typeof column.cellClassName === 'function'
+                        ? column.cellClassName(row, globalIndex)
+                        : column.cellClassName
                     )}
                   >
                     {getCellValue(row, column, globalIndex)}
