@@ -335,6 +335,7 @@ type Column {
   header: ReactNode
   hidden?: boolean | undefined
   key: string
+  pinned?: "right" | "left" | undefined
   sortable?: boolean | undefined
   width?: string | number | undefined
 }
@@ -1252,13 +1253,22 @@ type TableBodyProps = TableBodyProps
 type TableCaptionProps = TableCaptionProps
 
 type TableCellProps {
+  align?: TableAlign | undefined
+  numeric?: boolean | undefined
   stickyAction?: boolean | undefined
   stickyLead?: boolean | undefined
+}
+
+type TableEmptyProps {
+  children?: ReactNode
+  className?: string | undefined
+  colSpan?: number | undefined
 }
 
 type TableFooterProps = TableFooterProps
 
 type TableHeadProps {
+  align?: TableAlign | undefined
   sortDirection?: "desc" | "asc" | null | undefined
   sortable?: boolean | undefined
   stickyAction?: boolean | undefined
@@ -1266,6 +1276,12 @@ type TableHeadProps {
 }
 
 type TableHeaderProps = TableHeaderProps
+
+type TableLoadingProps {
+  children?: ReactNode
+  className?: string | undefined
+  colSpan?: number | undefined
+}
 
 type TableProps {
   bordered?: boolean | undefined
@@ -1873,11 +1889,15 @@ value TableCaption: React.ForwardRefExoticComponent<TableCaptionProps & React.Re
 
 value TableCell: React.ForwardRefExoticComponent<TableCellProps & React.RefAttributes<HTMLTableCellElement>>
 
+value TableEmpty: ({ colSpan, children, className }: TableEmptyProps) => JSX.Element
+
 value TableFooter: React.ForwardRefExoticComponent<TableFooterProps & React.RefAttributes<HTMLTableSectionElement>>
 
 value TableHead: React.ForwardRefExoticComponent<TableHeadProps & React.RefAttributes<HTMLTableCellElement>>
 
 value TableHeader: React.ForwardRefExoticComponent<TableHeaderProps & React.RefAttributes<HTMLTableSectionElement>>
+
+value TableLoading: ({ colSpan, children, className }: TableLoadingProps) => JSX.Element
 
 value TableRow: React.ForwardRefExoticComponent<TableRowProps & React.RefAttributes<HTMLTableRowElement>>
 

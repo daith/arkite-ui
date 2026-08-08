@@ -1,5 +1,23 @@
-import { forwardRef, type HTMLAttributes, type TdHTMLAttributes, type ThHTMLAttributes } from 'react'
+import {
+  forwardRef,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+  type TdHTMLAttributes,
+  type ThHTMLAttributes,
+} from 'react'
 import { cn } from '../../utils/cn'
+import { useLocale } from '../../locale'
+
+type TableAlign = 'left' | 'center' | 'right'
+
+const alignStyles: Record<TableAlign, string | false> = {
+  left: false,
+  center: 'text-center',
+  right: 'text-right',
+}
 
 export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   /** Table variant */
@@ -128,11 +146,13 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
 
 TableRow.displayName = 'TableRow'
 
-export interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
+export interface TableHeadProps extends Omit<ThHTMLAttributes<HTMLTableCellElement>, 'align'> {
   /** Sortable column */
   sortable?: boolean
   /** Sort direction */
   sortDirection?: 'asc' | 'desc' | null
+  /** Text alignment @default "left" */
+  align?: TableAlign
   /** Sticky action column — pins to the right edge during horizontal scroll */
   stickyAction?: boolean
   /** Sticky lead column — pins to the left edge during horizontal scroll (e.g. a ticker/name column in a wide table) */
@@ -141,13 +161,14 @@ export interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
 
 /** Table header cell with optional sort indicators and sticky positioning. */
 export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
-  ({ className, sortable, sortDirection, stickyAction, stickyLead, children, ...props }, ref) => (
+  ({ className, sortable, sortDirection, align = 'left', stickyAction, stickyLead, children, ...props }, ref) => (
     <th
       ref={ref}
       className={cn(
         'h-10 px-4 text-left align-middle font-medium text-muted-foreground',
         '[table[data-compact]_&]:h-8 [table[data-compact]_&]:px-3',
         '[&:has([role=checkbox])]:pr-0',
+        alignStyles[align],
         sortable && 'cursor-pointer select-none hover:text-foreground',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
         stickyLead && 'sticky left-0 bg-background shadow-sticky-right',
@@ -175,22 +196,28 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
 
 TableHead.displayName = 'TableHead'
 
-export interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
+export interface TableCellProps extends Omit<TdHTMLAttributes<HTMLTableCellElement>, 'align'> {
+  /** Text alignment @default "left" */
+  align?: TableAlign
+  /** Numeric cell — right-aligned with tabular figures so digit columns line up */
+  numeric?: boolean
   /** Sticky action column — pins to the right edge during horizontal scroll */
   stickyAction?: boolean
   /** Sticky lead column — pins to the left edge during horizontal scroll (e.g. a ticker/name column in a wide table) */
   stickyLead?: boolean
 }
 
-/** Table data cell with optional sticky column support. */
+/** Table data cell with optional alignment, numeric formatting, and sticky columns. */
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(
-  ({ className, stickyAction, stickyLead, ...props }, ref) => (
+  ({ className, align = 'left', numeric, stickyAction, stickyLead, ...props }, ref) => (
     <td
       ref={ref}
       className={cn(
         // Row separator lives here — tr borders don't paint under border-separate
         'border-b p-4 align-middle [&:has([role=checkbox])]:pr-0',
         '[table[data-compact]_&]:px-3 [table[data-compact]_&]:py-2',
+        alignStyles[align],
+        numeric && 'text-right tabular-nums',
         stickyAction && 'sticky right-0 bg-background shadow-sticky-left',
         stickyLead && 'sticky left-0 bg-background shadow-sticky-right',
         className
@@ -218,3 +245,73 @@ export const TableCaption = forwardRef<HTMLTableCaptionElement, TableCaptionProp
 )
 
 TableCaption.displayName = 'TableCaption'
+
+/**
+ * Auto colSpan: count the header cells of the enclosing table once mounted.
+ * An explicit colSpan skips measuring (use it when columns change at runtime).
+ */
+function useAutoColSpan(explicit?: number) {
+  const ref = useRef<HTMLTableCellElement>(null)
+  const [measured, setMeasured] = useState(1)
+  useLayoutEffect(() => {
+    if (explicit != null) return
+    const table = ref.current?.closest('table')
+    const headerRow = table?.querySelector('thead tr')
+    const count = headerRow?.children.length ?? 0
+    if (count > 0) setMeasured(count)
+  }, [explicit])
+  return { ref, colSpan: explicit ?? measured }
+}
+
+export interface TableEmptyProps {
+  /** Span — measured from the header row when omitted */
+  colSpan?: number
+  /** Custom empty content — defaults to the locale's empty message */
+  children?: ReactNode
+  className?: string
+}
+
+/** Full-width empty-state row for the Table family (colSpan handled for you). */
+export function TableEmpty({ colSpan, children, className }: TableEmptyProps) {
+  const locale = useLocale()
+  const auto = useAutoColSpan(colSpan)
+  return (
+    <TableRow>
+      <TableCell
+        ref={auto.ref}
+        colSpan={auto.colSpan}
+        className={cn('h-24 text-center text-muted-foreground', className)}
+      >
+        {children ?? locale.dataTable.emptyMessage}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+export interface TableLoadingProps {
+  /** Span — measured from the header row when omitted */
+  colSpan?: number
+  /** Custom label — defaults to the locale's loading message */
+  children?: ReactNode
+  className?: string
+}
+
+/** Full-width loading row for the Table family (colSpan handled for you). */
+export function TableLoading({ colSpan, children, className }: TableLoadingProps) {
+  const locale = useLocale()
+  const auto = useAutoColSpan(colSpan)
+  return (
+    <TableRow>
+      <TableCell
+        ref={auto.ref}
+        colSpan={auto.colSpan}
+        className={cn('h-24 text-center', className)}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="text-muted-foreground">{children ?? locale.dataTable.loading}</span>
+        </div>
+      </TableCell>
+    </TableRow>
+  )
+}

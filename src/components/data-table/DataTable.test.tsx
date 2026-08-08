@@ -793,6 +793,22 @@ describe('DataTable', () => {
     expect(rows.every((r) => r.classList.contains('text-xs'))).toBe(true)
   })
 
+  it('Column.pinned pins header and body cells left/right', () => {
+    const pinnedColumns: Column<TestRow>[] = [
+      { key: 'name', header: 'Name', pinned: 'left' },
+      { key: 'age', header: 'Age', pinned: 'right' },
+    ]
+    render(
+      <DataTable columns={pinnedColumns} data={data} getRowKey={(r) => r.id} />
+    )
+    const [nameHead, ageHead] = screen.getAllByRole('columnheader')
+    expect(nameHead).toHaveClass('sticky', 'left-0')
+    expect(ageHead).toHaveClass('sticky', 'right-0')
+    const firstRowCells = screen.getAllByRole('cell').slice(0, 2)
+    expect(firstRowCells[0]).toHaveClass('sticky', 'left-0')
+    expect(firstRowCells[1]).toHaveClass('sticky', 'right-0')
+  })
+
   // ─── Uncontrolled Selection Tests ───
 
   it('defaultSelectedRows sets initial uncontrolled selection', () => {

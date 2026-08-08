@@ -34,6 +34,14 @@ export interface Column<T> {
   filterOptions?: string[]
   /** Custom filter function */
   filterFn?: (row: T, filterValue: string) => boolean
+  /**
+   * Pin this column during horizontal scroll: `'left'` freezes it at the left
+   * edge (e.g. a ticker/name column in a wide table), `'right'` at the right
+   * edge (action columns). Note: `'left'` pins at the table's left edge — with
+   * `selectable`/expandable enabled, the leading utility columns scroll under
+   * the pinned column, so pin the first data column only in plain tables.
+   */
+  pinned?: 'left' | 'right'
 }
 
 export type SortDirection = 'asc' | 'desc' | null
@@ -621,6 +629,8 @@ export function DataTable<T>({
               return (
               <TableHead
                 key={column.key}
+                stickyLead={column.pinned === 'left'}
+                stickyAction={column.pinned === 'right'}
                 aria-sort={
                   column.sortable && sortState?.key === column.key && sortState.direction
                     ? sortState.direction === 'asc'
@@ -630,7 +640,9 @@ export function DataTable<T>({
                 }
                 style={{ width: column.width }}
                 className={cn(
-                  'relative',
+                  // Pinned headers are position:sticky — `relative` would
+                  // override it (the filter dropdown anchors fine either way)
+                  !column.pinned && 'relative',
                   column.align === 'center' && 'text-center',
                   column.align === 'right' && 'text-right'
                 )}
@@ -797,6 +809,8 @@ export function DataTable<T>({
                 {visibleColumns.map((column) => (
                   <TableCell
                     key={column.key}
+                    stickyLead={column.pinned === 'left'}
+                    stickyAction={column.pinned === 'right'}
                     className={cn(
                       column.align === 'center' && 'text-center',
                       column.align === 'right' && 'text-right'

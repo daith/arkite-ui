@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   Table, TableHeader, TableBody, TableFooter,
   TableRow, TableHead, TableCell, TableCaption,
+  TableEmpty, TableLoading,
 } from './Table'
 
 describe('Table', () => {
@@ -123,6 +124,74 @@ describe('TableCell', () => {
       <table><tbody><tr><TableCell stickyLead>AAPL</TableCell></tr></tbody></table>
     )
     expect(screen.getByRole('cell')).toHaveClass('sticky', 'left-0')
+  })
+})
+
+describe('align / numeric', () => {
+  it('align maps to text classes and is not passed as the deprecated HTML attribute', () => {
+    render(
+      <table><tbody><tr>
+        <TableCell align="right">1,234</TableCell>
+        <TableCell align="center">mid</TableCell>
+      </tr></tbody></table>
+    )
+    const [right, center] = screen.getAllByRole('cell')
+    expect(right).toHaveClass('text-right')
+    expect(right).not.toHaveAttribute('align')
+    expect(center).toHaveClass('text-center')
+  })
+
+  it('TableHead align works too', () => {
+    render(
+      <table><thead><tr><TableHead align="right">Market Cap</TableHead></tr></thead></table>
+    )
+    expect(screen.getByRole('columnheader')).toHaveClass('text-right')
+  })
+
+  it('numeric right-aligns with tabular figures', () => {
+    render(
+      <table><tbody><tr><TableCell numeric>3.4T</TableCell></tr></tbody></table>
+    )
+    expect(screen.getByRole('cell')).toHaveClass('text-right', 'tabular-nums')
+  })
+})
+
+describe('TableEmpty / TableLoading', () => {
+  it('TableEmpty measures colSpan from the header row', () => {
+    render(
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {['a', 'b', 'c', 'd', 'e'].map((k) => <TableHead key={k}>{k}</TableHead>)}
+          </TableRow>
+        </TableHeader>
+        <TableBody><TableEmpty /></TableBody>
+      </Table>
+    )
+    const cell = screen.getByRole('cell')
+    expect(cell).toHaveAttribute('colspan', '5')
+    expect(cell).toHaveTextContent('No results found.')
+  })
+
+  it('explicit colSpan wins and custom content renders', () => {
+    render(
+      <Table><TableBody><TableEmpty colSpan={3}>Nothing here</TableEmpty></TableBody></Table>
+    )
+    const cell = screen.getByRole('cell')
+    expect(cell).toHaveAttribute('colspan', '3')
+    expect(cell).toHaveTextContent('Nothing here')
+  })
+
+  it('TableLoading renders spinner row with measured colSpan', () => {
+    render(
+      <Table>
+        <TableHeader><TableRow><TableHead>a</TableHead><TableHead>b</TableHead></TableRow></TableHeader>
+        <TableBody><TableLoading /></TableBody>
+      </Table>
+    )
+    const cell = screen.getByRole('cell')
+    expect(cell).toHaveAttribute('colspan', '2')
+    expect(cell).toHaveTextContent('Loading')
   })
 })
 
