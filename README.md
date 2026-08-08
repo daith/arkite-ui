@@ -36,6 +36,18 @@ Arkite UI is not another generic component library. It focuses on the components
 - **Tested** — 1,200+ unit tests with Vitest + Testing Library, plus real-Chromium keyboard specs and a Next.js RSC smoke test in CI
 - **Bundle Monitoring** — size-limit budget (< 300 KB)
 
+## AI-Ready
+
+Most component libraries make coding agents guess. Arkite ships its documentation in machine-readable form, following the [llms.txt](https://llmstxt.org/) convention:
+
+| File | Contents | Where |
+|------|----------|-------|
+| [`llms.txt`](https://daith.github.io/arkite-ui/llms.txt) | Setup, design rules, core patterns, full export inventory | Site root + inside the npm package |
+| [`llms-full.txt`](https://daith.github.io/arkite-ui/llms-full.txt) | The above + complete design spec + the typed public API of every export | Site root + inside the npm package |
+| `DESIGN.md` | Machine-readable design system spec (tokens, hard rules, component selection) | Inside the npm package |
+
+Point your agent at `node_modules/@arkite-ui/core/llms-full.txt` (or the hosted URL) and it imports the right component with the right props on the first try. Both files are regenerated from the type-checked API snapshot on every build, so they can't drift from the code.
+
 ## Installation
 
 ```bash
