@@ -117,6 +117,33 @@
 - [ ] MIGRATION.md 完善 — v0.x → v1.0 升級指南
 - [ ] 所有消費端升級驗證 — ark-crm、ark-harvest、ark-rendoc-web 全部跑通
 
+### 大廠 issue 挖礦(2026-08-08,六庫 top-reacted open issues 對照)
+
+> 方法:MUI / AntD / Chakra / Mantine / shadcn / Radix 各抓 reaction 排序前 15 條 open issues,
+> 對照我們的現況。reaction 數 = 已驗證的市場需求強度。
+
+**✅ 我們已有、而且是他們的高票許願(行銷彈藥,寫進文章/landing)**
+
+| 他們的許願 | 票數 | 我們 |
+|---|---|---|
+| shadcn: Multi select | 306 | `Combobox multiple`(shadcn 第一高票,我們內建) |
+| MUI: Zero-runtime CSS | 291 | Tailwind v4,本來就零 runtime |
+| MUI: Improve Next.js support | 255 | RSC smoke test in CI + server-safe tokens |
+| AntD: 表單無障礙(盲人無法使用) | 68+26 | WCAG AA CI 強制 + APG 鍵盤真瀏覽器測試 |
+| MUI: cascading/nested menu | 124 | `DropdownMenuSub`(Radix) |
+| AntD: prefers-color-scheme 自動暗色 | 36 | token 層自動 |
+| shadcn: Stepper | 36 | `Steps` |
+| AntD: v5 太慢 | 53 | size-limit 預算 + 無 runtime style 引擎 |
+
+**⬆️ 缺口且被大廠高票驗證(候選排期,依票數)**
+
+- [ ] **Slider / RangeSlider**(MUI 66 + 我們稽核 1 處 + shadcn 生態常見)— 三度出現,從「押後」升級為排期
+- [ ] **Timeline horizontal orientation**(MUI 84)— 便宜,`orientation` prop
+- [ ] **Combobox 非同步/分頁選項**(MUI 83+103)— 和 useServerTable 同構:`useServerOptions()`?
+- [ ] **DataTable 曝露處理後資料**(AntD 61:filter/sort 後的 currentDataSource)— `onDataChange?` 便宜
+- [ ] **Table/DataTable 欄寬拖拉調整**(AntD 24;admin 表格經典需求)— 中等工程量
+- 🚫 Charts(shadcn 37)— 維持範圍外(用專門庫)
+
 ### DX 稽核產出(2026-08,證據見 docs/DX_AUDIT.md)
 
 已完成:
