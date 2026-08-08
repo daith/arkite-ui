@@ -134,8 +134,9 @@
 - [x] `AdminLayout bottomNav` slot(fixed + safe-area padding + main 自動讓位)— 配合 hideSidebar='mobile'
 - [x] `FileTrigger` — headless 檔案選取觸發器(任意元素開 picker;FileUpload=dropzone、FileUploadButton=按鈕、FileTrigger=headless 三層並列)
 - [x] `PinInput`(OTP 驗證碼,含 SMS autofill / 貼上分配 / 鍵盤導航)
-- [ ] Range Slider、通用 Backdrop primitive — 缺口確認但證據量低(各 1-4 處),待需求再排
-- [ ] 零使用元件盤點 — CommandPalette/Tree/TagInput/VirtualList/BulkActionBar/ColorPicker(0/9):檢視需求或下架
+- [ ] `Backdrop`/`Lightbox` primitive — 深掃後證據升級:19 處手刻(4 專案)、2 處註解明文點名缺口 → **升級為該做**;連帶查 Modal 為何沒被 ark-finance 採用
+- [ ] Range Slider — 證據仍只有 1 處,續押後
+- [x] 零使用元件盤點(結論見 docs/DX_AUDIT.md 附錄)— BulkActionBar/TagInput 是發現性問題該救;CommandPalette/VirtualList/Tree/ColorPicker 建議 1.0 標 experimental 不凍結 API,觀察至 1.0+6mo;VirtualList 缺測試,不補則候選下架
 
 ### v1.0.0 什麼時候發？
 
