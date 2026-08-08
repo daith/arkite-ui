@@ -61,7 +61,11 @@ import { useToast, ToastContainer } from '@arkite-ui/core'
 
 const toast = useToast()
 toast.success('Saved', { description: 'Changes are live.' })
-toast.error('Failed to save')
+
+// error handling in catch blocks — wire the app's parser once at startup:
+toast.configure({ formatError: getErrorMessage })
+// then every call site is one line (title = prefix, description = parsed message):
+catch (err) { toast.fromError(err, { prefix: 'Failed to save' }) }
 ```
 
 ### Theming
@@ -173,6 +177,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
 | Overlay panels | `Modal` (centered) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs |
 | Notifications | `toast.success/error/…` + `ImperativeToastContainer` (or `useToast` + `ToastContainer`) | Custom snackbars |
+| Error in a `catch` block | `toast.fromError(err, { prefix: '儲存失敗' })` — wire the app's parser ONCE at startup: `toast.configure({ formatError: getErrorMessage })` | ``toast.error(`失敗：${getErrorMessage(err)}`)`` boilerplate at every call site |
 | Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
 | Empty / error / loading | `EmptyState` / `ErrorState` / `Skeleton` family / `Spinner` / `LoadingOverlay` (`fullscreen`) | Blank screens |
 | Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |
@@ -1605,6 +1610,10 @@ type TimelineProps {
 
 type TimelineVariant = TimelineVariant
 
+type ToastConfig {
+  formatError?: ((error: unknown) => ReactNode) | undefined
+}
+
 type ToastContainerProps {
   className?: string | undefined
   position?: ToastPosition | undefined
@@ -1618,6 +1627,14 @@ type ToastData {
   isLoading?: boolean | undefined
   title?: ReactNode
   variant?: ToastVariant | undefined
+}
+
+type ToastFromErrorOptions {
+  action?: { label: string; onClick: () => void; } | undefined
+  description?: ReactNode
+  duration?: number | undefined
+  isLoading?: boolean | undefined
+  prefix?: ReactNode
 }
 
 type ToastItem {
@@ -2114,7 +2131,7 @@ value themePresets: { readonly default: ThemePreset; readonly neutral: ThemePres
 
 value themeToCSS: (theme: ThemePreset, selector?: string) => string
 
-value toast: { show: (title: ReactNode, options?: Partial<Omit<ToastData, "id" | "title">>) => string; success: (title: ReactNode, options?: ToastOptions) => string; error: (title: ReactNode, options?: ToastOptions) => string; warning: (title: ReactNode, options?: ToastOptions) => string; info: (title: ReactNode, options?: ToastOptions) => string; loading: (title: ReactNode, options?: ToastOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; }
+value toast: { show: (title: ReactNode, options?: Partial<Omit<ToastData, "id" | "title">>) => string; success: (title: ReactNode, options?: ToastOptions) => string; error: (title: ReactNode, options?: ToastOptions) => string; warning: (title: ReactNode, options?: ToastOptions) => string; info: (title: ReactNode, options?: ToastOptions) => string; loading: (title: ReactNode, options?: ToastOptions) => string; fromError: (err: unknown, options?: ToastFromErrorOptions) => string; configure: (next: ToastConfig) => void; dismiss: (id: string) => void; dismissAll: () => void; }
 
 value useCommandPalette: () => { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; }
 
@@ -2128,7 +2145,7 @@ value useServerTable: (options?: UseServerTableOptions) => UseServerTableResult
 
 value useSidebar: () => SidebarContextValue
 
-value useToast: () => ((options: Omit<ToastData, "id">) => string) & { show: (title: ReactNode, options?: ShorthandOptions) => string; success: (title: ReactNode, options?: ShorthandOptions) => string; error: (title: ReactNode, options?: ShorthandOptions) => string; warning: (title: ReactNode, options?: ShorthandOptions) => string; info: (title: ReactNode, options?: ShorthandOptions) => string; loading: (title: ReactNode, options?: ToastOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; clear: () => void; }
+value useToast: () => ((options: Omit<ToastData, "id">) => string) & { show: (title: ReactNode, options?: ShorthandOptions) => string; success: (title: ReactNode, options?: ShorthandOptions) => string; error: (title: ReactNode, options?: ShorthandOptions) => string; warning: (title: ReactNode, options?: ShorthandOptions) => string; info: (title: ReactNode, options?: ShorthandOptions) => string; loading: (title: ReactNode, options?: ToastOptions) => string; fromError: (err: unknown, options?: ToastFromErrorOptions) => string; dismiss: (id: string) => void; dismissAll: () => void; clear: () => void; }
 
 value useToastStore: UseBoundStore<StoreApi<ToastStoreState>>
 

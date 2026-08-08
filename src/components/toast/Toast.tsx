@@ -10,7 +10,7 @@ import { cn } from '../../utils/cn'
 import { warnDeprecated } from '../../utils/deprecate'
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info, Loader2 } from 'lucide-react'
 import { useToastStore } from './toast-store'
-import { toast as toastApi, type ToastOptions } from './toast-api'
+import { toast as toastApi, type ToastFromErrorOptions, type ToastOptions } from './toast-api'
 
 export type ToastVariant =
   | 'default'
@@ -241,6 +241,8 @@ export function useToast() {
           toastApi.info(title, resolveShorthandOptions('info', options)),
         loading: (title: ReactNode, options?: ToastOptions) =>
           toastApi.loading(title, options),
+        fromError: (err: unknown, options?: ToastFromErrorOptions) =>
+          toastApi.fromError(err, options),
         dismiss: (id: string) => toastApi.dismiss(id),
         dismissAll: () => toastApi.dismissAll(),
         /** @deprecated Use `dismissAll()` instead — removed in v1.0. */

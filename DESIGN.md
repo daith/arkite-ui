@@ -88,6 +88,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
 | Overlay panels | `Modal` (centered) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs |
 | Notifications | `toast.success/error/…` + `ImperativeToastContainer` (or `useToast` + `ToastContainer`) | Custom snackbars |
+| Error in a `catch` block | `toast.fromError(err, { prefix: '儲存失敗' })` — wire the app's parser ONCE at startup: `toast.configure({ formatError: getErrorMessage })` | ``toast.error(`失敗：${getErrorMessage(err)}`)`` boilerplate at every call site |
 | Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
 | Empty / error / loading | `EmptyState` / `ErrorState` / `Skeleton` family / `Spinner` / `LoadingOverlay` (`fullscreen`) | Blank screens |
 | Status chips | `Badge` (7 variants + `count`, `max`) / `StatusDot` | Colored spans |

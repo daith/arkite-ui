@@ -61,7 +61,11 @@ import { useToast, ToastContainer } from '@arkite-ui/core'
 
 const toast = useToast()
 toast.success('Saved', { description: 'Changes are live.' })
-toast.error('Failed to save')
+
+// error handling in catch blocks — wire the app's parser once at startup:
+toast.configure({ formatError: getErrorMessage })
+// then every call site is one line (title = prefix, description = parsed message):
+catch (err) { toast.fromError(err, { prefix: 'Failed to save' }) }
 ```
 
 ### Theming

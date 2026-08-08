@@ -129,7 +129,7 @@
 
 待做(按證據頻率):
 
-- [ ] `toast.fromError(err, { prefix })` — 283+ 次 catch+toast.error 樣板的收斂點
+- [x] `toast.fromError(err, { prefix })` + `toast.configure({ formatError })` — 283+ 次 catch+toast.error 樣板的收斂點(解析留 app 層,一次接線)
 - [ ] `Button variant="link"` + clickable row/card 模式 — 16+ 處 lint bypass 的來源
 - [ ] `AdminLayout bottomNav` slot(含 safe-area padding)— 行動版底部導航,配合 hideSidebar='mobile'
 - [ ] `FileUpload` headless/自訂觸發器模式確認與文件化(7 處手刻隱藏 input)

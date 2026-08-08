@@ -113,3 +113,61 @@ describe('toast imperative API', () => {
     expect(toasts[4].title).toBe('Toast 6')
   })
 })
+
+describe('toast.fromError', () => {
+  beforeEach(() => {
+    toast.dismissAll()
+    // Reset app-level wiring between tests
+    toast.configure({ formatError: undefined })
+  })
+
+  it('uses the configured formatError: prefix as title, parsed message as description', () => {
+    toast.configure({ formatError: (err) => `parsed:${(err as { code: string }).code}` })
+    toast.fromError({ code: 'E42' }, { prefix: '儲存失敗' })
+    const t = getToasts()[0]
+    expect(t.title).toBe('儲存失敗')
+    expect(t.description).toBe('parsed:E42')
+    expect(t.variant).toBe('destructive')
+  })
+
+  it('unconfigured: falls back to Error#message', () => {
+    toast.fromError(new Error('boom'), { prefix: '刪除失敗' })
+    const t = getToasts()[0]
+    expect(t.title).toBe('刪除失敗')
+    expect(t.description).toBe('boom')
+  })
+
+  it('unconfigured: plain string errors pass through', () => {
+    toast.fromError('連線逾時', { prefix: '載入失敗' })
+    expect(getToasts()[0].description).toBe('連線逾時')
+  })
+
+  it('never invents copy: unparseable error with prefix shows the prefix alone', () => {
+    toast.fromError({ weird: true }, { prefix: '更新失敗' })
+    const t = getToasts()[0]
+    expect(t.title).toBe('更新失敗')
+    expect(t.description).toBeUndefined()
+  })
+
+  it('without prefix the message becomes the title', () => {
+    toast.fromError(new Error('boom'))
+    const t = getToasts()[0]
+    expect(t.title).toBe('boom')
+    expect(t.description).toBeUndefined()
+  })
+
+  it('a throwing formatError falls back instead of crashing', () => {
+    toast.configure({
+      formatError: () => {
+        throw new Error('formatter bug')
+      },
+    })
+    toast.fromError(new Error('actual message'), { prefix: '失敗' })
+    expect(getToasts()[0].description).toBe('actual message')
+  })
+
+  it('forwards remaining ToastOptions (e.g. duration)', () => {
+    toast.fromError(new Error('boom'), { prefix: '失敗', duration: 0 })
+    expect(getToasts()[0].duration).toBe(0)
+  })
+})
