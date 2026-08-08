@@ -16,7 +16,21 @@ import { fileURLToPath } from 'node:url'
 
 import { Project, ts } from 'ts-morph'
 
-import { applyRulesToSourceFile, rules, TODO_MARKER, type RuleHit } from './rules'
+import {
+  applyRulesToSourceFile,
+  fromErrorRules,
+  rules,
+  TODO_MARKER,
+  type RuleHit,
+} from './rules'
+
+/** 具名規則集:v1(破壞性遷移,預設)、from-error(選用的 toast.fromError 採用) */
+export const RULE_SETS = {
+  v1: rules,
+  'from-error': fromErrorRules,
+} as const
+
+export type RuleSetName = keyof typeof RULE_SETS
 
 export interface CodemodReport {
   target: string
@@ -96,8 +110,12 @@ function createProject(target: string): Project {
   return project
 }
 
-export function runCodemod(targetDir: string, options: { dryRun?: boolean } = {}): CodemodReport {
+export function runCodemod(
+  targetDir: string,
+  options: { dryRun?: boolean; ruleSet?: RuleSetName } = {}
+): CodemodReport {
   const dryRun = options.dryRun ?? false
+  const ruleSet = RULE_SETS[options.ruleSet ?? 'v1']
   const target = path.resolve(targetDir)
   if (!fs.existsSync(target) || !fs.statSync(target).isDirectory()) {
     throw new Error(`目標路徑不存在或不是資料夾:${target}`)
@@ -117,13 +135,13 @@ export function runCodemod(targetDir: string, options: { dryRun?: boolean } = {}
     .sort((a, b) => a.getFilePath().localeCompare(b.getFilePath()))
 
   const totals: Record<string, RuleHit> = {}
-  for (const rule of rules) totals[rule.name] = { changes: 0, todos: 0 }
+  for (const rule of ruleSet) totals[rule.name] = { changes: 0, todos: 0 }
   const changedFiles: string[] = []
   const errors: CodemodReport['errors'] = []
 
   for (const sf of sourceFiles) {
     try {
-      const outcome = applyRulesToSourceFile(sf)
+      const outcome = applyRulesToSourceFile(sf, ruleSet)
       for (const [name, hit] of Object.entries(outcome.hits)) {
         totals[name].changes += hit.changes
         totals[name].todos += hit.todos
@@ -158,17 +176,18 @@ function write(line = ''): void {
 }
 
 function formatReport(report: CodemodReport): void {
-  const nameWidth = Math.max(...rules.map((r) => r.name.length)) + 2
+  const names = Object.keys(report.totals)
+  const nameWidth = Math.max(...names.map((n) => n.length)) + 2
   write()
-  write('@arkite-ui/core v1.0 codemod 報告')
+  write('@arkite-ui/core codemod 報告')
   write(`目標:${report.target}(掃描 ${report.fileCount} 個檔案,模式:${report.mode})`)
   write()
   write(`${'規則'.padEnd(nameWidth + 2)}變更  TODO`)
-  for (const rule of rules) {
-    const hit = report.totals[rule.name]
+  for (const name of names) {
+    const hit = report.totals[name]
     const marker = hit.changes > 0 || hit.todos > 0 ? '●' : ' '
     write(
-      `${marker} ${rule.name.padEnd(nameWidth)}${String(hit.changes).padStart(4)}  ${String(hit.todos).padStart(4)}`
+      `${marker} ${name.padEnd(nameWidth)}${String(hit.changes).padStart(4)}  ${String(hit.todos).padStart(4)}`
     )
   }
   write(`${'─'.repeat(nameWidth + 12)}`)
@@ -202,16 +221,26 @@ function formatReport(report: CodemodReport): void {
 function main(): void {
   const args = process.argv.slice(2)
   const dryRun = args.includes('--dry-run')
-  const unknownFlags = args.filter((a) => a.startsWith('--') && a !== '--dry-run')
+  const rulesFlag = args.find((a) => a.startsWith('--rules='))
+  const ruleSetName = (rulesFlag?.slice('--rules='.length) ?? 'v1') as RuleSetName
+  const unknownFlags = args.filter(
+    (a) => a.startsWith('--') && a !== '--dry-run' && !a.startsWith('--rules=')
+  )
   const positional = args.filter((a) => !a.startsWith('--'))
-  if (positional.length !== 1 || unknownFlags.length > 0) {
+  if (positional.length !== 1 || unknownFlags.length > 0 || !(ruleSetName in RULE_SETS)) {
     write('用法:pnpm codemod:v1 <目標專案路徑> [--dry-run]')
+    write('   或:pnpm codemod:from-error <目標專案路徑> [--dry-run]')
     process.exitCode = 1
     return
   }
   try {
-    const report = runCodemod(positional[0], { dryRun })
+    const report = runCodemod(positional[0], { dryRun, ruleSet: ruleSetName })
     formatReport(report)
+    if (ruleSetName === 'from-error' && report.totalChanges > 0) {
+      write('提醒:toast.fromError 需要 app 啟動處註冊解析器(一次):')
+      write("  toast.configure({ formatError: getErrorMessage })")
+      write()
+    }
   } catch (err) {
     write(err instanceof Error ? err.message : String(err))
     process.exitCode = 1

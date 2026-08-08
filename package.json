@@ -76,6 +76,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,json}\"",
     "typecheck": "tsc --noEmit",
     "codemod:v1": "tsx src/codemod/run.ts",
+    "codemod:from-error": "tsx src/codemod/run.ts --rules=from-error",
     "clean": "rm -rf dist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

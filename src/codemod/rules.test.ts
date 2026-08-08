@@ -5,7 +5,7 @@ import * as path from 'node:path'
 import { Project, ts } from 'ts-morph'
 import { describe, expect, it } from 'vitest'
 
-import { applyRulesToSourceFile, TODO_MARKER, type FileOutcome } from './rules'
+import { applyRulesToSourceFile, fromErrorRules, TODO_MARKER, type FileOutcome } from './rules'
 import { runCodemod } from './run'
 
 function apply(
@@ -505,6 +505,101 @@ export function other(toast: { clear: () => void; success: (a: string, b: string
     // 同名參數:方法與第二參數都不動
     expect(text).toContain('toast.clear()')
     expect(text).toContain("toast.success('a', 'b')")
+  })
+})
+
+describe('採用規則:toast-from-error(獨立規則集,不在 v1 內)', () => {
+  function applyFromError(code: string): string {
+    const project = new Project({
+      useInMemoryFileSystem: true,
+      compilerOptions: { jsx: ts.JsxEmit.ReactJSX },
+    })
+    const sf = project.createSourceFile('/app.tsx', code)
+    applyRulesToSourceFile(sf, fromErrorRules)
+    return sf.getFullText()
+  }
+
+  it('模板字串:前綴(去尾冒號)進 prefix、err 進第一參數', () => {
+    const text = applyFromError(
+      `import { useToast } from '@arkite-ui/core'
+export function useSave() {
+  const toast = useToast()
+  return (err: unknown) => toast.error(\`儲存失敗：\${getErrorMessage(err)}\`)
+}
+`
+    )
+    expect(text).toContain("toast.fromError(err, { prefix: '儲存失敗' })")
+  })
+
+  it('第二參數為物件字面量時屬性併入新 options', () => {
+    const text = applyFromError(
+      `import { toast } from '@arkite-ui/core'
+export const f = (e: unknown) => toast.error(\`載入失敗:\${getErrorMessage(e)}\`, { duration: 0 })
+`
+    )
+    expect(text).toContain("toast.fromError(e, { prefix: '載入失敗', duration: 0 })")
+  })
+
+  it('裸呼叫與字串串接形式', () => {
+    const text = applyFromError(
+      `import { toast } from '@arkite-ui/core'
+export const f = (e: unknown) => {
+  toast.error(getErrorMessage(e))
+  toast.error('刪除失敗: ' + getErrorMessage(e))
+}
+`
+    )
+    expect(text).toContain('toast.fromError(e)\n')
+    expect(text).toContain("toast.fromError(e, { prefix: '刪除失敗' })")
+  })
+
+  it('干擾項:非 arkite toast、多插值模板、插值後有尾字 → 不動', () => {
+    const code = `import { useToast } from './toast'
+declare const toast2: { error: (m: string) => void }
+export function useX(err: unknown, ctx: string) {
+  const toast = useToast()
+  toast.error(\`失敗:\${getErrorMessage(err)}\`)
+  toast2.error(\`失敗:\${getErrorMessage(err)}\`)
+}
+`
+    expect(applyFromError(code)).toBe(code)
+    const multi = `import { toast } from '@arkite-ui/core'
+export const f = (e: unknown, ctx: string) => {
+  toast.error(\`\${ctx}失敗:\${getErrorMessage(e)}\`)
+  toast.error(\`失敗:\${getErrorMessage(e)}(請重試)\`)
+}
+`
+    expect(applyFromError(multi)).toBe(multi)
+  })
+
+  it('v1 規則集不包含此規則(跑 v1 不會改寫)', () => {
+    const code = `import { toast } from '@arkite-ui/core'
+export const f = (e: unknown) => toast.error(\`失敗:\${getErrorMessage(e)}\`)
+`
+    const { text } = apply(code)
+    expect(text).toBe(code)
+  })
+
+  it('runCodemod ruleSet 分流:from-error 規則集實跑寫檔', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'arkite-codemod-'))
+    fs.mkdirSync(path.join(dir, 'src'))
+    const file = path.join(dir, 'src', 'save.ts')
+    fs.writeFileSync(
+      file,
+      `import { toast } from '@arkite-ui/core'
+export const f = (e: unknown) => toast.error(\`儲存失敗:\${getErrorMessage(e)}\`)
+`
+    )
+    try {
+      const report = runCodemod(dir, { ruleSet: 'from-error' })
+      expect(Object.keys(report.totals)).toEqual(['toast-from-error'])
+      expect(report.totalChanges).toBe(1)
+      expect(fs.readFileSync(file, 'utf8')).toContain(
+        "toast.fromError(e, { prefix: '儲存失敗' })"
+      )
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true })
+    }
   })
 })
 

@@ -12,7 +12,7 @@ pnpm codemod:v1 ~/workspace/work/<專案> --dry-run  # 只列報告與將變更�
 
 ### 行為
 
-- 優先載入目標的 `tsconfig.json`；找不到（或沒列出任何檔案，如 monorepo 根目錄）時，改掃描 `**/src/**/*.{ts,tsx}`（略過 node_modules / dist / build 等）。
+- 優先載入目標的 `tsconfig.json`；找不到（或沒列出任何檔案，如 monorepo 根目錄）時，改掃描整個目標資料夾的 `*.{ts,tsx}`（略過 node_modules / dist / build 等；不限定 `src/`，根目錄 `app/`、`pages/` 的 Next.js 專案也掃得到）。
 - **安全第一**：只轉換確定 import 自 `@arkite-ui/core`（或消費端自己 re-export 該名稱的模組）的元件與 API，同名的專案自有元件不會被動到。
 - 無法安全自動化的用法會插入 `// TODO(arkite-v1): <說明>` 註解並在報告中計數——**不會用猜的**。
 - 結束時印出每條規則的變更數與 TODO 標記數。codemod 可重跑（冪等，TODO 註解不會重複插入）。
@@ -48,6 +48,44 @@ pnpm codemod:v1 ~/workspace/work/<專案> --dry-run  # 只列報告與將變更�
 
 1. 全域搜尋 `TODO(arkite-v1)`，逐一人工處理後刪除註解。
 2. 在目標專案跑 typecheck / lint / prettier（codemod 保留原格式，少數插入處的排版交給 prettier 收尾）。
+
+---
+
+## toast.fromError 採用（選用，非破壞性）
+
+v0.14 起 `toast` 提供 `fromError`，把 `catch` 區塊的錯誤 toast 收斂成一行（title = prefix、解析訊息進 description）。採用分兩步：
+
+**1. app 啟動處註冊解析器（一次）** — 錯誤物件怎麼轉訊息是 app 層知識，元件庫不內建解析：
+
+```ts
+import { toast } from '@arkite-ui/core'
+import { getErrorMessage } from '@arkite/utils' // 或專案自己的 parser
+
+toast.configure({ formatError: getErrorMessage })
+```
+
+**2. 呼叫點改寫** — 手動或跑採用型 codemod（獨立規則集，與 v1.0 破壞性遷移分開）：
+
+```bash
+pnpm codemod:from-error ~/workspace/work/<專案>            # 直接改檔
+pnpm codemod:from-error ~/workspace/work/<專案> --dry-run  # 只列報告
+```
+
+認得的形狀（其他一律不動，不用猜的）：
+
+| Before | After |
+|--------|-------|
+| ``toast.error(`儲存失敗：${getErrorMessage(err)}`)`` | `toast.fromError(err, { prefix: '儲存失敗' })` |
+| `toast.error('儲存失敗: ' + getErrorMessage(err))` | `toast.fromError(err, { prefix: '儲存失敗' })` |
+| `toast.error(getErrorMessage(err))` | `toast.fromError(err)` |
+| ``toast.error(`X:${getErrorMessage(e)}`, { duration: 0 })`` | `toast.fromError(e, { prefix: 'X', duration: 0 })` |
+
+注意：
+
+- 只認 `getErrorMessage` 這個函式名；prefix 尾端的冒號／頓號會自動去掉（prefix 現在是 title，不該帶冒號）。
+- 多插值模板、插值後還有文字、第二參數非物件字面量 → 一律跳過，保持原樣。
+- 視覺變化：原本一行長字串變成「title + description」兩層，資訊相同、層次更清楚。
+- 未註冊 `formatError` 時只有零知識 fallback（`Error#message`、純字串）；解析不出來就只顯示 prefix — `fromError` 不會發明文案。
 
 ---
 

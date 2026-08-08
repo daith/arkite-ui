@@ -746,6 +746,120 @@ const toastDescriptionRule: Rule = {
   },
 }
 
+// ── toast.fromError 採用規則(選用,非 v1.0 破壞性變更)───────────
+
+/** 尾端的半形/全形冒號與空白 — prefix 變成 title 後不該帶冒號 */
+function trimPrefix(text: string): string {
+  return text.replace(/[\s:：、,，-]+$/u, '').trim()
+}
+
+function quoteSingle(text: string): string {
+  return `'${text.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+}
+
+/** expr 是否為 getErrorMessage(x) 形式的單參數呼叫;是則回傳 x */
+function unwrapGetErrorMessageCall(expr: Node): Node | undefined {
+  const inner = unwrapExpression(expr)
+  if (!Node.isCallExpression(inner)) return undefined
+  const callee = inner.getExpression()
+  if (!Node.isIdentifier(callee) || callee.getText() !== 'getErrorMessage') return undefined
+  const args = inner.getArguments()
+  return args.length === 1 ? args[0] : undefined
+}
+
+interface FromErrorMatch {
+  call: CallExpression
+  objText: string
+  errText: string
+  prefix: string | undefined
+  optionsProps: string[] | undefined
+}
+
+function matchFromErrorCall(sf: SourceFile): FromErrorMatch | undefined {
+  const decls = toastObjectDeclarations(sf)
+  if (decls.size === 0) return undefined
+  for (const call of sf.getDescendantsOfKind(SyntaxKind.CallExpression)) {
+    const target = call.getExpression()
+    if (!Node.isPropertyAccessExpression(target)) continue
+    if (target.getName() !== 'error') continue
+    const obj = target.getExpression()
+    if (!isArkiteToastRef(obj, decls)) continue
+    const args = call.getArguments()
+    if (args.length === 0 || args.length > 2) continue
+    // 第二參數只接受物件字面量(其屬性併入新 options),其他形狀略過
+    let optionsProps: string[] | undefined
+    if (args.length === 2) {
+      const second = unwrapExpression(args[1])
+      if (!Node.isObjectLiteralExpression(second)) continue
+      optionsProps = second.getProperties().map((p) => p.getText())
+    }
+    const first = unwrapExpression(args[0])
+    // 形狀 A:toast.error(getErrorMessage(err))
+    const bare = unwrapGetErrorMessageCall(first)
+    if (bare != null) {
+      return { call, objText: obj.getText(), errText: bare.getText(), prefix: undefined, optionsProps }
+    }
+    // 形狀 B:toast.error(`前綴:${getErrorMessage(err)}`)(單一插值、插值後無尾字)
+    if (Node.isTemplateExpression(first)) {
+      const spans = first.getTemplateSpans()
+      if (spans.length !== 1) continue
+      if (spans[0].getLiteral().getLiteralText() !== '') continue
+      const err = unwrapGetErrorMessageCall(spans[0].getExpression())
+      if (err == null) continue
+      const prefix = trimPrefix(first.getHead().getLiteralText())
+      return {
+        call,
+        objText: obj.getText(),
+        errText: err.getText(),
+        prefix: prefix === '' ? undefined : prefix,
+        optionsProps,
+      }
+    }
+    // 形狀 C:toast.error('前綴:' + getErrorMessage(err))
+    if (Node.isBinaryExpression(first) && first.getOperatorToken().getKind() === SyntaxKind.PlusToken) {
+      const left = unwrapExpression(first.getLeft())
+      if (!Node.isStringLiteral(left) && !Node.isNoSubstitutionTemplateLiteral(left)) continue
+      const err = unwrapGetErrorMessageCall(first.getRight())
+      if (err == null) continue
+      const prefix = trimPrefix(left.getLiteralText())
+      return {
+        call,
+        objText: obj.getText(),
+        errText: err.getText(),
+        prefix: prefix === '' ? undefined : prefix,
+        optionsProps,
+      }
+    }
+  }
+  return undefined
+}
+
+/**
+ * 採用型 codemod:`toast.error(\`X:${getErrorMessage(err)}\`)` →
+ * `toast.fromError(err, { prefix: 'X' })`。
+ * 前提:app 啟動處已註冊 `toast.configure({ formatError: getErrorMessage })`
+ * (runner 會在報告尾端提醒)。只認 getErrorMessage 這個名稱;其他形狀不動。
+ */
+const toastFromErrorRule: Rule = {
+  name: 'toast-from-error',
+  description: 'toast.error(`X:${getErrorMessage(err)}`) → toast.fromError(err, { prefix: "X" })',
+  transform(sf) {
+    return editUntilStable(() => {
+      const hit = matchFromErrorCall(sf)
+      if (hit == null) return false
+      const opts: string[] = []
+      if (hit.prefix != null) opts.push(`prefix: ${quoteSingle(hit.prefix)}`)
+      if (hit.optionsProps != null) opts.push(...hit.optionsProps)
+      const optionsText = opts.length > 0 ? `, { ${opts.join(', ')} }` : ''
+      hit.call.replaceWithText(`${hit.objText}.fromError(${hit.errText}${optionsText})`)
+      return true
+    })
+  },
+}
+
+/** 選用的採用型規則集(`pnpm codemod:from-error`),不屬於 v1.0 破壞性遷移 */
+export const fromErrorRules: readonly Rule[] = [toastFromErrorRule]
+
 export const rules: readonly Rule[] = [
   propStringValueRule(
     'alert-variant-destructive',
@@ -845,18 +959,18 @@ function planTodoInsert(sf: SourceFile, text: string, req: TodoRequest): Planned
   return { insertPos: lineStart, text: `${indent}${comment}\n` }
 }
 
-/** 對單一檔案套用全部規則(先轉換、再於最終 AST 上規劃並插入 TODO 註解) */
-export function applyRulesToSourceFile(sf: SourceFile): FileOutcome {
+/** 對單一檔案套用整組規則(先轉換、再於最終 AST 上規劃並插入 TODO 註解) */
+export function applyRulesToSourceFile(sf: SourceFile, ruleSet: readonly Rule[] = rules): FileOutcome {
   const before = sf.getFullText()
   const hits: Record<string, RuleHit> = {}
-  for (const rule of rules) {
+  for (const rule of ruleSet) {
     hits[rule.name] = { changes: rule.transform(sf), todos: 0 }
   }
   // TODO 全部先規劃(未插入前節點位置才有效),再由後往前插入
   const snapshot = sf.getFullText()
   const planned: PlannedInsert[] = []
   const seen = new Set<string>()
-  for (const rule of rules) {
+  for (const rule of ruleSet) {
     if (rule.collectTodos == null) continue
     for (const req of rule.collectTodos(sf)) {
       const plan = planTodoInsert(sf, snapshot, req)

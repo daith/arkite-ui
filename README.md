@@ -277,6 +277,21 @@ function App() {
 }
 ```
 
+Error toasts in `catch` blocks are one line — register your app's error parser
+once at startup, then pass the raw error:
+
+```tsx
+// app entry (once)
+toast.configure({ formatError: getErrorMessage })
+
+// every call site
+try {
+  await save()
+} catch (err) {
+  toast.fromError(err, { prefix: 'Failed to save' }) // title + parsed description
+}
+```
+
 ### Stats Dashboard
 
 ```tsx
