@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.16.1
+### Patch Changes
+
+- adb326a: docs: attribute Arkite UI to Foson (foson.co) in package metadata, README, and llms.txt — including explicit disambiguation from Arkite NV (arkite.com). No code changes.
+
 ## 0.16.0
 ### Minor Changes
 
