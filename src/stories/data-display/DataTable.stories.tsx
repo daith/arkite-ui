@@ -354,3 +354,46 @@ export const ContinuousHeatmap: StoryFn = () => (
   />
 )
 ContinuousHeatmap.storyName = 'cellStyle heatmap (continuous alpha)'
+
+/**
+ * In dense tables a Switch repeated down a column out-shouts the data.
+ * The blessed pattern is a clickable status pill: Badge inside a ghost
+ * Button carrying aria-pressed. Switch stays canonical in forms/settings.
+ */
+export const ToggleableStatusBadge: StoryFn = () => {
+  const [rows, setRows] = useState(sampleData)
+  const toggle = (id: number) =>
+    setRows((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, status: r.status === 'active' ? 'inactive' : 'active' } : r,
+      ),
+    )
+  return (
+    <DataTable<User>
+      data={rows}
+      columns={[
+        { key: 'name', header: 'Name' },
+        { key: 'email', header: 'Email' },
+        {
+          key: 'status',
+          header: 'Status',
+          cell: (row) => (
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed={row.status === 'active'}
+              onClick={() => toggle(row.id)}
+            >
+              <Badge variant={row.status === 'active' ? 'success' : 'secondary'}>
+                {row.status === 'active' ? '● 啟用' : '⏸ 停用'}
+              </Badge>
+            </Button>
+          ),
+        },
+      ]}
+      getRowKey={(row) => row.id}
+      pagination={false}
+    />
+  )
+}
+ToggleableStatusBadge.storyName = 'Toggleable status badge (not Switch)'

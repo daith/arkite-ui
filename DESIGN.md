@@ -88,7 +88,8 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Action styled as a text link (e.g. in a table cell) | `Button variant="link"` | `eslint-disable` + raw `<button>` with underline classes |
 | Whole card/row clickable | `Card interactive onClick` (button semantics, keyboard included); table rows: `DataTable onRowClick` | Wrapping cards in raw `<button>` or clickable `<div>`s |
 | Mobile select | `SheetSelect` (bottom sheet) | Desktop `Select` on touch UIs |
-| Binary toggle | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
+| Binary toggle **in forms / settings pages** | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
+| Toggleable status **inside a data table** | `Badge` wrapped in `Button variant="ghost" size="sm"` with `aria-pressed` — a clickable status pill. N switches down a column out-shout the data; a pill keeps density and stays scannable. Exception: `Switch` is fine when toggling IS the page's primary task (e.g. a feature-flag admin list) and there's at most one toggle column | `Switch` repeated per row in dense tables; "making everything else heavier to compensate" |
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
 | Overlay panels | `Modal` (centered; height-capped with scrolling body) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs; hand-rolled backdrop + focus trap |
 | Form dialog (fields in body, submit in footer) | `Modal onSubmit` — wraps the dialog in a real `<form>`, footer `type="submit"` button just works | `form="<id>"` attribute plumbing; re-implementing the dialog to get a form inside |
