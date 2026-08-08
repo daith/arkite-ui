@@ -4,8 +4,10 @@ Production-ready React components for SaaS admin panels. Built with Tailwind CSS
 
 [![npm version](https://img.shields.io/npm/v/%40arkite-ui%2Fcore)](https://www.npmjs.com/package/@arkite-ui/core)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/%40arkite-ui%2Fcore)](https://bundlephobia.com/package/@arkite-ui/core)
-[![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://daith.github.io/arkite-ui/)
+[![Storybook](https://img.shields.io/badge/Storybook-Live%20Demo-ff4785?logo=storybook)](https://daith.github.io/arkite-ui/storybook/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
+**[Website](https://daith.github.io/arkite-ui/)** · **[Storybook](https://daith.github.io/arkite-ui/storybook/)** · **[Getting Started](https://daith.github.io/arkite-ui/storybook/?path=/docs/getting-started--docs)** · **[llms.txt](https://daith.github.io/arkite-ui/llms.txt)** (for AI agents)
 
 Arkite UI is not another generic component library. It focuses on the components you actually need to build multi-tenant SaaS admin panels — tenant switchers, data tables, stat dashboards, filter bars, and more.
 
@@ -13,11 +15,14 @@ Arkite UI is not another generic component library. It focuses on the components
 
 **Links:**
 
-- [Storybook (Component Docs)](https://daith.github.io/arkite-ui/) — Live component preview
+- [Website](https://daith.github.io/arkite-ui/) — Landing page & live demo
+- [Storybook (Component Docs)](https://daith.github.io/arkite-ui/storybook/) — Every component, every state
 - [GitHub Repository](https://github.com/daith/arkite-ui) — Source code
 - [Issue Tracker](https://github.com/daith/arkite-ui/issues) — Bug reports & feature requests
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — Development guide
 - [CHANGELOG.md](./CHANGELOG.md) — Release history
+
+> Maintained first for the nine production SaaS products that run on it — issues are welcome and read; PRs are reviewed on a best-effort basis.
 
 ## Features
 
