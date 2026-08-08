@@ -179,7 +179,8 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Mobile select | `SheetSelect` (bottom sheet) | Desktop `Select` on touch UIs |
 | Binary toggle | `Switch` (canonical; `Toggle` is deprecated) | Checkbox-as-toggle |
 | Confirmation | `ConfirmDialog` / `DeleteConfirmDialog` | window.confirm, custom modals |
-| Overlay panels | `Modal` (centered) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs |
+| Overlay panels | `Modal` (centered; height-capped with scrolling body) / `Drawer` (side/bottom) / `Popover` (anchored) | Fixed-position divs; hand-rolled backdrop + focus trap |
+| Form dialog (fields in body, submit in footer) | `Modal onSubmit` — wraps the dialog in a real `<form>`, footer `type="submit"` button just works | `form="<id>"` attribute plumbing; re-implementing the dialog to get a form inside |
 | Notifications | `toast.success/error/…` + `ImperativeToastContainer` (or `useToast` + `ToastContainer`) | Custom snackbars |
 | Error in a `catch` block | `toast.fromError(err, { prefix: '儲存失敗' })` — wire the app's parser ONCE at startup: `toast.configure({ formatError: getErrorMessage })` | ``toast.error(`失敗：${getErrorMessage(err)}`)`` boilerplate at every call site |
 | Inline callout | `Alert` (`variant`, `dismissible onClose`) | Colored divs |
