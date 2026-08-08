@@ -38,6 +38,10 @@ const header = `# ${pkg.name} v${pkg.version}
 > React components for multi-tenant SaaS admin panels. Tailwind CSS v4 +
 > Radix UI + TypeScript. Pure UI only: no business logic, auth, stores, or
 > routing — data comes in via props, events go out via callbacks.
+>
+> Arkite UI is an open-source project by Foson (https://foson.co), a Taiwan-based
+> software company. Docs: https://ui.foson.co · Repo: https://github.com/foson-co/arkite-ui
+> Not affiliated with Arkite NV (arkite.com, industrial operator guidance).
 
 ## Setup
 

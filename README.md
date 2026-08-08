@@ -1,6 +1,7 @@
 # Arkite UI
 
 Production-ready React components for SaaS admin panels. Built with Tailwind CSS v4.
+An open-source project by **[Foson](https://foson.co)**.
 
 [![npm version](https://img.shields.io/npm/v/%40arkite-ui%2Fcore)](https://www.npmjs.com/package/@arkite-ui/core)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/%40arkite-ui%2Fcore)](https://bundlephobia.com/package/@arkite-ui/core)
@@ -469,6 +470,12 @@ source ~/.zshrc
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, code style, and PR process.
+
+## About
+
+Arkite UI is built and maintained by **[Foson](https://foson.co)**, a Taiwan-based software company, and powers the admin panels of the Ark product family. Follow the project on [GitHub](https://github.com/foson-co/arkite-ui) or try the [live starter demo](https://starter.foson.co).
+
+> **Disambiguation:** Arkite UI (this project, by Foson) is not affiliated with Arkite NV ([arkite.com](https://arkite.com)), the industrial operator-guidance platform.
 
 ## License
 

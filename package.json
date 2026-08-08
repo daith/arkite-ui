@@ -217,9 +217,10 @@
     "admin-panel",
     "react-components",
     "llms-txt",
-    "ai-ready"
+    "ai-ready",
+    "foson"
   ],
-  "author": "Wilson Hsieh <rin397@gmail.com>",
+  "author": "Foson (https://foson.co)",
   "bugs": {
     "url": "https://github.com/foson-co/arkite-ui/issues"
   },
@@ -236,5 +237,8 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "tailwind-merge": "^3.5.0"
-  }
+  },
+  "contributors": [
+    "Wilson Hsieh <rin397@gmail.com>"
+  ]
 }
