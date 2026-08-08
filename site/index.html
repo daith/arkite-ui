@@ -71,7 +71,9 @@
   }
   a { color: inherit; text-decoration: none; }
   code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  /* Full-bleed like the header and Storybook — no centered column,
+     so moving between the landing and the app surfaces feels seamless */
+  .wrap { padding: 0 24px; }
 
   /* ── nav ── */
   nav { border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
