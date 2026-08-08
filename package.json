@@ -201,7 +201,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/foson.co/arkite-ui.git"
+    "url": "git+https://github.com/foson-co/arkite-ui.git"
   },
   "keywords": [
     "react",
@@ -217,9 +217,9 @@
   ],
   "author": "Wilson Hsieh <rin397@gmail.com>",
   "bugs": {
-    "url": "https://gitlab.com/foson.co/arkite-ui/-/issues"
+    "url": "https://github.com/foson-co/arkite-ui/issues"
   },
-  "homepage": "https://gitlab.com/foson.co/arkite-ui#readme",
+  "homepage": "https://ui.foson.co",
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "eslint --fix",
