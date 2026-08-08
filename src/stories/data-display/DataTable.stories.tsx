@@ -265,12 +265,12 @@ export const PinnedColumns: StoryFn = () => (
 const heatColumns: Column<User>[] = [
   { key: 'name', header: 'Name' },
   {
-    key: 'age',
-    header: 'Age',
-    align: 'right',
+    key: 'status',
+    header: 'Status',
+    align: 'center',
     // Whole-cell styling — no negative-margin hacks needed for matrix/heatmap cells
     cellClassName: (row) =>
-      row.age >= 35 ? 'bg-destructive-soft' : row.age >= 30 ? 'bg-warning-soft' : 'bg-success-soft',
+      row.status === 'active' ? 'bg-success-soft' : 'bg-warning-soft',
     headerClassName: 'bg-muted',
   },
   { key: 'email', header: 'Email (hidden on mobile)', hidden: 'mobile' },
