@@ -113,6 +113,43 @@ CI will warn if a merge request is missing a changeset.
 - `minor` — New features (new components, new props)
 - `patch` — Bug fixes, internal refactors
 
+## Release & Sync Process
+
+This is the agreed team process — every release follows it, in this order.
+
+### 1. Sync happens *before* release, not after
+
+A library change is not "done" when the code merges. Each change ships **in the same MR** with:
+
+- Tests covering the new behavior
+- A Storybook story demonstrating it (real-scenario stories, not prop dumps)
+- `DESIGN.md` updated when the change affects component-selection rules
+- A changeset (see above)
+
+`llms.txt` / `llms-full.txt` and the API snapshot regenerate automatically during build/release — never edit them by hand.
+
+The bar: when someone asks "does Storybook/starter need updating for this release?", the correct answer is "already done".
+
+### 2. Changes are consumer-evidence-driven
+
+New props/components come from observed consumer pain (grep audits, lint-exemption clusters, feedback docs from consuming projects) — not speculation. Fix the library upstream instead of documenting workarounds downstream. Each release's CHANGELOG notes **which consumer workarounds it retires**, so consumers know what to delete.
+
+### 3. Cutting a release
+
+```bash
+pnpm release:cut
+```
+
+This runs: `changeset version` → regenerate llms docs → commit → tag → push. The GitLab **tag pipeline** publishes to npm + GitLab registry; the script then syncs the GitHub mirror (`foson-co/arkite-ui`), which redeploys ui.foson.co (landing + Storybook). Never publish to npm manually.
+
+### 4. Starter canary (mandatory post-release step)
+
+After **every** release, `arkite-admin-starter` immediately bumps to the new version, builds, and redeploys starter.foson.co. The starter is our first consumer — it surfaces upgrade regressions before real consumers hit them (this is how the 0.14.1 bare-`Table` hover regression was caught). A release is not complete until the canary is green.
+
+### 5. Public-facing links
+
+Anything public (README, docs, npm metadata, articles) links to **github.com/foson-co/arkite-ui** and **ui.foson.co** — never to GitLab. GitLab is the private source of truth and CI; GitHub is the public front door.
+
 ## Commit Convention
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
