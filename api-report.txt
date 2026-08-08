@@ -655,6 +655,11 @@ type FilterBarFiltersProps {
   children: ReactNode
 }
 
+type FilterBarGroupProps {
+  children: ReactNode
+  label: ReactNode
+}
+
 type FilterBarProps {
   children: ReactNode
 }
@@ -1762,6 +1767,8 @@ value FilterBar: React.ForwardRefExoticComponent<FilterBarProps & React.RefAttri
 value FilterBarActions: React.ForwardRefExoticComponent<FilterBarActionsProps & React.RefAttributes<HTMLDivElement>>
 
 value FilterBarFilters: React.ForwardRefExoticComponent<FilterBarFiltersProps & React.RefAttributes<HTMLDivElement>>
+
+value FilterBarGroup: React.ForwardRefExoticComponent<FilterBarGroupProps & React.RefAttributes<HTMLDivElement>>
 
 value FilterBarSearch: React.ForwardRefExoticComponent<FilterBarSearchProps & React.RefAttributes<HTMLDivElement>>
 

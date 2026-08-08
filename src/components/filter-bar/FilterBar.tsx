@@ -114,7 +114,12 @@ export const FilterBarFilters = forwardRef<HTMLDivElement, FilterBarFiltersProps
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn('flex flex-wrap items-center gap-2', className)}
+      className={cn(
+        // min-w-0 so labelled groups can shrink and wrap rather than pushing
+        // the bar wider than its container.
+        'flex min-w-0 flex-wrap items-center gap-2',
+        className
+      )}
       {...props}
     >
       {children}
@@ -123,6 +128,67 @@ export const FilterBarFilters = forwardRef<HTMLDivElement, FilterBarFiltersProps
 )
 
 FilterBarFilters.displayName = 'FilterBarFilters'
+
+/* ─── FilterBarGroup ─── */
+
+export interface FilterBarGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  /**
+   * Visible label for the group (e.g. "Period", "時間範圍"). When it is a
+   * plain string it also becomes the group's accessible name.
+   */
+  label: ReactNode
+  children: ReactNode
+}
+
+/**
+ * A labelled cluster of filter controls — the "Period: [1d][7d][30d]" shape
+ * that preset toggles need and a `Select` does not.
+ *
+ * `FilterSelect`'s `label` only prefixes its "all" option ("Status: All"),
+ * which works for dropdowns but leaves preset groups with nowhere to put a
+ * visible label. Without this, callers hand-roll a label span plus a flex row
+ * — and the hand-rolled version reliably ships without `flex-wrap`, so the
+ * group refuses to shrink and pushes the page sideways on narrow viewports.
+ *
+ * Wraps at both levels and carries `min-w-0`, so a long group folds onto the
+ * next line instead of forcing a horizontal scrollbar.
+ *
+ * @example
+ * ```tsx
+ * <FilterBarFilters>
+ *   <FilterBarGroup label="Period">
+ *     <SegmentedControl size="sm" options={PERIODS} value={period} onChange={setPeriod} />
+ *   </FilterBarGroup>
+ * </FilterBarFilters>
+ * ```
+ */
+export const FilterBarGroup = forwardRef<HTMLDivElement, FilterBarGroupProps>(
+  ({ className, label, children, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="group"
+      aria-label={typeof label === 'string' ? label : undefined}
+      className={cn(
+        'flex min-w-0 flex-wrap items-center gap-2',
+        // Trailing inset so adjacent groups read as separate clusters: the
+        // parent's 8px gap plus this 8px doubles the space *between* groups
+        // while the label↔control gap inside one stays 8px. Kept here rather
+        // than as a wider gap on FilterBarFilters so bars of plain selects
+        // keep their existing rhythm.
+        'pe-2 last:pe-0',
+        className
+      )}
+      {...props}
+    >
+      <span className="text-2xs font-medium uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
+      <div className="flex min-w-0 flex-wrap items-center gap-1">{children}</div>
+    </div>
+  )
+)
+
+FilterBarGroup.displayName = 'FilterBarGroup'
 
 /* ─── FilterBarActions ─── */
 

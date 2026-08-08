@@ -83,6 +83,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Huge lists (1000+ rows) | `VirtualList` | Rendering everything |
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
+| A **labelled** filter cluster ("Period: 1D 7D 30D") | `FilterBarGroup label="Period"` wrapping a `SegmentedControl` (2–5 mutually exclusive presets). `FilterSelect`'s `label` only prefixes its "all" option, so it cannot show a visible group label | A hand-rolled label `<span>` + flex row (ships without `flex-wrap`, so one group's width pushes the page sideways on mobile); hand-styled active/inactive pills with raw palette classes |
 | Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
 | OTP / verification code | `PinInput` (`length`, `type`, `onComplete`; SMS autofill built in) | Hand-styled single inputs with tracking CSS |
 | File pick from a custom trigger (thumbnail, icon, menu item) | `FileTrigger` (headless — makes any element open the picker) | Hand-rolled hidden `<input type="file">` |

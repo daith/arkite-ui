@@ -5,10 +5,12 @@ import {
   FilterBarSearch,
   FilterBarFilters,
   FilterBarActions,
+  FilterBarGroup,
 } from '../../components/filter-bar/FilterBar'
 import { Select } from '../../components/select/Select'
 import { Button } from '../../components/button/Button'
 import { Badge } from '../../components/badge/Badge'
+import { SegmentedControl } from '../../components/segmented-control/SegmentedControl'
 
 const meta: Meta<typeof FilterBar> = {
   title: 'Data Display/FilterBar',
@@ -134,4 +136,94 @@ export const FiltersOnly: Story = {
       </FilterBarActions>
     </FilterBar>
   ),
+}
+
+/**
+ * Preset toggles rather than dropdowns — the shape reporting and analytics
+ * pages need, and the one a bare `FilterSelect` can't express because its
+ * `label` only prefixes the "all" option.
+ *
+ * Every group is a `FilterBarGroup`, so each carries a visible label, an
+ * accessible name, and wrapping. Narrow the viewport and the groups fold onto
+ * new lines instead of pushing the page sideways.
+ */
+export const PresetGroups: Story = {
+  render: function PresetGroupsStory() {
+    const [period, setPeriod] = useState('7d')
+    const [segment, setSegment] = useState('all')
+    const [direction, setDirection] = useState('up')
+    const [rows, setRows] = useState('50')
+
+    return (
+      <FilterBar>
+        <FilterBarFilters>
+          <FilterBarGroup label="Period">
+            <SegmentedControl
+              size="sm"
+              value={period}
+              onChange={setPeriod}
+              options={[
+                { value: '1d', label: '1D' },
+                { value: '7d', label: '7D' },
+                { value: '30d', label: '30D' },
+                { value: '90d', label: '90D' },
+              ]}
+            />
+          </FilterBarGroup>
+          <FilterBarGroup label="Segment">
+            <SegmentedControl
+              size="sm"
+              value={segment}
+              onChange={setSegment}
+              options={[
+                { value: 'all', label: 'All' },
+                { value: 'smb', label: 'SMB' },
+                { value: 'ent', label: 'Enterprise' },
+              ]}
+            />
+          </FilterBarGroup>
+          <FilterBarGroup label="Trend">
+            <SegmentedControl
+              size="sm"
+              value={direction}
+              onChange={setDirection}
+              options={[
+                { value: 'up', label: 'Growing ↑' },
+                { value: 'down', label: 'Shrinking ↓' },
+              ]}
+            />
+          </FilterBarGroup>
+          <FilterBarGroup label="Rows">
+            <SegmentedControl
+              size="sm"
+              value={rows}
+              onChange={setRows}
+              options={[
+                { value: '20', label: '20' },
+                { value: '50', label: '50' },
+                { value: '100', label: '100' },
+              ]}
+            />
+          </FilterBarGroup>
+        </FilterBarFilters>
+      </FilterBar>
+    )
+  },
+}
+
+/**
+ * The same bar at phone width. Groups wrap; nothing overflows. A hand-rolled
+ * label + non-wrapping flex row is what puts a horizontal scrollbar on the
+ * whole page here.
+ */
+export const PresetGroupsNarrow: Story = {
+  ...PresetGroups,
+  name: 'Preset groups (narrow viewport)',
+  decorators: [
+    (StoryFn) => (
+      <div className="w-[320px] rounded-lg border p-3">
+        <StoryFn />
+      </div>
+    ),
+  ],
 }

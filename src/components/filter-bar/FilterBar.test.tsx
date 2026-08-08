@@ -6,6 +6,7 @@ import {
   FilterBarSearch,
   FilterBarFilters,
   FilterBarActions,
+  FilterBarGroup,
 } from './FilterBar'
 
 describe('FilterBar', () => {
@@ -99,5 +100,57 @@ describe('FilterBar composition', () => {
     expect(screen.getByPlaceholderText('Search...')).toBeInTheDocument()
     expect(screen.getByText('Status')).toBeInTheDocument()
     expect(screen.getByText('Export')).toBeInTheDocument()
+  })
+})
+
+describe('FilterBarGroup', () => {
+  it('renders its label and children', () => {
+    render(
+      <FilterBarGroup label="Period">
+        <button>7d</button>
+      </FilterBarGroup>
+    )
+    expect(screen.getByText('Period')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '7d' })).toBeInTheDocument()
+  })
+
+  it('exposes a named group to assistive tech', () => {
+    render(
+      <FilterBarGroup label="Period">
+        <button>7d</button>
+      </FilterBarGroup>
+    )
+    expect(screen.getByRole('group', { name: 'Period' })).toBeInTheDocument()
+  })
+
+  it('omits aria-label when the label is not plain text', () => {
+    render(
+      <FilterBarGroup label={<em>Period</em>}>
+        <button>7d</button>
+      </FilterBarGroup>
+    )
+    expect(screen.getByRole('group')).not.toHaveAttribute('aria-label')
+  })
+
+  // The hand-rolled version of this group (seen downstream) had neither, so a
+  // single group's content width pushed the whole page sideways on mobile.
+  it('wraps and can shrink so it never forces a horizontal scrollbar', () => {
+    render(
+      <FilterBarGroup label="Period">
+        <button>7d</button>
+      </FilterBarGroup>
+    )
+    const group = screen.getByRole('group', { name: 'Period' })
+    expect(group).toHaveClass('flex-wrap', 'min-w-0')
+    expect(group.lastElementChild).toHaveClass('flex-wrap', 'min-w-0')
+  })
+
+  it('merges className', () => {
+    render(
+      <FilterBarGroup label="Period" className="mt-2">
+        <button>7d</button>
+      </FilterBarGroup>
+    )
+    expect(screen.getByRole('group', { name: 'Period' })).toHaveClass('mt-2')
   })
 })

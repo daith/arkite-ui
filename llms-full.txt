@@ -81,7 +81,7 @@ applyTheme(createTheme({ primary: '#7c3aed' })) // HSL tokens from one hex
 
 ## Export inventory
 
-Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileTrigger, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, PinInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, ScrollFade, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableEmpty, TableFooter, TableHead, TableHeader, TableLoading, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
+Components: ActionButtons, AdminLayout, Alert, Avatar, AvatarGroup, Badge, Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbItemComponent, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbRoot, BreadcrumbSeparator, BulkActionBar, Button, Calendar, Card, CardContent, CardField, CardFooter, CardGrid, CardHeader, Checkbox, CheckboxCard, CircularProgress, CollapsibleSection, ColorPicker, Combobox, Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut, ConfirmDialog, Container, CopyButton, CopyInput, DataTable, DatePicker, DateRangePicker, DeleteConfirmDialog, DescriptionItem, DescriptionList, Divider, Drawer, DrawerBody, DrawerFooter, DrawerHeader, DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, EmptyState, ErrorBoundary, ErrorState, FileTrigger, FileUpload, FileUploadButton, FilterBar, FilterBarActions, FilterBarFilters, FilterBarGroup, FilterBarSearch, FilterSelect, Form, FormActions, FormControl, FormDescription, FormField, FormLabel, FormMessage, FormSection, HStack, ImageUpload, ImperativeToastContainer, InfiniteScroll, InlineCode, Input, Kbd, Label, LoadingOverlay, LocaleProvider, Modal, ModalBody, ModalFooter, ModalHeader, Navbar, NavbarBrand, NavbarContent, NavbarDivider, NavbarItem, NavbarLink, NavbarSpacer, NoData, NoResults, NumberInput, PageHeader, Pagination, PasswordInput, PinInput, Popover, PopoverAnchor, PopoverClose, PopoverContent, PopoverTrigger, Progress, Radio, RadioGroup, ScrollFade, SearchInput, SegmentedControl, Select, SheetSelect, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarHeader, SidebarItem, SidebarToggle, SimpleTooltip, Skeleton, SkeletonAvatar, SkeletonCard, SkeletonTable, SkeletonText, Sparkline, Spinner, Stack, Stat, StatCard, StatGroup, StatusDot, Steps, Switch, Table, TableBody, TableCaption, TableCell, TableEmpty, TableFooter, TableHead, TableHeader, TableLoading, TableRow, Tabs, TabsContent, TabsList, TabsTrigger, TagInput, TenantSwitcher, Textarea, Timeline, Toast, ToastContainer, Toggle, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, Tree, VStack, ViewToggle, VirtualList
 
 Hooks: useCommandPalette, useFormContext, useFormFieldContext, useLocale, useServerTable, useSidebar, useToast, useToastStore
 
@@ -176,6 +176,7 @@ Naming rule: the "dangerous/negative" semantic is always **`destructive`** (neve
 | Huge lists (1000+ rows) | `VirtualList` | Rendering everything |
 | KPI numbers | `Stat` / `StatCard` / `StatGroup` + `Sparkline` | Custom stat blocks |
 | Filters above a table | `FilterBar` (+`FilterBarSearch/Filters/Actions`, `FilterSelect`) | Ad-hoc toolbars |
+| A **labelled** filter cluster ("Period: 1D 7D 30D") | `FilterBarGroup label="Period"` wrapping a `SegmentedControl` (2–5 mutually exclusive presets). `FilterSelect`'s `label` only prefixes its "all" option, so it cannot show a visible group label | A hand-rolled label `<span>` + flex row (ships without `flex-wrap`, so one group's width pushes the page sideways on mobile); hand-styled active/inactive pills with raw palette classes |
 | Forms | `Form` family (`FormField label errorMessage`) + `Input`/`Select`/`Textarea`/`NumberInput`/`DatePicker`/`Combobox`/`TagInput`/`ColorPicker`/`FileUpload`/`ImageUpload` | Uncontrolled raw inputs |
 | OTP / verification code | `PinInput` (`length`, `type`, `onComplete`; SMS autofill built in) | Hand-styled single inputs with tracking CSS |
 | File pick from a custom trigger (thumbnail, icon, menu item) | `FileTrigger` (headless — makes any element open the picker) | Hand-rolled hidden `<input type="file">` |
@@ -896,6 +897,11 @@ type FilterBarActionsProps {
 
 type FilterBarFiltersProps {
   children: ReactNode
+}
+
+type FilterBarGroupProps {
+  children: ReactNode
+  label: ReactNode
 }
 
 type FilterBarProps {
@@ -2005,6 +2011,8 @@ value FilterBar: React.ForwardRefExoticComponent<FilterBarProps & React.RefAttri
 value FilterBarActions: React.ForwardRefExoticComponent<FilterBarActionsProps & React.RefAttributes<HTMLDivElement>>
 
 value FilterBarFilters: React.ForwardRefExoticComponent<FilterBarFiltersProps & React.RefAttributes<HTMLDivElement>>
+
+value FilterBarGroup: React.ForwardRefExoticComponent<FilterBarGroupProps & React.RefAttributes<HTMLDivElement>>
 
 value FilterBarSearch: React.ForwardRefExoticComponent<FilterBarSearchProps & React.RefAttributes<HTMLDivElement>>
 
