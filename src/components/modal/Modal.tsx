@@ -3,6 +3,7 @@ import {
   useEffect,
   useId,
   useRef,
+  type FormEventHandler,
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
@@ -13,7 +14,7 @@ import { X } from 'lucide-react'
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | 'full'
 
-export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title' | 'onSubmit'> {
   /** Whether the modal is open */
   open: boolean
   /** Callback when modal should close */
@@ -32,6 +33,13 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   closeOnEscape?: boolean
   /** Footer content */
   footer?: ReactNode
+  /**
+   * Form dialogs: wraps header/body/footer in a `<form>` and fires on submit,
+   * so a `type="submit"` button in `footer` submits the fields in `children`
+   * without `form="<id>"` attribute plumbing. Call `e.preventDefault()`
+   * yourself (or use a server action) as with any React form.
+   */
+  onSubmit?: FormEventHandler<HTMLFormElement>
 }
 
 const sizeStyles: Record<ModalSize, string> = {
@@ -58,6 +66,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
       closeOnBackdropClick = true,
       closeOnEscape = true,
       footer,
+      onSubmit,
       children,
       className,
       ...props
@@ -159,16 +168,20 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             else if (ref) ref.current = node
           }}
           className={cn(
-            'relative z-50 w-full rounded-lg bg-card shadow-xl',
+            'relative z-50 flex w-full flex-col rounded-lg bg-card shadow-xl',
+            // Hard height cap: without it, long content grows past the
+            // viewport while the body scroll-lock makes the page unscrollable
+            'max-h-[calc(100vh-2rem)]',
             'animate-in fade-in-0 zoom-in-95 duration-200',
             sizeStyles[size],
             className
           )}
           {...props}
         >
+          <PanelLayout onSubmit={onSubmit}>
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className="flex items-start justify-between gap-4 border-b p-4">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b p-4">
               <div className="space-y-1">
                 {title && (
                   <h2
@@ -199,15 +212,16 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
             </div>
           )}
 
-          {/* Body */}
-          <div className="p-4">{children}</div>
+          {/* Body — scrolls when the panel hits its height cap */}
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="flex items-center justify-end gap-2 border-t p-4">
+            <div className="flex shrink-0 items-center justify-end gap-2 border-t p-4">
               {footer}
             </div>
           )}
+          </PanelLayout>
         </div>
       </div>
     )
@@ -217,6 +231,26 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(
 )
 
 Modal.displayName = 'Modal'
+
+/**
+ * With `onSubmit` the header/body/footer are wrapped in a real `<form>`, so a
+ * `type="submit"` button in `footer` submits the fields in `children` — no
+ * `form="<id>"` attribute plumbing needed for the most common admin dialog.
+ */
+function PanelLayout({
+  onSubmit,
+  children,
+}: {
+  onSubmit?: FormEventHandler<HTMLFormElement>
+  children: ReactNode
+}) {
+  if (!onSubmit) return <>{children}</>
+  return (
+    <form onSubmit={onSubmit} className="flex min-h-0 flex-col">
+      {children}
+    </form>
+  )
+}
 
 // Convenience components
 export type ModalHeaderProps = HTMLAttributes<HTMLDivElement>

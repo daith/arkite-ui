@@ -45,6 +45,18 @@ export function createEslintConfig(options = {}) {
     ...controlComponents,
   ]
 
+  // 命名遮蔽防護:本地宣告與 core 高碰撞名同名時警告。
+  // 實證:consumer 自己宣告了 `Modal`,同檔從此 import 不到 core 的 Modal,
+  // 於是整個機制(focus trap / Esc / 捲動鎖)被重刻——lint 是唯一治得了這個的層。
+  const SHADOW_PRONE = [
+    'Modal', 'Drawer', 'Card', 'Badge', 'Button', 'Table', 'Input', 'Select',
+    'Form', 'Alert', 'Avatar', 'Tabs', 'Toast', 'Tooltip', 'Popover', 'Progress',
+    'Timeline', 'Steps', 'Calendar', 'Tree', 'Pagination', 'Sidebar', 'Navbar', 'Switch',
+  ]
+  const shadowPattern = `/^(${SHADOW_PRONE.join('|')})$/`
+  const shadowMessage =
+    'Local declaration shadows an @arkite-ui/core export of the same name — the library component becomes unimportable in this file and tends to get re-implemented. Rename it (e.g. AppModal) or import from @arkite-ui/core.'
+
   return tseslint.config(
     { ignores },
     js.configs.recommended,
@@ -75,6 +87,16 @@ export function createEslintConfig(options = {}) {
         'no-console': ['warn', { allow: ['warn', 'error'] }],
         'prefer-const': 'error',
         'no-var': 'error',
+        'no-restricted-syntax': ['warn',
+          {
+            selector: `:matches(FunctionDeclaration, ClassDeclaration)[id.name=${shadowPattern}]`,
+            message: shadowMessage,
+          },
+          {
+            selector: `VariableDeclarator[id.name=${shadowPattern}] > :matches(ArrowFunctionExpression, FunctionExpression)`,
+            message: shadowMessage,
+          },
+        ],
 
         // ── Accessibility ──
         ...jsxA11y.configs.recommended.rules,

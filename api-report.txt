@@ -789,6 +789,7 @@ type ModalProps {
   description?: ReactNode
   footer?: ReactNode
   onClose: () => void
+  onSubmit?: FormEventHandler<HTMLFormElement> | undefined
   open: boolean
   showCloseButton?: boolean | undefined
   size?: ModalSize | undefined

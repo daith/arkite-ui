@@ -130,4 +130,47 @@ describe('Modal', () => {
       screen.getByText('Dialog Description').id
     )
   })
+
+  // ark-finance feedback ①: without a height cap + scrollable body, long
+  // content grows past the viewport while body scroll is locked
+  it('caps panel height and makes the body scrollable', () => {
+    render(
+      <Modal open onClose={() => {}} title="Long">
+        <p>content</p>
+      </Modal>
+    )
+    const body = screen.getByText('content').parentElement!
+    expect(body).toHaveClass('overflow-y-auto', 'min-h-0')
+    // Without onSubmit the body's parent IS the panel
+    expect(body.parentElement!.className).toContain('max-h-[calc(100vh-2rem)]')
+  })
+
+  // ark-finance feedback ②: a submit button in `footer` must reach the form
+  // fields in `children` without form="<id>" plumbing
+  it('onSubmit wraps sections in a form; footer submit button submits it', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault())
+    render(
+      <Modal
+        open
+        onClose={() => {}}
+        title="Create"
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      >
+        <input aria-label="Name" defaultValue="x" />
+      </Modal>
+    )
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    expect(onSubmit).toHaveBeenCalledTimes(1)
+  })
+
+  it('without onSubmit no form element is rendered', () => {
+    render(
+      <Modal open onClose={() => {}} title="Plain">
+        <p>body</p>
+      </Modal>
+    )
+    expect(document.querySelector('[role="dialog"] form')).toBeNull()
+  })
 })
