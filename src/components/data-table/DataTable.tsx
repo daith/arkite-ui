@@ -133,10 +133,27 @@ export interface DataTableProps<T> {
   renderExpandedRow?: (row: T, index: number) => ReactNode
   /** Show column visibility toggle */
   columnToggle?: boolean
-  /** Stick table header to top when scrolling */
+  /** Stick table header to top when scrolling. Requires `maxHeight` (or `fillHeight`) to have any effect. */
   stickyHeader?: boolean
   /** Max height for the scrollable table area (e.g. '400px', '60vh'). Required for stickyHeader to work. */
   maxHeight?: string | number
+  /**
+   * Minimum table width (e.g. `960`, `'60rem'`) — below it the table scrolls
+   * horizontally instead of squashing columns to min-content.
+   *
+   * **Wide tables need this, and `Column.pinned` is inert without it.** With
+   * `width: 100%` + auto layout the browser shrinks columns to min-content
+   * before it overflows, so a many-column (or CJK-header) table collapses to
+   * ~30px columns and multi-line headers while never handing you a usable
+   * scroll. `Column.width` is only a hint to the layout algorithm, not a
+   * guarantee — `minWidth` is the floor that makes it stick.
+   */
+  minWidth?: string | number
+  /**
+   * Show fades at the horizontal edges while columns are hidden there.
+   * @default true when `minWidth` is set
+   */
+  scrollFade?: boolean
   /**
    * Make the table scroll wrapper fill its parent's height (`h-full`).
    * Use when the DataTable is inside a fixed-height flex container so the
@@ -249,6 +266,8 @@ export function DataTable<T>({
   columnToggle = false,
   stickyHeader = false,
   maxHeight,
+  minWidth,
+  scrollFade,
   fillHeight = false,
   sortState: controlledSortState,
   onSortChange,
@@ -656,17 +675,21 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div
-        data-testid={stickyHeader ? 'sticky-scroll-container' : undefined}
-        className={cn(
-          // 沒 fillHeight 時 sticky 自己提供 scroll container
-          stickyHeader && !fillHeight && 'overflow-auto',
-          // fillHeight 模式：middle 只當 flex 容器，scroll 交給 inner Table wrapper
-          fillHeight && 'flex-1 min-h-0',
-        )}
-        style={stickyHeader && !fillHeight && maxHeight ? { maxHeight } : undefined}
+      {/* fillHeight 模式：middle 只當 flex 容器，scroll 交給 Table 的 wrapper。
+          其他模式不需要中間層——maxHeight 直接給 Table 的 wrapper，讓「有
+          overflow 的元素」和「有高度上限的元素」是同一個，sticky thead 才
+          咬得住（兩層 overflow 嵌套會讓 sticky 完全失效）。 */}
+      <div className={cn(fillHeight && 'flex-1 min-h-0')}>
+      <Table
+        stickyHeader={stickyHeader}
+        fillHeight={fillHeight}
+        hoverable={hoverable}
+        compact={compact}
+        minWidth={minWidth}
+        maxHeight={fillHeight ? undefined : maxHeight}
+        scrollFade={scrollFade}
+        wrapperProps={stickyHeader ? { 'data-testid': 'sticky-scroll-container' } : undefined}
       >
-      <Table stickyHeader={stickyHeader} fillHeight={fillHeight} hoverable={hoverable} compact={compact}>
         <TableHeader>
           <TableRow>
             {isExpandable && (

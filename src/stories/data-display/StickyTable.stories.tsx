@@ -29,9 +29,12 @@ const rows = Array.from({ length: 30 }, (_, i) => ({
 
 export const StickyHeader: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <div className="h-[400px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Sticky header table">
-      <Table stickyHeader>
+    <div className="rounded-md border">
+      <Table
+        stickyHeader
+        maxHeight="400px"
+        wrapperProps={{ tabIndex: 0, role: 'region', 'aria-label': 'Sticky header table' }}
+      >
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
@@ -61,9 +64,11 @@ export const StickyHeader: Story = {
 
 export const StickyActionColumn: Story = {
   render: () => (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <div className="max-w-[600px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Table with sticky action column">
-      <Table>
+    <div className="max-w-[600px] rounded-md border">
+      <Table
+        minWidth={900}
+        wrapperProps={{ tabIndex: 0, role: 'region', 'aria-label': 'Table with sticky action column' }}
+      >
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
@@ -98,9 +103,17 @@ export const StickyActionColumn: Story = {
 export const StickyHeaderAndAction: Story = {
   name: 'Sticky Header + Action Column',
   render: () => (
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-    <div className="h-[400px] max-w-[600px] overflow-auto rounded-md border" tabIndex={0} role="region" aria-label="Table with sticky header and action column">
-      <Table stickyHeader>
+    <div className="max-w-[600px] rounded-md border">
+      <Table
+        stickyHeader
+        maxHeight="400px"
+        minWidth={900}
+        wrapperProps={{
+          tabIndex: 0,
+          role: 'region',
+          'aria-label': 'Table with sticky header and action column',
+        }}
+      >
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>

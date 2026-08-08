@@ -45,8 +45,8 @@ describe('Card density', () => {
       </Card>
     )
     expect(screen.getByTestId('header')).toHaveClass('p-4')
-    expect(screen.getByTestId('content')).toHaveClass('p-4', 'pt-0')
-    expect(screen.getByTestId('footer')).toHaveClass('p-4', 'pt-0')
+    expect(screen.getByTestId('content')).toHaveClass('p-4', '[&:not(:first-child)]:pt-0')
+    expect(screen.getByTestId('footer')).toHaveClass('p-4', '[&:not(:first-child)]:pt-0')
     expect(screen.getByText('Title')).toHaveClass('text-lg')
   })
 
@@ -59,8 +59,8 @@ describe('Card density', () => {
       </Card>
     )
     expect(screen.getByTestId('header')).toHaveClass('px-4', 'py-3')
-    expect(screen.getByTestId('content')).toHaveClass('px-4', 'pb-3', 'pt-0')
-    expect(screen.getByTestId('footer')).toHaveClass('px-4', 'pb-3', 'pt-0')
+    expect(screen.getByTestId('content')).toHaveClass('px-4', 'py-3', '[&:not(:first-child)]:pt-0')
+    expect(screen.getByTestId('footer')).toHaveClass('px-4', 'py-3', '[&:not(:first-child)]:pt-0')
     expect(screen.getByText('Title')).toHaveClass('text-sm')
     expect(screen.getByText('Desc')).toHaveClass('text-xs')
   })
@@ -71,7 +71,45 @@ describe('Card density', () => {
         <CardContent density="default" data-testid="content">Body</CardContent>
       </Card>
     )
-    expect(screen.getByTestId('content')).toHaveClass('p-4', 'pt-0')
+    expect(screen.getByTestId('content')).toHaveClass('p-4', '[&:not(:first-child)]:pt-0')
+  })
+})
+
+describe('Card section top padding', () => {
+  // Regression: `pt-0` used to be unconditional, so a header-less Card (the
+  // shape you get when a DataTable or a plain list is the whole card body) put
+  // the content flush against the top border while the other three sides kept
+  // their 16px inset.
+  it('keeps its own top padding when CardContent is the first child', () => {
+    render(
+      <Card>
+        <CardContent data-testid="content">Body</CardContent>
+      </Card>
+    )
+    const content = screen.getByTestId('content')
+    expect(content).toHaveClass('p-4')
+    expect(content.matches(':first-child')).toBe(true)
+  })
+
+  it('drops top padding when a CardHeader sits above it', () => {
+    render(
+      <Card>
+        <CardHeader title="Title" />
+        <CardContent data-testid="content">Body</CardContent>
+      </Card>
+    )
+    const content = screen.getByTestId('content')
+    expect(content).toHaveClass('[&:not(:first-child)]:pt-0')
+    expect(content.matches(':not(:first-child)')).toBe(true)
+  })
+
+  it('keeps its own top padding when CardFooter is the only child', () => {
+    render(
+      <Card>
+        <CardFooter data-testid="footer">Footer</CardFooter>
+      </Card>
+    )
+    expect(screen.getByTestId('footer').matches(':first-child')).toBe(true)
   })
 })
 

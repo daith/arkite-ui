@@ -45,6 +45,7 @@ export * from './components/stat'
 export * from './components/sparkline'
 export * from './components/empty-state'
 export * from './components/table'
+export * from './components/scroll-fade'
 
 // Form
 export * from './components/form'

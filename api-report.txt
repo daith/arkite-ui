@@ -434,6 +434,8 @@ type CreateThemeOptions {
   radius?: string | undefined
 }
 
+type DataAttributes = DataAttributes
+
 type DataTableProps {
   className?: string | undefined
   columnToggle?: boolean | undefined
@@ -451,6 +453,7 @@ type DataTableProps {
   isRowSelectable?: ((row: T, index: number) => boolean) | undefined
   loading?: boolean | undefined
   maxHeight?: string | number | undefined
+  minWidth?: string | number | undefined
   onFilterChange?: ((filters: Record<string, string[]>) => void) | undefined
   onPageChange?: ((page: number) => void) | undefined
   onPageSizeChange?: ((pageSize: number) => void) | undefined
@@ -463,6 +466,7 @@ type DataTableProps {
   pagination?: boolean | undefined
   renderExpandedRow?: ((row: T, index: number) => ReactNode) | undefined
   rowClassName?: string | ((row: T, index: number) => string) | undefined
+  scrollFade?: boolean | undefined
   selectable?: boolean | undefined
   selectedRows?: Set<string | number> | undefined
   sortState?: SortState | null | undefined
@@ -1007,6 +1011,12 @@ type RadioProps {
 
 type RadioSize = RadioSize
 
+type ScrollFadeProps {
+  children: ReactNode
+  className?: string | undefined
+  scrollClassName?: string | undefined
+}
+
 type SearchInputProps {
   clearable?: boolean | undefined
   debounce?: number | undefined
@@ -1299,8 +1309,13 @@ type TableProps {
   compact?: boolean | undefined
   fillHeight?: boolean | undefined
   hoverable?: boolean | undefined
+  maxHeight?: string | number | undefined
+  minWidth?: string | number | undefined
+  scrollFade?: boolean | undefined
   stickyHeader?: boolean | undefined
   variant?: "default" | "striped" | undefined
+  wrapperClassName?: string | undefined
+  wrapperProps?: (HTMLAttributes<HTMLDivElement> & DataAttributes) | undefined
 }
 
 type TableRowProps {
@@ -1678,7 +1693,7 @@ value CopyButton: React.ForwardRefExoticComponent<CopyButtonProps & React.RefAtt
 
 value CopyInput: React.ForwardRefExoticComponent<CopyInputProps & React.RefAttributes<HTMLInputElement>>
 
-value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, hoverable, onRowSelect, isRowSelectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
+value DataTable: <T>({ data, columns, pagination, compact, pageSizeOptions, defaultPageSize, getRowKey, loading, emptyContent, onRowClick, rowClassName, selectable, hoverable, onRowSelect, isRowSelectable, selectedRows, defaultSelectedRows, onSelectionChange, expandable, renderExpandedRow, columnToggle, stickyHeader, maxHeight, minWidth, scrollFade, fillHeight, sortState: controlledSortState, onSortChange, filters: controlledFilters, onFilterChange, page: controlledPage, onPageChange, onPageSizeChange, totalRows, className, }: DataTableProps<T>) => JSX.Element
 
 value DatePicker: React.ForwardRefExoticComponent<DatePickerProps & React.RefAttributes<HTMLInputElement>>
 
@@ -1839,6 +1854,8 @@ value Progress: React.ForwardRefExoticComponent<ProgressProps & React.RefAttribu
 value Radio: React.ForwardRefExoticComponent<RadioProps & React.RefAttributes<HTMLInputElement>>
 
 value RadioGroup: React.ForwardRefExoticComponent<RadioGroupProps & React.RefAttributes<HTMLDivElement>>
+
+value ScrollFade: React.ForwardRefExoticComponent<ScrollFadeProps & React.RefAttributes<HTMLDivElement>>
 
 value SearchInput: React.ForwardRefExoticComponent<SearchInputProps & React.RefAttributes<HTMLInputElement>>
 

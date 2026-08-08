@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { cn } from '../../utils/cn'
 import { useLocale } from '../../locale'
+import { ScrollFade, type DataAttributes } from '../scroll-fade/ScrollFade'
 
 // Includes HTML's deprecated `align` values so third-party renderers (e.g.
 // markdown td/th mappings) type-check — justify/char simply apply nothing.
@@ -32,7 +33,15 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   bordered?: boolean
   /** Row hover feedback @default true — pass `false` for static/print-like tables */
   hoverable?: boolean
-  /** Sticky header — stays fixed while scrolling vertically */
+  /**
+   * Sticky header — stays fixed while scrolling vertically.
+   *
+   * Needs a height limit on the scroll wrapper to do anything: pass
+   * `maxHeight` (or `fillHeight` inside a determinate-height flex chain).
+   * Wrapping the table in your own `overflow-auto` box does NOT work — that
+   * makes the wrapper the nearest scrollport, and the header sticks to a box
+   * that never scrolls vertically, so it scrolls out of view.
+   */
   stickyHeader?: boolean
   /**
    * Make the scroll wrapper fill its parent's height (`h-full`).
@@ -42,6 +51,37 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
    * `flex-1 min-h-0` inside a `flex flex-col` chain).
    */
   fillHeight?: boolean
+  /**
+   * Minimum table width (e.g. `960`, `'60rem'`). Below it the wrapper scrolls
+   * horizontally instead of squashing every column to its min-content width.
+   *
+   * **Wide tables need this.** `width: 100%` + auto layout means a table with
+   * many columns — or CJK headers, which break between characters — shrinks to
+   * min-content first: columns collapse to ~30px and headers stack vertically
+   * *before* any scrollbar appears. It is also what makes `stickyLead` /
+   * `stickyAction` (and `DataTable`'s `Column.pinned`) reachable at all —
+   * frozen columns are meaningless if the table never overflows.
+   */
+  minWidth?: string | number
+  /**
+   * Max height of the scroll wrapper (e.g. `'400px'`, `'60vh'`) — the element
+   * that owns `overflow`, which is what `stickyHeader` sticks to.
+   */
+  maxHeight?: string | number
+  /**
+   * Show fades at the horizontal edges while content is hidden there, as a
+   * "this scrolls sideways" affordance.
+   * @default true when `minWidth` is set
+   */
+  scrollFade?: boolean
+  /** Class for the scroll wrapper (the element that owns `overflow`) */
+  wrapperClassName?: string
+  /**
+   * Props for the scroll wrapper — most usefully the a11y trio that makes a
+   * scroll region keyboard-reachable: `tabIndex={0}`, `role="region"`,
+   * `aria-label`.
+   */
+  wrapperProps?: HTMLAttributes<HTMLDivElement> & DataAttributes
 }
 
 /**
@@ -51,8 +91,26 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
  * falsy values must render as `undefined` (never `"false"`).
  */
 export const Table = forwardRef<HTMLTableElement, TableProps>(
-  ({ className, variant = 'default', compact, bordered, hoverable = true, stickyHeader, fillHeight, ...props }, ref) => (
-    <div className={cn('relative w-full overflow-auto', fillHeight && 'h-full')}>
+  (
+    {
+      className,
+      variant = 'default',
+      compact,
+      bordered,
+      hoverable = true,
+      stickyHeader,
+      fillHeight,
+      minWidth,
+      maxHeight,
+      scrollFade,
+      wrapperClassName,
+      wrapperProps,
+      style,
+      ...props
+    },
+    ref
+  ) => {
+    const table = (
       <table
         ref={ref}
         className={cn(
@@ -62,14 +120,52 @@ export const Table = forwardRef<HTMLTableElement, TableProps>(
           bordered && 'border',
           className
         )}
+        style={minWidth != null ? { minWidth, ...style } : style}
         data-variant={variant}
         data-compact={compact || undefined}
         data-hoverable={hoverable || undefined}
         data-sticky-header={stickyHeader || undefined}
         {...props}
       />
-    </div>
-  )
+    )
+
+    // The wrapper is the single scroll container: it owns overflow AND the
+    // height limit, so `position: sticky` inside resolves against a scrollport
+    // that actually scrolls. Nesting another overflow box around it silently
+    // kills stickyHeader.
+    const scrollClass = cn('relative w-full', fillHeight && 'h-full', wrapperClassName)
+    const { style: wrapperStyle, ...restWrapperProps } = wrapperProps ?? {}
+    // Merged rather than spread-over, so wrapperProps.style can't drop maxHeight.
+    const scrollStyle =
+      maxHeight != null ? { maxHeight, ...wrapperStyle } : wrapperStyle
+
+    // Fades default on for wide tables (`minWidth`), which are exactly the ones
+    // whose hidden columns need advertising.
+    if (scrollFade ?? minWidth != null) {
+      return (
+        <ScrollFade
+          className={cn('w-full', fillHeight && 'h-full')}
+          scrollClassName={scrollClass}
+          style={scrollStyle}
+          data-scroll-container=""
+          {...restWrapperProps}
+        >
+          {table}
+        </ScrollFade>
+      )
+    }
+
+    return (
+      <div
+        className={cn(scrollClass, 'overflow-auto')}
+        style={scrollStyle}
+        data-scroll-container=""
+        {...restWrapperProps}
+      >
+        {table}
+      </div>
+    )
+  }
 )
 
 Table.displayName = 'Table'

@@ -1118,6 +1118,40 @@ describe('DataTable', () => {
     expect(scrollContainer.className).toContain('overflow-auto')
   })
 
+  // Regression: DataTable used to wrap Table's own `overflow-auto` wrapper in a
+  // second `overflow-auto` box that carried maxHeight. Nested scrollports make
+  // the sticky thead resolve against the inner box — which never scrolls
+  // vertically — so the header scrolled away with the rows (verified in
+  // Chromium: header offset went 0 → -300 after a 300px scroll).
+  it('keeps a single scroll container so the sticky header has something to stick to', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        stickyHeader
+        maxHeight="400px"
+        pagination={false}
+      />
+    )
+    const scrollers = container.querySelectorAll('[data-scroll-container]')
+    expect(scrollers).toHaveLength(1)
+    expect((scrollers[0] as HTMLElement).style.maxHeight).toBe('400px')
+  })
+
+  it('forwards minWidth to the table so pinned columns can engage', () => {
+    const { container } = render(
+      <DataTable
+        columns={columns}
+        data={data}
+        getRowKey={(r) => r.id}
+        minWidth={960}
+        pagination={false}
+      />
+    )
+    expect(container.querySelector('table')!.style.minWidth).toBe('960px')
+  })
+
   it('does not apply sticky styles when stickyHeader is false', () => {
     const { container } = render(
       <DataTable

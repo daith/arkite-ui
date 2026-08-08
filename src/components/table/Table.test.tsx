@@ -254,3 +254,60 @@ describe('TableFooter', () => {
     expect(screen.getByText('Total')).toBeInTheDocument()
   })
 })
+
+describe('Table scroll container', () => {
+  const body = <tbody><tr><td>Cell</td></tr></tbody>
+
+  it('renders exactly one scroll container', () => {
+    const { container } = render(<Table>{body}</Table>)
+    expect(container.querySelectorAll('[data-scroll-container]')).toHaveLength(1)
+  })
+
+  it('applies minWidth to the table itself, not the wrapper', () => {
+    const { container } = render(<Table minWidth={960}>{body}</Table>)
+    expect(container.querySelector('table')!.style.minWidth).toBe('960px')
+    expect(container.querySelector('[data-scroll-container]')!.getAttribute('style') ?? '')
+      .not.toContain('min-width')
+  })
+
+  it('accepts a CSS length for minWidth', () => {
+    const { container } = render(<Table minWidth="60rem">{body}</Table>)
+    expect(container.querySelector('table')!.style.minWidth).toBe('60rem')
+  })
+
+  // Regression: the height limit and `overflow` must sit on the SAME element.
+  // Split across two nested boxes, the thead sticks to a scrollport that never
+  // scrolls vertically and simply scrolls out of view (verified in Chromium).
+  it('puts maxHeight and overflow on the same element as the sticky scrollport', () => {
+    const { container } = render(<Table stickyHeader maxHeight="400px">{body}</Table>)
+    const scrollers = container.querySelectorAll('[data-scroll-container]')
+    expect(scrollers).toHaveLength(1)
+    const scroller = scrollers[0] as HTMLElement
+    expect(scroller.style.maxHeight).toBe('400px')
+    expect(scroller.className).toMatch(/overflow-(auto|x-auto)/)
+    expect(container.querySelector('table')).toHaveAttribute('data-sticky-header', 'true')
+  })
+
+  it('forwards wrapperProps to the scroll container for a11y', () => {
+    const { container } = render(
+      <Table wrapperProps={{ tabIndex: 0, role: 'region', 'aria-label': 'Revenue' }}>{body}</Table>
+    )
+    const scroller = container.querySelector('[data-scroll-container]')!
+    expect(scroller).toHaveAttribute('tabindex', '0')
+    expect(scroller).toHaveAttribute('role', 'region')
+    expect(scroller).toHaveAttribute('aria-label', 'Revenue')
+  })
+
+  it('opts into scroll fades with minWidth, and honours an explicit opt-out', () => {
+    const { container: withMin } = render(<Table minWidth={960}>{body}</Table>)
+    expect(withMin.querySelector('[data-scroll-container]')!.parentElement!.className)
+      .toContain('relative')
+
+    const { container: plain } = render(<Table>{body}</Table>)
+    // No fade wrapper: the scroll container is the outermost node.
+    expect(plain.firstElementChild).toHaveAttribute('data-scroll-container')
+
+    const { container: optOut } = render(<Table minWidth={960} scrollFade={false}>{body}</Table>)
+    expect(optOut.firstElementChild).toHaveAttribute('data-scroll-container')
+  })
+})

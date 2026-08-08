@@ -183,7 +183,15 @@ export const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
     return (
       <div
         ref={ref}
-        className={cn(compact ? 'px-4 pb-3 pt-0' : 'p-4 pt-0', className)}
+        className={cn(
+          // `pt-0` only when something sits above (CardHeader, another section):
+          // as the Card's first child it must keep its own top padding, or the
+          // content sits flush against the top border while the other three
+          // sides stay inset — asymmetric and immediately visible.
+          compact ? 'px-4 py-3' : 'p-4',
+          '[&:not(:first-child)]:pt-0',
+          className
+        )}
         {...props}
       />
     )
@@ -202,7 +210,10 @@ export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         ref={ref}
         className={cn(
           'flex items-center',
-          compact ? 'px-4 pb-3 pt-0' : 'p-4 pt-0',
+          // Same first-child rule as CardContent — a footer-only Card keeps its
+          // top padding instead of collapsing onto the border.
+          compact ? 'px-4 py-3' : 'p-4',
+          '[&:not(:first-child)]:pt-0',
           className
         )}
         {...props}
